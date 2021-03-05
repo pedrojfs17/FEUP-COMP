@@ -1,0 +1,160 @@
+options 
+{
+    LOOKAHEAD=2;
+}
+
+PARSER_BEGIN(JmmParser)
+
+import java.io.FileInputStream;
+import java.util.HashMap;
+
+public class JmmParser {
+
+    public static HashMap<String, Integer> var = new HashMap<String, Integer>();
+    public static void main(String[] args) throws ParseException {
+        System.out.println("Parser for a file.");
+        System.out.println("Write a file name");
+        try{
+            FileInputStream file = new FileInputStream("test/public/java/HelloWorld");
+            JmmParser parser = new JmmParser(file);
+            SimpleNode root = parser.Program();
+
+            root.dump("");
+            System.out.println("Parsed.");
+        } catch (Exception e) {
+            System.out.println("Couldn't parse file");
+            e.printStackTrace();
+        }
+
+    }
+
+}
+
+PARSER_END(JmmParser)
+
+SKIP : 
+{
+    " " | "\t" | "\n" | "\r" | <"//"(~["\r","\n"])*> | <"/*">: MLCOMMENT
+}
+
+<MLCOMMENT> SKIP :
+{
+    <"*/"> : DEFAULT
+    | <~[]>
+}
+
+TOKEN : 
+{
+    < INTEGER : (["0" - "9"])+ >
+    | <IMPORT: "import">
+    | <CLASS: "class">
+    | <PUBLIC: "public">
+    | <STATIC: "static">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <STRING: "String">
+    | <EXTENDS: "extends">
+    | <RETURN: "return">
+    | <INT: "int">
+    | <BOOLEAN: "boolean">
+    | <IF: "if">
+    | <ELSE: "else">
+    | <ELIF: <ELSE> <IF>>
+    | <WHILE: "while">
+    | <SOUT: "System.out.println">
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <THIS: "this">
+    | <NEW: "new">
+    | <LENGTH: "length">
+    | <LBRACKET: "{">
+    | <RBRACKET: "}">
+    | <LPARENTHESES: "(">
+    | <RPARENTHESES: ")">
+    | <LSQUAREBRACKET: "[">
+    | <RSQUAREBRACKET: "]">
+    | <COLON: ",">
+    | <SEMICOLON: ";">
+    | <DOT: ".">
+    | <MINUS: "-">
+    | <ADD: "+">
+    | <EQ : "=">
+    | <MULT: "*">
+    | <DIV: "/">
+    | <LESS: "<">
+    | <EXCLAMATION: "!">
+    | <AND: "&&">
+    | <LETTERS: ["a"-"z","A"-"Z"]>
+    | <IDENTIFIER: (<LETTERS>)+(<LETTERS>|<INTEGER>|"_")*>
+}
+
+SimpleNode Program(): {}
+{
+    ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
+}
+
+void ImportDeclaration(): {}
+{
+    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)*
+}
+
+void ClassDeclaration(): {}
+{
+    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>]
+    <LBRACKET>
+    (VarDeclaration())*
+    (MethodDeclaration())*
+    <RBRACKET>
+}
+
+void MethodDeclaration(): {}
+{
+    <PUBLIC> Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
+    (VarDeclaration())*
+    (Statement())*
+    <RETURN> Expression() <SEMICOLON> <RBRACKET>
+    |
+    <PUBLIC> <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
+    (VarDeclaration())*
+    (Statement())* <RBRACKET>
+}
+
+void VarDeclaration(): {}
+{
+    Type() <IDENTIFIER> <SEMICOLON>
+}
+
+void Type(): {}
+{
+    <INT> <LSQUAREBRACKET> <RSQUAREBRACKET>
+    | <BOOLEAN>
+    | <INT>
+    | <IDENTIFIER>
+}
+
+void Statement(): {}
+{
+    <LBRACKET> (Statement())* <RBRACKET>
+    | <IF> <LPARENTHESES> Expression() <RPARENTHESES> Statement() <ELSE> Statement()
+    | <WHILE> <LPARENTHESES> Expression() <RPARENTHESES> Statement()
+    | Expression() <SEMICOLON>
+    | <IDENTIFIER> <EQ> Expression() <SEMICOLON>
+    | <IDENTIFIER> <LSQUAREBRACKET> Expression() <RSQUAREBRACKET> <EQ> Expression() <SEMICOLON>
+}
+
+void Expression(): {}
+{
+    Expression() (<AND>|<LESS>|<ADD>|<MINUS>|<MULT>|<DIV>) Expression()
+    | Expression() <LSQUAREBRACKET> Expression() <RSQUAREBRACKET>
+    | Expression() <DOT> <LENGTH>
+    | Expression() <DOT> <IDENTIFIER> <LPARENTHESES> [ Expression() (<COLON> Expression())*] <RPARENTHESES>
+    // | INTEGERLITERAL ?????
+    | <TRUE>
+    | <FALSE>
+    | <IDENTIFIER>
+    | <THIS>
+    | <NEW> <INT> <LSQUAREBRACKET> Expression() <RSQUAREBRACKET>
+    | <NEW> <IDENTIFIER> <LPARENTHESES> <RPARENTHESES>
+    | <EXCLAMATION> Expression()
+    | <LPARENTHESES> Expression() <RPARENTHESES>
+}
