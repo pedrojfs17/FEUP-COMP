@@ -45,7 +45,8 @@ SKIP :
 
 TOKEN : 
 {
-    < INTEGER : (["0" - "9"])+ >
+    <INTEGERLITERAL : <INTEGER> <DOT> <INTEGER>>
+    |<INTEGER : (["0" - "9"])+ >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <PUBLIC: "public">
@@ -57,9 +58,9 @@ TOKEN :
     | <RETURN: "return">
     | <INT: "int">
     | <BOOLEAN: "boolean">
+    | <ELIF: <ELSE> <IF>>
     | <IF: "if">
     | <ELSE: "else">
-    | <ELIF: <ELSE> <IF>>
     | <WHILE: "while">
     | <SOUT: "System.out.println">
     | <TRUE: "true">
@@ -84,8 +85,7 @@ TOKEN :
     | <LESS: "<">
     | <EXCLAMATION: "!">
     | <AND: "&&">
-    | <LETTERS: ["a"-"z","A"-"Z"]>
-    | <IDENTIFIER: (<LETTERS>)+(<LETTERS>|<INTEGER>|"_")*>
+    | <IDENTIFIER: (["a"-"z","A"-"Z"])+(["a"-"z","A"-"Z"]|<INTEGER>|"_")*>
 }
 
 SimpleNode Program(): {}
