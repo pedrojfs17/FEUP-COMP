@@ -1,6 +1,6 @@
 options 
 {
-    LOOKAHEAD=2;
+    LOOKAHEAD=1;
 }
 
 PARSER_BEGIN(JmmParser)
@@ -45,8 +45,7 @@ SKIP :
 
 TOKEN : 
 {
-    <INTEGERLITERAL : <INTEGER> <DOT> <INTEGER>>
-    |<INTEGER : (["0" - "9"])+ >
+    <INTEGERLITERAL : (["+","-"])?(["0" - "9"])+ >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <PUBLIC: "public">
@@ -85,7 +84,7 @@ TOKEN :
     | <LESS: "<">
     | <EXCLAMATION: "!">
     | <AND: "&&">
-    | <IDENTIFIER: (["a"-"z","A"-"Z"])+(["a"-"z","A"-"Z"]|<INTEGER>|"_")*>
+    | <IDENTIFIER: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])*>
 }
 
 SimpleNode Program(): {}
@@ -109,52 +108,117 @@ void ClassDeclaration(): {}
 
 void MethodDeclaration(): {}
 {
-    <PUBLIC> Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
-    (VarDeclaration())*
-    (Statement())*
-    <RETURN> Expression() <SEMICOLON> <RBRACKET>
-    |
-    <PUBLIC> <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
+    <PUBLIC> (MainDeclaration() | OtherMethodDeclaration())
+}
+
+void MainDeclaration(): {}
+{
+    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
     (VarDeclaration())*
     (Statement())* <RBRACKET>
 }
 
-void VarDeclaration(): {}
+void OtherMethodDeclaration(): {}
 {
-    Type() <IDENTIFIER> <SEMICOLON>
+    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
+    (VarDeclaration())*
+    (Statement())*
+    <RETURN> ExpressionAndMin() <SEMICOLON> <RBRACKET>
 }
 
-void Type(): {}
+void VarDeclaration(): {Token t;}
 {
-    <INT> <LSQUAREBRACKET> <RSQUAREBRACKET>
-    | <BOOLEAN>
-    | <INT>
-    | <IDENTIFIER>
+    Type() t=<IDENTIFIER>#IDENTIFIER <SEMICOLON>
 }
 
-void Statement(): {}
+void Type(): {Token t;}
 {
-    <LBRACKET> (Statement())* <RBRACKET>
-    | <IF> <LPARENTHESES> Expression() <RPARENTHESES> Statement() <ELSE> Statement()
-    | <WHILE> <LPARENTHESES> Expression() <RPARENTHESES> Statement()
-    | Expression() <SEMICOLON>
-    | <IDENTIFIER> <EQ> Expression() <SEMICOLON>
-    | <IDENTIFIER> <LSQUAREBRACKET> Expression() <RSQUAREBRACKET> <EQ> Expression() <SEMICOLON>
+     (t=<INT>#INT) (<LSQUAREBRACKET> <RSQUAREBRACKET>#ARRAY)?
+    | t=<BOOLEAN>#BOOLEAN
+    | t=<IDENTIFIER>#IDENTIFIER
 }
 
-void Expression(): {}
+void Statement(): {Token t;}
 {
-    Expression() (<AND>|<LESS>|<ADD>|<MINUS>|<MULT>|<DIV>) Expression()
-    | Expression() <LSQUAREBRACKET> Expression() <RSQUAREBRACKET>
-    | Expression() <DOT> <LENGTH>
-    | Expression() <DOT> <IDENTIFIER> <LPARENTHESES> [ Expression() (<COLON> Expression())*] <RPARENTHESES>
-    // | INTEGERLITERAL ?????
-    | <TRUE>
-    | <FALSE>
-    | <IDENTIFIER>
-    | <THIS>
-    | <NEW> <INT> <LSQUAREBRACKET> Expression() <RSQUAREBRACKET>
-    | <NEW> <IDENTIFIER> <LPARENTHESES> <RPARENTHESES>
-    | <EXCLAMATION> Expression()
-    | <LPARENTHESES> Expression() <RPARENTHESES>
+    <LBRACKET> (Statement())* <RBRACKET> #BODY
+    | <IF> <LPARENTHESES> ExpressionAndMin() <RPARENTHESES> Statement() <ELSE> Statement() #IFELSE
+    | <WHILE> <LPARENTHESES> ExpressionAndMin() <RPARENTHESES> Statement() #ELSE
+    | ExpressionAndMin() <SEMICOLON> #DECLARATION
+    | <IDENTIFIER> StatementAssignment() #ASSIGNMENT
 }
+
+void StatementAssignment(): {Token t;}
+{
+     <EQ> ExpressionAndMin() <SEMICOLON> #SIMPLEASSIGNMENT
+     |  <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> <EQ> ExpressionAndMin() <SEMICOLON> #ARRAYASSIGNMENT
+}
+
+// Operations
+void ExpressionAndMin(): {Token t;}
+{
+    ExpressionAddSub()
+    (   <AND> ExpressionAddSub() #AND(2)
+    | <LESS> ExpressionAddSub() #LESS(2))?
+
+}
+
+void ExpressionAddSub(): {Token t;}
+{
+    ExpressionMultDiv()
+    (   <ADD> ExpressionMultDiv() #ADD(2)
+    | <MINUS> ExpressionMultDiv() #SUB(2))?
+}
+
+void ExpressionMultDiv(): {Token t;}
+{
+    ExpressionArray()
+    (   <MULT> ExpressionArray() #MULT(2)
+    | <DIV> ExpressionArray() #DIV(2))?
+}
+void ExpressionArray(): {Token t;}
+{
+    ExpressionDot()
+    [   <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #ARRAY
+    ]
+}
+
+void ExpressionDot(): {Token t;}
+{
+    ExpressionNew()
+   ( <DOT> #DOT(1)
+        ( <LENGTH> #LENGTH(2)
+          | <IDENTIFIER> <LPARENTHESES> [ ExpressionAndMin() (<COLON> ExpressionAndMin())*] <RPARENTHESES> #FUNCTION(2)
+        )
+    )?
+
+}
+
+void ExpressionNew(): {Token t;}
+{
+    Expression()
+    [   ( <NEW> #NEW(1)
+            ( <INTEGERLITERAL> <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #INTARRAY(2)
+              | <IDENTIFIER> <LPARENTHESES> <RPARENTHESES>#CLASS(2)
+            )
+        )
+    ]
+}
+
+void Expression(): {Token t;}
+{
+     <INTEGERLITERAL> #INT
+    | <TRUE> #TRUE
+    | <FALSE> #FALSE
+    | <IDENTIFIER> #IDENTIFIER
+    | <THIS> #THIS
+    | <EXCLAMATION> ExpressionAndMin() #EXCLAMATION
+    | <LPARENTHESES> ExpressionAndMin() <RPARENTHESES> #PARENTHESES
+}
+
+void Integer(): {Token t;}
+{
+    t=<INTEGERLITERAL>
+}
+
+void Method
+
