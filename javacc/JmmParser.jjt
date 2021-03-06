@@ -165,44 +165,31 @@ void ExpressionAndMin(): {Token t;}
 void ExpressionAddSub(): {Token t;}
 {
     ExpressionMultDiv()
-    (   <ADD> ExpressionMultDiv() #ADD(2)
-    | <MINUS> ExpressionMultDiv() #SUB(2))?
+    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB(2))*
 }
 
 void ExpressionMultDiv(): {Token t;}
 {
     ExpressionArray()
-    (   <MULT> ExpressionArray() #MULT(2)
-    | <DIV> ExpressionArray() #DIV(2))?
+    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV(2))*
 }
 void ExpressionArray(): {Token t;}
 {
     ExpressionDot()
-    [   <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #ARRAY
-    ]
+    [<LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #ARRAY]
 }
 
 void ExpressionDot(): {Token t;}
 {
-    ExpressionNew()
-   ( <DOT> #DOT(1)
-        ( <LENGTH> #LENGTH(2)
-          | <IDENTIFIER> <LPARENTHESES> [ ExpressionAndMin() (<COLON> ExpressionAndMin())*] <RPARENTHESES> #FUNCTION(2)
-        )
-    )?
-
-}
-
-void ExpressionNew(): {Token t;}
-{
     Expression()
-    [   ( <NEW> #NEW(1)
-            ( <INTEGERLITERAL> <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #INTARRAY(2)
-              | <IDENTIFIER> <LPARENTHESES> <RPARENTHESES>#CLASS(2)
-            )
+   ( <DOT> #DOT(1)
+        ( <LENGTH> #LENGTH
+          | (<IDENTIFIER> <LPARENTHESES> [ ExpressionAndMin() (<COLON> ExpressionAndMin())*] <RPARENTHESES> #FUNCTION)
         )
-    ]
+    )*
+
 }
+
 
 void Expression(): {Token t;}
 {
@@ -213,12 +200,9 @@ void Expression(): {Token t;}
     | <THIS> #THIS
     | <EXCLAMATION> ExpressionAndMin() #EXCLAMATION
     | <LPARENTHESES> ExpressionAndMin() <RPARENTHESES> #PARENTHESES
+    | <NEW> (t=<INTEGERLITERAL> <LSQUAREBRACKET> ExpressionAndMin() <RSQUAREBRACKET> #INTARRAY | (t=<IDENTIFIER> #IDENTIFIER <LPARENTHESES> <RPARENTHESES> ))
+
 }
 
-void Integer(): {Token t;}
-{
-    t=<INTEGERLITERAL>
-}
 
-void Method
 
