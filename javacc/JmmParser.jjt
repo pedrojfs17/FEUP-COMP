@@ -114,16 +114,21 @@ void MethodDeclaration(): {}
 void MainDeclaration(): {}
 {
     <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
-    (VarDeclaration())*
-    (Statement())* <RBRACKET>
+    MethodBody()
+    <RBRACKET>
 }
 
 void OtherMethodDeclaration(): {}
 {
     Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
-    (VarDeclaration())*
-    (Statement())*
+    MethodBody()
     <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET>
+}
+
+void MethodBody(): {Token t;}
+{
+    (LOOKAHEAD(2) VarDeclaration())*
+    (Statement())*
 }
 
 void VarDeclaration(): {Token t;}
@@ -141,16 +146,25 @@ void Type(): {Token t;}
 void Statement(): {Token t;}
 {
     <LBRACKET> (Statement())* <RBRACKET> #BODY
-    | <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() <ELSE> Statement() #IFELSE
-    | <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() #ELSE
-    | ExpressionAnd() <SEMICOLON> #DECLARATION
-    | <IDENTIFIER> StatementAssignment() #ASSIGNMENT
+    | ifStatement() #IFELSE
+    | whileStatement() #WHILE
+    | ExpressionAnd() [StatementAssignment()] <SEMICOLON> #ASSIGNMENT
+}
+
+void ifStatement(): {Token t;}
+{
+    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() <ELSE> Statement()
+}
+
+void whileStatement(): {Token t;}
+{
+    <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()
 }
 
 void StatementAssignment(): {Token t;}
 {
-     <EQ> ExpressionAnd() <SEMICOLON> #SIMPLEASSIGNMENT
-     |  <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> <EQ> ExpressionAnd() <SEMICOLON> #ARRAYASSIGNMENT
+     <EQ> ExpressionAnd()
+     |  <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> <EQ> ExpressionAnd()
 }
 
 // Operations
@@ -182,8 +196,15 @@ void ExpressionMultDiv(): {Token t;}
 }
 void ExpressionArray(): {Token t;}
 {
-    ExpressionDot()
+    ExpressionExc()
     [<LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY]
+}
+
+
+void ExpressionExc(): {Token t;}
+{
+    ExpressionDot()
+    | <EXCLAMATION> ExpressionAnd() #EXCLAMATION
 }
 
 void ExpressionDot(): {Token t;}
@@ -191,10 +212,19 @@ void ExpressionDot(): {Token t;}
     Expression()
    ( <DOT> #DOT(1)
         ( <LENGTH> #LENGTH
-          | (<IDENTIFIER> <LPARENTHESES> [ ExpressionAnd() (<COLON> ExpressionAnd())*] <RPARENTHESES> #FUNCTION)
+          | MethodCall() #FUNCTION
         )
     )*
+}
 
+void MethodCall(): {Token t;}
+{
+    <IDENTIFIER> <LPARENTHESES> (Params())? <RPARENTHESES>
+}
+
+void Params(): {Token t;}
+{
+    ExpressionAnd() (<COLON> ExpressionAnd())*
 }
 
 void Expression(): {Token t;}
@@ -204,7 +234,6 @@ void Expression(): {Token t;}
     | <FALSE> #FALSE
     | <IDENTIFIER> #IDENTIFIER
     | <THIS> #THIS
-    | <EXCLAMATION> ExpressionAnd() #EXCLAMATION
     | <LPARENTHESES> ExpressionAnd() <RPARENTHESES> #PARENTHESES
     | <NEW> (t=<INT> <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #INTARRAY | (t=<IDENTIFIER> #IDENTIFIER <LPARENTHESES> <RPARENTHESES> ))
 
