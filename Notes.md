@@ -4,9 +4,9 @@
 - [ ] Parser
   - [X] Solve Left Recursion
   - [ ] Choice conflicts: 
-    - VarDeclaration choice conflict (**\<IDENTIFIER>**)
-    - ExpressionAndMin() and \<IDENTIFIER> Statement() (**\<IDENTIFIER> [** )
-    - Expressions
+    - [X] VarDeclaration choice conflict (**\<IDENTIFIER>**)
+    - [X] ExpressionAndMin() and \<IDENTIFIER> Statement() (**\<IDENTIFIER> [** )
+    - [ ] Expressions
 - [ ] Error Treatment
 - [ ] Recovery Mechanism for while condition
 
