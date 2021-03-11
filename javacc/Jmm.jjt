@@ -3,20 +3,20 @@ options
     LOOKAHEAD=1;
 }
 
-PARSER_BEGIN(JmmParser)
+PARSER_BEGIN(Jmm)
 
 import java.io.FileInputStream;
 import java.util.HashMap;
 
-public class JmmParser {
+public class Jmm{
 
     public static HashMap<String, Integer> var = new HashMap<String, Integer>();
     public static void main(String[] args) throws ParseException {
         System.out.println("Parser for a file.");
         System.out.println("Write a file name");
         try{
-            FileInputStream file = new FileInputStream("test/public/java/HelloWorld");
-            JmmParser parser = new JmmParser(file);
+
+            Jmm parser = new Jmm(System.in);
             SimpleNode root = parser.Program();
 
             root.dump("");
@@ -30,7 +30,7 @@ public class JmmParser {
 
 }
 
-PARSER_END(JmmParser)
+PARSER_END(Jmm)
 
 SKIP : 
 {
@@ -92,142 +92,140 @@ SimpleNode Program(): {}
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
 
-void ImportDeclaration(): {}
+void ImportDeclaration() #void: {}
 {
-    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)*
+    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)* #IMPORT
 }
 
-void ClassDeclaration(): {}
+void ClassDeclaration() #void: {}
 {
-    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>]
+    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>] #CLASS_DECLARATION
     <LBRACKET>
     (VarDeclaration())*
     (MethodDeclaration())*
     <RBRACKET>
 }
 
-void MethodDeclaration(): {}
+void MethodDeclaration() #void: {}
 {
     <PUBLIC> (MainDeclaration() | OtherMethodDeclaration())
 }
 
-void MainDeclaration(): {}
+void MainDeclaration() #void: {}
 {
-    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
+    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET> #MAIN
     MethodBody()
     <RBRACKET>
 }
 
-void OtherMethodDeclaration(): {}
+void OtherMethodDeclaration() #void: {}
 {
-    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
+    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>  #METHOD
     MethodBody()
     <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET>
 }
 
-void MethodBody(): {Token t;}
+void MethodBody() #void: {Token t;}
 {
     (LOOKAHEAD(2) VarDeclaration())*
     (Statement())*
 }
 
-void VarDeclaration(): {Token t;}
+void VarDeclaration() #void: {Token t;}
 {
-    Type() t=<IDENTIFIER>#IDENTIFIER <SEMICOLON>
+    Type() t=<IDENTIFIER>#IDENTIFIER <SEMICOLON> #VAR_DECLARATION
 }
 
-void Type(): {Token t;}
+void Type() #void: {Token t;}
 {
-     (t=<INT>#INT) (<LSQUAREBRACKET> <RSQUAREBRACKET>#ARRAY)?
+     t=<INT> [<LSQUAREBRACKET> <RSQUAREBRACKET>#INTARRAY]
     | t=<BOOLEAN>#BOOLEAN
     | t=<IDENTIFIER>#IDENTIFIER
 }
 
-void Statement(): {Token t;}
+void Statement() #void: {Token t;}
 {
     <LBRACKET> (Statement())* <RBRACKET> #BODY
     | ifStatement() #IFELSE
     | whileStatement() #WHILE
-    | ExpressionAnd() [StatementAssignment()] <SEMICOLON> #ASSIGNMENT
+    | ExpressionAnd() #STATEMENT [ <EQ> ExpressionAnd() #ASSIGNMENT] <SEMICOLON>
 }
 
-void ifStatement(): {Token t;}
+void ifStatement() #void: {Token t;}
 {
     <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() <ELSE> Statement()
 }
 
-void whileStatement(): {Token t;}
+void whileStatement() #void: {Token t;}
 {
     <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()
 }
 
-void StatementAssignment(): {Token t;}
-{
-     <EQ> ExpressionAnd()
-     |  <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> <EQ> ExpressionAnd()
-}
-
 // Operations
 
-void ExpressionAnd(): {Token t;}
+void ExpressionAnd() #void: {Token t;}
 {
     ExpressionLess()
-    (<AND> ExpressionLess() #AND(2))*
+    (<AND> ExpressionLess() #AND)*
 
 }
 
-void ExpressionLess(): {Token t;}
+void ExpressionLess() #void: {Token t;}
 {
     ExpressionAddSub()
-    (<LESS> ExpressionAddSub() #LESS(2))*
+    (<LESS> ExpressionAddSub() #LESS)*
 
 }
 
-void ExpressionAddSub(): {Token t;}
+void ExpressionAddSub() #void: {Token t;}
 {
     ExpressionMultDiv()
-    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB(2))*
+    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB)*
 }
 
-void ExpressionMultDiv(): {Token t;}
+void ExpressionMultDiv() #void: {Token t;}
 {
     ExpressionArray()
-    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV(2))*
+    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV)*
 }
-void ExpressionArray(): {Token t;}
+void ExpressionArray() #void: {Token t;}
 {
     ExpressionExc()
-    [<LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY]
+    [Array()]
 }
 
+void Array() #void: {Token t;}
+{
+    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY
+}
 
-void ExpressionExc(): {Token t;}
+void ExpressionExc() #void: {Token t;}
 {
     ExpressionDot()
-    | <EXCLAMATION> ExpressionAnd() #EXCLAMATION
+    | (<EXCLAMATION> ExpressionExc() #EXCLAMATION)
 }
 
-void ExpressionDot(): {Token t;}
+void ExpressionDot() #void: {Token t;}
 {
     Expression()
-   ( <DOT> #DOT(1)
+   ( <DOT>
         ( <LENGTH> #LENGTH
-          | MethodCall() #FUNCTION
+          | MethodCall() #METHOD_CALL
         )
     )*
 }
 
-void MethodCall(): {Token t;}
+void MethodCall() #void: {Token t;}
 {
-    <IDENTIFIER> <LPARENTHESES> (Params())? <RPARENTHESES>
+    <IDENTIFIER> <LPARENTHESES> [Params()] <RPARENTHESES>
 }
 
-void Params(): {Token t;}
+void Params() #void: {Token t;}
 {
     ExpressionAnd() (<COLON> ExpressionAnd())*
 }
 
-void Expression(): {Token t;}
+void Expression() #void: {Token t;}
 {
      <INTEGERLITERAL> #INT
     | <TRUE> #TRUE
@@ -235,7 +233,7 @@ void Expression(): {Token t;}
     | <IDENTIFIER> #IDENTIFIER
     | <THIS> #THIS
     | <LPARENTHESES> ExpressionAnd() <RPARENTHESES> #PARENTHESES
-    | <NEW> (t=<INT> <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #INTARRAY | (t=<IDENTIFIER> #IDENTIFIER <LPARENTHESES> <RPARENTHESES> ))
+    | <NEW> (t=<INT> <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #INTARRAY | t=<IDENTIFIER>  <LPARENTHESES> <RPARENTHESES> #OBJECT)
 
 }
 

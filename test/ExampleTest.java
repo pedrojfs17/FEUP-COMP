@@ -10,10 +10,15 @@ import pt.up.fe.comp.TestUtils;
 
 public class ExampleTest {
 
-
     @Test
-    public void testExpression() {		
-		assertEquals("Expression", TestUtils.parse("2+3\n").getRootNode().getKind());		
+    public void testExpression() {
+        String test = "import ioPlus;\n" +
+                "class HelloWorld {\n" +
+                "\tpublic static void main(String[] args) {\n" +
+                "\t\tioPlus.printHelloWorld();\n" +
+                "\t}\n" +
+                "}";
+		assertEquals("Program", TestUtils.parse(test).getRootNode().getKind());
 	}
 
 }
