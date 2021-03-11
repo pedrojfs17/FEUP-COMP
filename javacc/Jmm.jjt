@@ -92,14 +92,14 @@ SimpleNode Program(): {}
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
 
-void ImportDeclaration() #void: {}
+void ImportDeclaration() #IMPORT: {}
 {
-    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)* #IMPORT
+    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)*
 }
 
-void ClassDeclaration() #void: {}
+void ClassDeclaration() #CLASS_DECLARATION: {}
 {
-    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER>] #CLASS_DECLARATION
+    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER> #EXTENDS(1)]
     <LBRACKET>
     (VarDeclaration())*
     (MethodDeclaration())*
@@ -111,16 +111,16 @@ void MethodDeclaration() #void: {}
     <PUBLIC> (MainDeclaration() | OtherMethodDeclaration())
 }
 
-void MainDeclaration() #void: {}
+void MainDeclaration() #MAIN: {}
 {
-    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET> #MAIN
+    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
     MethodBody()
     <RBRACKET>
 }
 
-void OtherMethodDeclaration() #void: {}
+void OtherMethodDeclaration() #METHOD: {}
 {
-    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>  #METHOD
+    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
     MethodBody()
     <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET>
 }
@@ -131,9 +131,9 @@ void MethodBody() #void: {Token t;}
     (Statement())*
 }
 
-void VarDeclaration() #void: {Token t;}
+void VarDeclaration() #VAR_DECLARATION: {Token t;}
 {
-    Type() t=<IDENTIFIER>#IDENTIFIER <SEMICOLON> #VAR_DECLARATION
+    Type() t=<IDENTIFIER> #VAR <SEMICOLON>
 }
 
 void Type() #void: {Token t;}
@@ -146,17 +146,17 @@ void Type() #void: {Token t;}
 void Statement() #void: {Token t;}
 {
     <LBRACKET> (Statement())* <RBRACKET> #BODY
-    | ifStatement() #IFELSE
-    | whileStatement() #WHILE
+    | ifStatement()
+    | whileStatement()
     | ExpressionAnd() #STATEMENT [ <EQ> ExpressionAnd() #ASSIGNMENT] <SEMICOLON>
 }
 
-void ifStatement() #void: {Token t;}
+void ifStatement() #IFELSE: {Token t;}
 {
     <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() <ELSE> Statement()
 }
 
-void whileStatement() #void: {Token t;}
+void whileStatement() #WHILE: {Token t;}
 {
     <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()
 }
@@ -166,27 +166,27 @@ void whileStatement() #void: {Token t;}
 void ExpressionAnd() #void: {Token t;}
 {
     ExpressionLess()
-    (<AND> ExpressionLess() #AND)*
+    (<AND> ExpressionLess() #AND(2))*
 
 }
 
 void ExpressionLess() #void: {Token t;}
 {
     ExpressionAddSub()
-    (<LESS> ExpressionAddSub() #LESS)*
+    (<LESS> ExpressionAddSub() #LESS(2))*
 
 }
 
 void ExpressionAddSub() #void: {Token t;}
 {
     ExpressionMultDiv()
-    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB)*
+    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB(2))*
 }
 
 void ExpressionMultDiv() #void: {Token t;}
 {
     ExpressionArray()
-    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV)*
+    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV(2))*
 }
 void ExpressionArray() #void: {Token t;}
 {
@@ -196,7 +196,7 @@ void ExpressionArray() #void: {Token t;}
 
 void Array() #void: {Token t;}
 {
-    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY
+    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY(2)
 }
 
 void ExpressionExc() #void: {Token t;}
@@ -212,6 +212,7 @@ void ExpressionDot() #void: {Token t;}
         ( <LENGTH> #LENGTH
           | MethodCall() #METHOD_CALL
         )
+        #OBJECT_METHOD(2)
     )*
 }
 
