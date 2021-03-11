@@ -158,7 +158,17 @@ void ifStatement() #void: {Token t;}
 
 void whileStatement() #void: {Token t;}
 {
-    <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()
+    try {
+        <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
+    } catch (ParseException e) {
+         error_skipto(LBRACKET);
+    }
+
+    try {
+        Statement()
+    } catch(ParseException e) {
+         error_skipto(RBRACKET);
+    }
 }
 
 // Operations
@@ -237,5 +247,12 @@ void Expression() #void: {Token t;}
 
 }
 
-
-
+JAVACODE
+void error_skipto(int kind) {
+  ParseException e = generateParseException();  // generate the exception object.
+  System.out.println(e.toString());  // print the error message
+  Token t;
+  do {
+    t = getNextToken();
+  } while (t.kind != kind);
+}
