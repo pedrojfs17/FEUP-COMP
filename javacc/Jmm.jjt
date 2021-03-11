@@ -45,7 +45,7 @@ SKIP :
 
 TOKEN : 
 {
-    <INTEGERLITERAL : (["+","-"])?(["0" - "9"])+ >
+    <INTEGERLITERAL : (["0" - "9"])+ >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <PUBLIC: "public">
@@ -84,7 +84,7 @@ TOKEN :
     | <LESS: "<">
     | <EXCLAMATION: "!">
     | <AND: "&&">
-    | <IDENTIFIER: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])*>
+    | <IDENTIFIER: ["a"-"z","A"-"Z","_"](["a"-"z","A"-"Z","0"-"9","_"])*>
 }
 
 SimpleNode Program(): {}
