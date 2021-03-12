@@ -84,7 +84,7 @@ TOKEN :
     | <LESS: "<">
     | <EXCLAMATION: "!">
     | <AND: "&&">
-    | <IDENTIFIER: ["a"-"z","A"-"Z","_"](["a"-"z","A"-"Z","0"-"9","_"])*>
+    | <IDENTIFIER: ["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*>
 }
 
 SimpleNode Program(): {}
