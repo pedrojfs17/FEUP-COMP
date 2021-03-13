@@ -16,6 +16,7 @@ class SimpleNode implements Node, JmmNode {
   protected int id;
   protected Object value;
   protected Jmm parser;
+  protected String name = null;
 
     // added
     public int val;
@@ -102,7 +103,7 @@ class SimpleNode implements Node, JmmNode {
      you need to do. */
 
   public String toString() {
-    return JmmTreeConstants.jjtNodeName[id];
+    return name!=null ? JmmTreeConstants.jjtNodeName[id] + " [" + name + "]" : JmmTreeConstants.jjtNodeName[id];
   }
   public String toString(String prefix) { return prefix + toString(); }
 

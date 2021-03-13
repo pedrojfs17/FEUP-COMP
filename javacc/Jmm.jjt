@@ -92,14 +92,14 @@ SimpleNode Program(): {}
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
 
-void ImportDeclaration() #IMPORT: {}
+void ImportDeclaration() #void: {}
 {
-    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON>)*
+    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON> #IMPORT)*
 }
 
-void ClassDeclaration() #CLASS_DECLARATION: {}
+void ClassDeclaration() #CLASS_DECLARATION: {Token t,t1;}
 {
-    <CLASS> <IDENTIFIER> [<EXTENDS> <IDENTIFIER> #EXTENDS(1)]
+    <CLASS> t=<IDENTIFIER> {jjtThis.name = t.image;} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.name = t1.image;} #EXTENDS]
     <LBRACKET>
     (VarDeclaration())*
     (MethodDeclaration())*
@@ -118,14 +118,19 @@ void MainDeclaration() #MAIN: {}
     <RBRACKET>
 }
 
-void OtherMethodDeclaration() #METHOD: {}
+void OtherMethodDeclaration() #METHOD_DECLARATION: {Token t;}
 {
-    Type() <IDENTIFIER> <LPARENTHESES> [Type() <IDENTIFIER> (<COLON> Type() <IDENTIFIER> )*] <RPARENTHESES> <LBRACKET>
+    Type() #METHOD_TYPE t=<IDENTIFIER> {jjtThis.name = t.image;}<LPARENTHESES> [ ParameterDeclaration() (<COLON> ParameterDeclaration())* ] #PARAMETERS <RPARENTHESES> <LBRACKET>
     MethodBody()
-    <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET>
+    <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET> #RETURN(1)
 }
 
-void MethodBody() #void: {Token t;}
+void ParameterDeclaration() #PARAMETER: {Token t;}
+{
+    Type() t=<IDENTIFIER>{jjtThis.name = t.image;}
+}
+
+void MethodBody() #METHOD_BODY: {Token t;}
 {
     (LOOKAHEAD(2) VarDeclaration())*
     (Statement())*
@@ -133,27 +138,28 @@ void MethodBody() #void: {Token t;}
 
 void VarDeclaration() #VAR_DECLARATION: {Token t;}
 {
-    Type() t=<IDENTIFIER> #VAR <SEMICOLON>
+    Type() t=<IDENTIFIER>{jjtThis.name = t.image;} <SEMICOLON>
 }
 
 void Type() #void: {Token t;}
 {
-     t=<INT> [<LSQUAREBRACKET> <RSQUAREBRACKET>#INTARRAY]
+     t=<INT> #INT [<LSQUAREBRACKET> <RSQUAREBRACKET>#ARRAY]
     | t=<BOOLEAN>#BOOLEAN
-    | t=<IDENTIFIER>#IDENTIFIER
+    | t=<IDENTIFIER> {jjtThis.name = t.image;}#IDENTIFIER
 }
 
 void Statement() #void: {Token t;}
 {
-    <LBRACKET> (Statement())* <RBRACKET> #BODY
+    <LBRACKET> (Statement())* <RBRACKET>
     | ifStatement()
     | whileStatement()
-    | ExpressionAnd() #STATEMENT [ <EQ> ExpressionAnd() #ASSIGNMENT] <SEMICOLON>
+    | ExpressionAnd() [ <EQ> ExpressionAnd() #ASSIGNMENT(2)] <SEMICOLON>
 }
 
-void ifStatement() #IFELSE: {Token t;}
+void ifStatement() #void: {Token t;}
 {
-    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() <ELSE> Statement()
+    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() #IF(2)
+    <ELSE> Statement() #ELSE
 }
 
 void whileStatement() #WHILE: {Token t;}
@@ -190,29 +196,29 @@ void ExpressionLess() #void: {Token t;}
 void ExpressionAddSub() #void: {Token t;}
 {
     ExpressionMultDiv()
-    (   (<ADD>|<MINUS>) ExpressionMultDiv() #ADDSUB(2))*
+    (   (t=<ADD>|t=<MINUS>) ExpressionMultDiv() {jjtThis.name = t.image;}#ADDSUB(2))*
 }
 
 void ExpressionMultDiv() #void: {Token t;}
 {
     ExpressionArray()
-    (  (<MULT>|<DIV>) ExpressionArray() #MULTDIV(2))*
+    (  (t=<MULT>|t=<DIV>) ExpressionArray() {jjtThis.name = t.image;}#MULTDIV(2))*
 }
 void ExpressionArray() #void: {Token t;}
 {
     ExpressionExc()
-    [Array()]
+    [Array() #ARRAY(2)]
 }
 
 void Array() #void: {Token t;}
 {
-    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #ARRAY(2)
+    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET>
 }
 
 void ExpressionExc() #void: {Token t;}
 {
     ExpressionDot()
-    | (<EXCLAMATION> ExpressionExc() #EXCLAMATION)
+    | (<EXCLAMATION> ExpressionExc() #EXCLAMATION(1))
 }
 
 void ExpressionDot() #void: {Token t;}
@@ -220,31 +226,31 @@ void ExpressionDot() #void: {Token t;}
     Expression()
    ( <DOT>
         ( <LENGTH> #LENGTH
-          | MethodCall() #METHOD_CALL
+          | MethodCall()
         )
         #OBJECT_METHOD(2)
     )*
 }
 
-void MethodCall() #void: {Token t;}
+void MethodCall() #METHOD_CALL: {Token t;}
 {
-    <IDENTIFIER> <LPARENTHESES> [Params()] <RPARENTHESES>
+    t=<IDENTIFIER>{jjtThis.name = t.image;} <LPARENTHESES> [Params()] <RPARENTHESES>
 }
 
-void Params() #void: {Token t;}
+void Params() #PARAMS: {Token t;}
 {
     ExpressionAnd() (<COLON> ExpressionAnd())*
 }
 
 void Expression() #void: {Token t;}
 {
-     <INTEGERLITERAL> #INT
+     t=<INTEGERLITERAL>{jjtThis.name = t.image;} #INT
     | <TRUE> #TRUE
     | <FALSE> #FALSE
-    | <IDENTIFIER> #IDENTIFIER
+    | t=<IDENTIFIER>{jjtThis.name = t.image;} #IDENTIFIER
     | <THIS> #THIS
-    | <LPARENTHESES> ExpressionAnd() <RPARENTHESES> #PARENTHESES
-    | <NEW> (t=<INT> <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET> #INTARRAY | t=<IDENTIFIER>  <LPARENTHESES> <RPARENTHESES> #OBJECT)
+    | <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
+    | <NEW> (t=<INT> Array()#ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES>{jjtThis.name = t.image;} #OBJECT) #NEW(1)
 
 }
 
@@ -256,4 +262,5 @@ void error_skipto(int kind) {
   do {
     t = getNextToken();
   } while (t.kind != kind);
+  //throw e;
 }
