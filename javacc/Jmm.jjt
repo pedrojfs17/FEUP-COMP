@@ -45,7 +45,7 @@ SKIP :
 
 TOKEN : 
 {
-    <INTEGERLITERAL : (["+","-"])?(["0" - "9"])+ >
+    <INTEGERLITERAL : (["0" - "9"])+ >
     | <IMPORT: "import">
     | <CLASS: "class">
     | <PUBLIC: "public">
@@ -84,7 +84,7 @@ TOKEN :
     | <LESS: "<">
     | <EXCLAMATION: "!">
     | <AND: "&&">
-    | <IDENTIFIER: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])*>
+    | <IDENTIFIER: ["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*>
 }
 
 SimpleNode Program(): {}
@@ -158,7 +158,17 @@ void ifStatement() #IFELSE: {Token t;}
 
 void whileStatement() #WHILE: {Token t;}
 {
-    <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()
+    try {
+        <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
+    } catch (ParseException e) {
+         error_skipto(LBRACKET);
+    }
+
+    try {
+        Statement()
+    } catch(ParseException e) {
+         error_skipto(RBRACKET);
+    }
 }
 
 // Operations
@@ -238,5 +248,12 @@ void Expression() #void: {Token t;}
 
 }
 
-
-
+JAVACODE
+void error_skipto(int kind) {
+  ParseException e = generateParseException();  // generate the exception object.
+  System.out.println(e.toString());  // print the error message
+  Token t;
+  do {
+    t = getNextToken();
+  } while (t.kind != kind);
+}
