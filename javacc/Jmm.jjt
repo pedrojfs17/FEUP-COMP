@@ -92,9 +92,14 @@ SimpleNode Program(): {}
     ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
 }
 
-void ImportDeclaration() #void: {}
+void ImportDeclaration() #IMPORT: {Token t,t1;}
 {
-    (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER> )* <SEMICOLON> #IMPORT)*
+    (<IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.name = t.image;})*
+}
+
+void SubImport() #SUB_IMPORT: {Token t;}
+{
+    <DOT> t=<IDENTIFIER> {jjtThis.name = t.image;} [SubImport() ]
 }
 
 void ClassDeclaration() #CLASS_DECLARATION: {Token t,t1;}
@@ -120,7 +125,7 @@ void MainDeclaration() #MAIN: {}
 
 void OtherMethodDeclaration() #METHOD_DECLARATION: {Token t;}
 {
-    Type() #METHOD_TYPE t=<IDENTIFIER> {jjtThis.name = t.image;}<LPARENTHESES> [ ParameterDeclaration() (<COLON> ParameterDeclaration())* ] #PARAMETERS <RPARENTHESES> <LBRACKET>
+    Type() #METHOD_TYPE t=<IDENTIFIER> {jjtThis.name = t.image;}<LPARENTHESES> [ (ParameterDeclaration() (<COLON> ParameterDeclaration())*) #PARAMETERS ]  <RPARENTHESES> <LBRACKET>
     MethodBody()
     <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET> #RETURN(1)
 }
