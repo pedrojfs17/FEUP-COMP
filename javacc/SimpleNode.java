@@ -6,6 +6,7 @@ import java.lang.RuntimeException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 
 public
@@ -16,9 +17,11 @@ class SimpleNode implements Node, JmmNode {
   protected int id;
   protected Object value;
   protected Jmm parser;
-  protected String name = null;
+
 
     // added
+    protected String name = null;
+    protected HashMap<String,String> attrs = new HashMap<>();
     public int val;
     public Operator op = null;
 
@@ -37,19 +40,26 @@ class SimpleNode implements Node, JmmNode {
   }
   
   public List<String> getAttributes() {
-	throw new RuntimeException("Not implemented yet");
+	return new ArrayList<>(this.attrs.keySet());
   }
 
   public void put(String attribute, String value) {
-	throw new RuntimeException("Not implemented yet");	  
+	this.attrs.put(attribute,value);
   }
 
   public String get(String attribute) {
-	throw new RuntimeException("Not implemented yet");
+	return this.attrs.get(attribute);
   }
-  
+
   public List<JmmNode> getChildren() {
-    return (children == null) ? new ArrayList<>() : Arrays.asList((JmmNode[])children);
+    if (children == null) {
+      return new ArrayList<>();
+    }
+    List<JmmNode> nodes = new ArrayList<>();
+    for (Node node : this.children) {
+      nodes.add((JmmNode) node);
+    }
+    return nodes;
   }
   
   public int getNumChildren() {
@@ -125,6 +135,8 @@ class SimpleNode implements Node, JmmNode {
   public int getId() {
     return id;
   }
+
+
 }
 
 /* JavaCC - OriginalChecksum=d33fdb2b8063d5de3474649324d5d160 (do not edit this line) */

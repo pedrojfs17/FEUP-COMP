@@ -94,17 +94,17 @@ SimpleNode Program(): {}
 
 void ImportDeclaration() #IMPORT: {Token t,t1;}
 {
-    (<IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.name = t.image;})*
+    (<IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.put("value",t.image);})*
 }
 
 void SubImport() #SUB_IMPORT: {Token t;}
 {
-    <DOT> t=<IDENTIFIER> {jjtThis.name = t.image;} [SubImport() ]
+    <DOT> t=<IDENTIFIER> {jjtThis.put("value",t.image);} [SubImport() ]
 }
 
 void ClassDeclaration() #CLASS_DECLARATION: {Token t,t1;}
 {
-    <CLASS> t=<IDENTIFIER> {jjtThis.name = t.image;} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.name = t1.image;} #EXTENDS]
+    <CLASS> t=<IDENTIFIER> {jjtThis.put("value",t.image);} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.put("value",t1.image);} #EXTENDS]
     <LBRACKET>
     (VarDeclaration())*
     (MethodDeclaration())*
@@ -125,14 +125,14 @@ void MainDeclaration() #MAIN: {}
 
 void OtherMethodDeclaration() #METHOD_DECLARATION: {Token t;}
 {
-    Type() #METHOD_TYPE t=<IDENTIFIER> {jjtThis.name = t.image;}<LPARENTHESES> [ (ParameterDeclaration() (<COLON> ParameterDeclaration())*) #PARAMETERS ]  <RPARENTHESES> <LBRACKET>
+    Type() #METHOD_TYPE t=<IDENTIFIER> {jjtThis.put("value",t.image);}<LPARENTHESES> [ (ParameterDeclaration() (<COLON> ParameterDeclaration())*) #PARAMETERS ]  <RPARENTHESES> <LBRACKET>
     MethodBody()
     <RETURN> ExpressionAnd() <SEMICOLON> <RBRACKET> #RETURN(1)
 }
 
 void ParameterDeclaration() #PARAMETER: {Token t;}
 {
-    Type() t=<IDENTIFIER>{jjtThis.name = t.image;}
+    Type() t=<IDENTIFIER>{jjtThis.put("value",t.image);}
 }
 
 void MethodBody() #METHOD_BODY: {Token t;}
@@ -143,14 +143,14 @@ void MethodBody() #METHOD_BODY: {Token t;}
 
 void VarDeclaration() #VAR_DECLARATION: {Token t;}
 {
-    Type() t=<IDENTIFIER>{jjtThis.name = t.image;} <SEMICOLON>
+    Type() t=<IDENTIFIER>{jjtThis.put("value",t.image);} <SEMICOLON>
 }
 
 void Type() #void: {Token t;}
 {
      t=<INT> #INT [<LSQUAREBRACKET> <RSQUAREBRACKET>#ARRAY]
     | t=<BOOLEAN>#BOOLEAN
-    | t=<IDENTIFIER> {jjtThis.name = t.image;}#IDENTIFIER
+    | t=<IDENTIFIER> {jjtThis.put("value",t.image);}#IDENTIFIER
 }
 
 void Statement() #void: {Token t;}
@@ -201,13 +201,13 @@ void ExpressionLess() #void: {Token t;}
 void ExpressionAddSub() #void: {Token t;}
 {
     ExpressionMultDiv()
-    (   (t=<ADD>|t=<MINUS>) ExpressionMultDiv() {jjtThis.name = t.image;}#ADDSUB(2))*
+    (   (t=<ADD>|t=<MINUS>) ExpressionMultDiv() {jjtThis.put("value",t.image);}#ADDSUB(2))*
 }
 
 void ExpressionMultDiv() #void: {Token t;}
 {
     ExpressionArray()
-    (  (t=<MULT>|t=<DIV>) ExpressionArray() {jjtThis.name = t.image;}#MULTDIV(2))*
+    (  (t=<MULT>|t=<DIV>) ExpressionArray() {jjtThis.put("value",t.image);}#MULTDIV(2))*
 }
 void ExpressionArray() #void: {Token t;}
 {
@@ -239,7 +239,7 @@ void ExpressionDot() #void: {Token t;}
 
 void MethodCall() #METHOD_CALL: {Token t;}
 {
-    t=<IDENTIFIER>{jjtThis.name = t.image;} <LPARENTHESES> [Params()] <RPARENTHESES>
+    t=<IDENTIFIER>{jjtThis.put("value",t.image);} <LPARENTHESES> [Params()] <RPARENTHESES>
 }
 
 void Params() #PARAMS: {Token t;}
@@ -249,13 +249,13 @@ void Params() #PARAMS: {Token t;}
 
 void Expression() #void: {Token t;}
 {
-     t=<INTEGERLITERAL>{jjtThis.name = t.image;} #INT
+     t=<INTEGERLITERAL>{jjtThis.put("value",t.image);} #INT
     | <TRUE> #TRUE
     | <FALSE> #FALSE
-    | t=<IDENTIFIER>{jjtThis.name = t.image;} #IDENTIFIER
+    | t=<IDENTIFIER>{jjtThis.put("value",t.image);} #IDENTIFIER
     | <THIS> #THIS
     | <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
-    | <NEW> (t=<INT> Array()#ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES>{jjtThis.name = t.image;} #OBJECT) #NEW(1)
+    | <NEW> (t=<INT> Array()#ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES>{jjtThis.put("value",t.image);} #OBJECT) #NEW(1)
 
 }
 

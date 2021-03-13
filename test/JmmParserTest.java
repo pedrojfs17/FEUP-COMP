@@ -42,6 +42,8 @@ public class JmmParserTest {
     @Test
     public void testJmmParserChecker() throws IOException {
         System.out.println("File is : " + fileName);
+        System.out.println(jmmParserChecker.getRoot(fileName).toJson());
         assertEquals(expectedResult, jmmParserChecker.parse(fileName));
     }
+
 }
