@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class Jmm{
 
     public static HashMap<String, Integer> var = new HashMap<String, Integer>();
+    public static int par_count=0;
     public static void main(String[] args) throws ParseException {
         System.out.println("Parser for a file.");
         System.out.println("Write a file name");
@@ -29,6 +30,8 @@ public class Jmm{
     }
 
 }
+
+
 
 PARSER_END(Jmm)
 
@@ -155,7 +158,7 @@ void Type() #void: {Token t;}
 
 void Statement() #void: {Token t;}
 {
-    <LBRACKET> (Statement())* <RBRACKET>
+    <LBRACKET>{System.out.println("MANA MNHA BILOTI");} (Statement())* <RBRACKET>
     | ifStatement()
     | whileStatement()
     | ExpressionAnd() [ <EQ> ExpressionAnd() #ASSIGNMENT(2)] <SEMICOLON>
@@ -170,23 +173,24 @@ void ifStatement() #void: {Token t;}
 void whileStatement() #WHILE: {Token t;}
 {
     try {
-        <WHILE> <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
+        <WHILE> <LPARENTHESES>{par_count++;} ExpressionAnd() <RPARENTHESES>{par_count--;}
     } catch (ParseException e) {
-         error_skipto(LBRACKET);
+        while(par_count>0) {
+         System.out.println(par_count);
+         error_skipto(RPARENTHESES);
+         par_count--;
+        }
+        System.out.println("TRIM TRIM");
     }
 
-    try {
-        Statement()
-    } catch(ParseException e) {
-         error_skipto(RBRACKET);
-    }
+    Statement()
 }
 
 // Operations
 
 void ExpressionAnd() #void: {Token t;}
 {
-    ExpressionLess()
+    ExpressionLess(){System.out.println("MAMA NHA BIROTI");}
     (<AND> ExpressionLess() #AND(2))*
 
 }
@@ -254,18 +258,21 @@ void Expression() #void: {Token t;}
     | <FALSE> #FALSE
     | t=<IDENTIFIER>{jjtThis.put("value",t.image);} #IDENTIFIER
     | <THIS> #THIS
-    | <LPARENTHESES> ExpressionAnd() <RPARENTHESES>
+    | <LPARENTHESES>{par_count++; System.out.println("NHO");} ExpressionAnd() <RPARENTHESES>{par_count--;}
     | <NEW> (t=<INT> Array()#ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES>{jjtThis.put("value",t.image);} #OBJECT) #NEW(1)
 
 }
 
 JAVACODE
 void error_skipto(int kind) {
+ System.out.println("bobobobob ");
   ParseException e = generateParseException();  // generate the exception object.
   System.out.println(e.toString());  // print the error message
   Token t;
   do {
     t = getNextToken();
-  } while (t.kind != kind);
+    System.out.println("Found "+t.kind);
+  } while (t.kind != kind && t.kind!=0);
   //throw e;
+
 }
