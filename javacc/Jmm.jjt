@@ -158,7 +158,7 @@ void Type() #void: {Token t;}
 
 void Statement() #void: {Token t;}
 {
-    <LBRACKET>{System.out.println("MANA MNHA BILOTI");} (Statement())* <RBRACKET>
+    <LBRACKET> (Statement())* <RBRACKET>
     | ifStatement()
     | whileStatement()
     | ExpressionAnd() [ <EQ> ExpressionAnd() #ASSIGNMENT(2)] <SEMICOLON>
@@ -173,14 +173,14 @@ void ifStatement() #void: {Token t;}
 void whileStatement() #WHILE: {Token t;}
 {
     try {
-        <WHILE> <LPARENTHESES>{par_count++;} ExpressionAnd() <RPARENTHESES>{par_count--;}
+        <WHILE> <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
     } catch (ParseException e) {
+        boolean exception = true;
         while(par_count>0) {
-         System.out.println(par_count);
-         error_skipto(RPARENTHESES);
-         par_count--;
+             error_skipto(RPARENTHESES, exception);
+             par_count--;
+             exception = false;
         }
-        System.out.println("TRIM TRIM");
     }
 
     Statement()
@@ -190,7 +190,7 @@ void whileStatement() #WHILE: {Token t;}
 
 void ExpressionAnd() #void: {Token t;}
 {
-    ExpressionLess(){System.out.println("MAMA NHA BIROTI");}
+    ExpressionLess()
     (<AND> ExpressionLess() #AND(2))*
 
 }
@@ -258,21 +258,20 @@ void Expression() #void: {Token t;}
     | <FALSE> #FALSE
     | t=<IDENTIFIER>{jjtThis.put("value",t.image);} #IDENTIFIER
     | <THIS> #THIS
-    | <LPARENTHESES>{par_count++; System.out.println("NHO");} ExpressionAnd() <RPARENTHESES>{par_count--;}
+    | <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
     | <NEW> (t=<INT> Array()#ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES>{jjtThis.put("value",t.image);} #OBJECT) #NEW(1)
 
 }
 
 JAVACODE
-void error_skipto(int kind) {
- System.out.println("bobobobob ");
-  ParseException e = generateParseException();  // generate the exception object.
-  System.out.println(e.toString());  // print the error message
-  Token t;
-  do {
-    t = getNextToken();
-    System.out.println("Found "+t.kind);
-  } while (t.kind != kind && t.kind!=0);
-  //throw e;
+void error_skipto(int kind, boolean exception) {
+     if (exception) {
+         ParseException e = generateParseException();  // generate the exception object.
+         System.out.println(e.toString());  // print the error message
+     }
 
+      Token t;
+      do {
+            t = getNextToken();
+      } while (t.kind != kind && t.kind!=0);
 }
