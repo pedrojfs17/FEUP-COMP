@@ -2,10 +2,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.comp.jmm.JmmParserResult;
+import pt.up.fe.comp.jmm.report.Report;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class JmmParserSyntacticalFailTest {
@@ -33,9 +39,15 @@ public class JmmParserSyntacticalFailTest {
         });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testJmmParserChecker() throws IOException {
         System.out.println("File is : " + fileName);
-        jmmParserChecker.parse(fileName);
+
+        JmmParserResult result = jmmParserChecker.getResult(fileName);
+        JmmNode rootNode = result.getRootNode();
+        List<Report> reports = result.getReports();
+
+        assertTrue(reports.size() > 0);
+        System.out.println(reports.toString());
     }
 }

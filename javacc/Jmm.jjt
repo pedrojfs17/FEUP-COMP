@@ -6,12 +6,16 @@ options
 PARSER_BEGIN(Jmm)
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import pt.up.fe.comp.jmm.report.*;
 
 public class Jmm{
 
     public static HashMap<String, Integer> var = new HashMap<String, Integer>();
     public static int par_count=0;
+    public static ArrayList<Report> reports = new ArrayList<Report>();
+
     public static void main(String[] args) throws ParseException {
         System.out.println("Parser for a file.");
         System.out.println("Write a file name");
@@ -26,7 +30,10 @@ public class Jmm{
             System.out.println("Couldn't parse file");
             e.printStackTrace();
         }
+    }
 
+    public ArrayList<Report> getReports() {
+        return reports;
     }
 
 }
@@ -90,9 +97,14 @@ TOKEN :
     | <IDENTIFIER: ["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*>
 }
 
-SimpleNode Program(): {}
+SimpleNode Program() #PROGRAM : {}
 {
-    ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
+    try {
+        ImportDeclaration() ClassDeclaration() <EOF> { return jjtThis; }
+    } catch(Exception e) {
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, e.getMessage()));
+        { return null; }
+    }
 }
 
 void ImportDeclaration() #IMPORT: {Token t,t1;}
@@ -175,11 +187,11 @@ void whileStatement() #WHILE: {Token t;}
     try {
         <WHILE> <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
     } catch (ParseException e) {
-        boolean exception = true;
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, e.getMessage()));
+
         while(par_count>0) {
-             error_skipto(RPARENTHESES, exception);
+             error_skipto(RPARENTHESES);
              par_count--;
-             exception = false;
         }
     }
 
@@ -264,12 +276,7 @@ void Expression() #void: {Token t;}
 }
 
 JAVACODE
-void error_skipto(int kind, boolean exception) {
-     if (exception) {
-         ParseException e = generateParseException();  // generate the exception object.
-         System.out.println(e.toString());  // print the error message
-     }
-
+void error_skipto(int kind) {
       Token t;
       do {
             t = getNextToken();
