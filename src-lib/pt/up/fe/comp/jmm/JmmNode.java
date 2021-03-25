@@ -1,9 +1,16 @@
 package pt.up.fe.comp.jmm;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
+import pt.up.fe.comp.jmm.ast.JmmSerializer;
+import pt.up.fe.specs.util.SpecsCollections;
 
 /**
  * This interface represents a node in the Jmm AST.
@@ -41,6 +48,24 @@ public interface JmmNode {
 
     /**
      * 
+     * @param attribute
+     * @return the value of the attribute wrapper around an Optional, or Optional.empty() if there is no value for the
+     *         given attribute
+     */
+    default Optional<String> getOptional(String attribute) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * 
+     * @return the parent of the current node, or null if this is the root node
+     */
+    default JmmNode getParent() {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * 
      * @return the children of the node or an empty list if there are no children
      * 
      */
@@ -75,5 +100,24 @@ public interface JmmNode {
                 .registerTypeAdapter(JmmNode.class, new JmmSerializer())
                 .create();
         return gson.toJson(this, JmmNode.class);
+    }
+
+    static JmmNode fromJson(String json) {
+        return JmmNodeImpl.fromJson(json);
+    }
+
+    default JmmNode sanitize() {
+        return fromJson(this.toJson());
+    }
+
+    static <T> List<JmmNode> convertChildren(T[] children) {
+        if (children == null) {
+            return new ArrayList<>();
+        }
+
+        JmmNode[] jmmChildren = SpecsCollections.convert(children, new JmmNode[children.length],
+                child -> (JmmNode) child);
+
+        return Arrays.asList(jmmChildren);
     }
 }
