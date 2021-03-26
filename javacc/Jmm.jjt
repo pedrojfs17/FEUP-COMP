@@ -9,13 +9,14 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import pt.up.fe.comp.jmm.report.*;
+import pt.up.fe.comp.jmm.analysis.*;
 
 public class Jmm{
 
     public static HashMap<String, Integer> var = new HashMap<String, Integer>();
     public static int par_count=0;
     public static ArrayList<Report> reports = new ArrayList<Report>();
-
+    public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ParseException {
         System.out.println("Parser for a file.");
         System.out.println("Write a file name");
@@ -109,17 +110,17 @@ SimpleNode Program() #PROGRAM : {}
 
 void ImportDeclaration() #IMPORT: {Token t,t1;}
 {
-    (<IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.put("value",t.image);})*
+    (<IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.put("name",t.image);})*
 }
 
 void SubImport() #SUB_IMPORT: {Token t;}
 {
-    <DOT> t=<IDENTIFIER> {jjtThis.put("value",t.image);} [SubImport() ]
+    <DOT> t=<IDENTIFIER> {jjtThis.put("name",t.image);} [SubImport() ]
 }
 
 void ClassDeclaration() #CLASS_DECLARATION: {Token t,t1;}
 {
-    <CLASS> t=<IDENTIFIER> {jjtThis.put("value",t.image);} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.put("value",t1.image);} #EXTENDS]
+    <CLASS> t=<IDENTIFIER> {jjtThis.put("name",t.image);} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.put("super",t1.image);} #EXTENDS]
     <LBRACKET>
     (VarDeclaration())*
     (MethodDeclaration())*
@@ -156,16 +157,16 @@ void MethodBody() #METHOD_BODY: {Token t;}
     (Statement())*
 }
 
-void VarDeclaration() #VAR_DECLARATION: {Token t;}
+void VarDeclaration() #VAR_DECLARATION: {Token t; String str;}
 {
-    Type() t=<IDENTIFIER>{jjtThis.put("value",t.image);} <SEMICOLON>
+    str=Type() t=<IDENTIFIER>{jjtThis.put("name",t.image); jjtThis.put("type",str);} <SEMICOLON>
 }
 
-void Type() #void: {Token t;}
+String Type() #void: {Token t;}
 {
-     t=<INT> #INT [<LSQUAREBRACKET> <RSQUAREBRACKET>#ARRAY]
-    | t=<BOOLEAN>#BOOLEAN
-    | t=<IDENTIFIER> {jjtThis.put("value",t.image);}#IDENTIFIER
+     t=<INT> [<LSQUAREBRACKET> <RSQUAREBRACKET>] {return "int array";}
+    | t=<BOOLEAN> {return "boolean";}
+    | t=<IDENTIFIER> {return t.image;}
 }
 
 void Statement() #void: {Token t;}
