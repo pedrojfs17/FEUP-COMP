@@ -1,8 +1,11 @@
 
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.specs.util.SpecsIo;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.StringReader;
@@ -29,6 +32,15 @@ public class Main implements JmmParser {
         if (args[0].contains("fail")) {
             throw new RuntimeException("It's supposed to fail");
         }
+        File outputDir = new File("out");
+        var fileContents = SpecsIo.read(args[0]);
+		System.out.println("Executing file: "+args[0]);
+
+		Main compiler = new Main();
+		AnalysisStage analysisStage = new AnalysisStage();
+		JmmParserResult parserResult = compiler.parse(fileContents);
+
+		JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(parserResult);
     }
 
 

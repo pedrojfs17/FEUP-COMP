@@ -152,13 +152,6 @@ class SimpleNode implements Node, JmmNode {
         return id;
     }
 
-    public void createSymbolTable(SymbolTable table) {
-        for(Map.Entry<String, String> entry: attrs.entrySet()) {
-
-        }
-    }
-
-
 }
 
 /* JavaCC - OriginalChecksum=d33fdb2b8063d5de3474649324d5d160 (do not edit this line) */

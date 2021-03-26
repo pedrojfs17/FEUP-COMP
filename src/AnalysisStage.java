@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -33,7 +34,7 @@ public class AnalysisStage implements JmmAnalysis {
             return new JmmSemanticsResult(parserResult, null, Arrays.asList(errorReport));
         }
 
-        JmmNode node = parserResult.getRootNode();
+        JmmNode node = parserResult.getRootNode().sanitize();
 
         System.out.println("Dump tree with Visitor where you control tree traversal");
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
@@ -41,6 +42,7 @@ public class AnalysisStage implements JmmAnalysis {
 
         System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
         var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
+        SymbolTable symbolTable = new SymbolTable(preOrderVisitor.visit(node, ""));
         System.out.println(preOrderVisitor.visit(node, ""));
 
         System.out.println(
@@ -56,7 +58,7 @@ public class AnalysisStage implements JmmAnalysis {
         varPrinter.visit(node, null);
 
         // No Symbol Table being calculated yet
-        return new JmmSemanticsResult(parserResult, null, new ArrayList<>());
+        return new JmmSemanticsResult(parserResult, symbolTable, new ArrayList<>());
 
     }
 
