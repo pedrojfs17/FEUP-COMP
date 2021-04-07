@@ -51,7 +51,7 @@ public class JmmParserTest {
 
         JmmParserResult result = jmmParserChecker.getResult(fileName);
         JmmNode rootNode = result.getRootNode();
-        System.out.println(rootNode.toJson());
+        //System.out.println(rootNode.toJson());
 
         List<Report> reports = result.getReports();
         System.out.println(reports.toString());

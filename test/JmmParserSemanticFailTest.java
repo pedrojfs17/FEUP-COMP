@@ -10,6 +10,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runner.RunWith;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParserResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.report.Report;
 
 import static org.junit.Assert.assertTrue;
@@ -50,8 +51,10 @@ public class JmmParserSemanticFailTest {
         System.out.println("File is : " + fileName);
 
         JmmParserResult result = jmmParserChecker.getResult(fileName);
-        JmmNode rootNode = result.getRootNode();
-        List<Report> reports = result.getReports();
+        AnalysisStage analysisStage = new AnalysisStage();
+        JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(result);
+        JmmNode rootNode = semanticsResult.getRootNode();
+        List<Report> reports = semanticsResult.getReports();
 
         assertTrue(reports.size() > 0);
         System.out.println(reports.toString());
