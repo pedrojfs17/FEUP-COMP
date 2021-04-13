@@ -10,7 +10,7 @@ public class Type {
     }
 
     public String getName() {
-        return name;
+        return isArray ? name + " array" : name;
     }
 
     public boolean isArray() {

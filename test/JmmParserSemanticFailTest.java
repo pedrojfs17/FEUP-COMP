@@ -46,17 +46,19 @@ public class JmmParserSemanticFailTest {
         });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testJmmParserChecker() throws IOException {
         System.out.println("File is : " + fileName);
 
         JmmParserResult result = jmmParserChecker.getResult(fileName);
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(result);
-        JmmNode rootNode = semanticsResult.getRootNode();
         List<Report> reports = semanticsResult.getReports();
 
         assertTrue(reports.size() > 0);
-        System.out.println(reports.toString());
+
+        System.out.println("Reports:");
+        for (Report report : reports)
+            System.out.println(report);
     }
 }

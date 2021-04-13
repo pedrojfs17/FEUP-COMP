@@ -40,10 +40,17 @@ public class AnalysisStage implements JmmAnalysis {
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
         //System.out.println(visitor.visit(node, ""));
 
-        System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
-        var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
-        SymbolTable symbolTable = new SymbolTable(preOrderVisitor.visit(node, ""));
-        System.out.println(preOrderVisitor.visit(node, ""));
+        //System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
+        //var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
+        SymbolTable symbolTable = new SymbolTable(visitor.visit(node, ""));
+        SemanticVisitor semanticVisitor = new SemanticVisitor(symbolTable);
+        List<Report> reports = new ArrayList<>();
+        semanticVisitor.visit(node, reports);
+
+        InitializedVariablesVisitor variablesVisitor = new InitializedVariablesVisitor(symbolTable);
+        variablesVisitor.visit(node, reports);
+
+        //System.out.println(preOrderVisitor.visit(node, ""));
         //System.out.println("Create histogram of node kinds with Visitor that automatically performs postorder tree traversal");
         //var postOrderVisitor = new ExamplePostorderVisitor();
         //var kindCount = new HashMap<String, Integer>();
@@ -55,7 +62,7 @@ public class AnalysisStage implements JmmAnalysis {
         //varPrinter.visit(node, null);
 
         // No Symbol Table being calculated yet
-        return new JmmSemanticsResult(parserResult, symbolTable, symbolTable.getReports());
+        return new JmmSemanticsResult(parserResult, symbolTable, reports);
 
     }
 

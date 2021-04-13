@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Method {
     private List<Symbol> parameters = new ArrayList<>();
-    private List<String> localVarName = new ArrayList<>();
     private List<Symbol> localVariables = new ArrayList<>();
     private Type type;
 
@@ -20,15 +19,21 @@ public class Method {
 
     public void addLocalVariables(Symbol localVariable) {
         this.localVariables.add(localVariable);
-        this.localVarName.add(localVariable.getName());
-    }
-
-    public List<String> getLocalVarNames() {
-        return localVarName;
     }
 
     public List<Symbol> getLocalVariables() {
         return localVariables;
+    }
+
+    public Symbol getLocalVariable(String varName) {
+        for( Symbol symbol: localVariables) {
+            if(symbol.getName().equals(varName)) return symbol;
+        }
+        return null;
+    }
+
+    public Symbol getLocalVariable(int index) {
+        return localVariables.get(index);
     }
 
     public List<Symbol> getParameters() {

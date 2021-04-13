@@ -1,6 +1,7 @@
 options 
 {
     LOOKAHEAD=1;
+    NODE_SCOPE_HOOK=true;
 }
 
 PARSER_BEGIN(Jmm)
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import pt.up.fe.comp.jmm.report.*;
 import pt.up.fe.comp.jmm.analysis.*;
+import pt.up.fe.comp.jmm.ast.*;
 
 public class Jmm{
 
@@ -22,9 +24,9 @@ public class Jmm{
         try{
 
             Jmm parser = new Jmm(System.in);
-            SimpleNode root = parser.Program();
+            JmmNodeImpl root = (JmmNodeImpl) parser.Program().sanitize();
 
-            root.dump("");
+
             System.out.println("Parsed.");
         } catch (Exception e) {
             System.out.println("Couldn't parse file");
@@ -36,9 +38,14 @@ public class Jmm{
         return reports;
     }
 
+    void jjtreeOpenNodeScope(Node n) {
+            ((SimpleNode)n).put("line", Integer.toString(getToken(1).beginLine));
+            ((SimpleNode)n).put("col", Integer.toString(getToken(1).beginColumn));
+    }
+
+    void jjtreeCloseNodeScope(Node n) {
+    }
 }
-
-
 
 PARSER_END(Jmm)
 
@@ -102,7 +109,7 @@ SimpleNode Program() #PROGRAM : {}
     try {
         (ImportDeclaration())* ClassDeclaration() <EOF> { return jjtThis; }
     } catch(Exception e) {
-        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, e.getMessage()));
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, getToken(0).beginColumn, e.getMessage()));
         { return null; }
     }
 }
@@ -131,18 +138,18 @@ void MethodDeclaration() #void: {}
     <PUBLIC> (MainDeclaration() | OtherMethodDeclaration())
 }
 
-void MainDeclaration() #MAIN: {}
+void MainDeclaration() #MAIN: {Token t;}
 {
-    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> <IDENTIFIER> <RPARENTHESES> <LBRACKET>
+    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> t=<IDENTIFIER> { jjtThis.put("name", "main"); jjtThis.put("param",t.image);} <RPARENTHESES> <LBRACKET>
     MethodBody()
     <RBRACKET>
 }
 
-void OtherMethodDeclaration() #METHOD_DECLARATION: {String str, str_2; Token t;}
+void OtherMethodDeclaration() #METHOD_DECLARATION: {String str; Token t;}
 {
     str=Type() {jjtThis.put("return",str);} t=<IDENTIFIER> {jjtThis.put("name",t.image);}<LPARENTHESES> [ (ParameterDeclaration() (<COLON> ParameterDeclaration())*) ]  <RPARENTHESES> <LBRACKET>
     MethodBody()
-    <RETURN> str_2=ExpressionAnd()  {jjtThis.put("returned",str_2);} <SEMICOLON> <RBRACKET>
+    <RETURN> ExpressionAnd()  <SEMICOLON> <RBRACKET> #RETURN(1)
 }
 
 void ParameterDeclaration() #PARAMETER: {Token t; String str;}
@@ -168,26 +175,26 @@ String Type() #void: {Token t;}
     | t=<IDENTIFIER> {return t.image;}
 }
 
-void Statement() #void: {Token t; String str,str_2;}
+void Statement() #void: {Token t;}
 {
     <LBRACKET> (Statement())* <RBRACKET>
     | ifStatement()
     | whileStatement()
-    | str = ExpressionAnd() [ <EQ> str_2 = ExpressionAnd() {jjtThis.put("variable",str); jjtThis.put("value",str_2);}#ASSIGNMENT] <SEMICOLON>
+    | ExpressionAnd() [ <EQ> ExpressionAnd() #ASSIGNMENT(2)] <SEMICOLON>
 }
 
 void ifStatement() #void: {Token t; String str;}
 {
-    <IF> <LPARENTHESES> str = ExpressionAnd() <RPARENTHESES> Statement() {jjtThis.put("condition",str);}#IF(1)
+    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() #IF(2)
     <ELSE> Statement() #ELSE
 }
 
-void whileStatement() #WHILE: {Token t; String str;}
+void whileStatement() #WHILE: {Token t;}
 {
     try {
-        <WHILE> <LPARENTHESES> {par_count++;} str=ExpressionAnd() {jjtThis.put("condition",str);} <RPARENTHESES> {par_count--;}
+        <WHILE> <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
     } catch (ParseException e) {
-        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, e.getMessage()));
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, getToken(0).beginColumn, e.getMessage()));
 
         while(par_count>0) {
              error_skipto(RPARENTHESES);
@@ -200,73 +207,78 @@ void whileStatement() #WHILE: {Token t; String str;}
 
 // Operations
 
-String ExpressionAnd() #void: {Token t; String str,str_2;}
+void ExpressionAnd() #void: {Token t;}
 {
-    str= ExpressionLess()
-    (<AND> str_2=ExpressionLess() {str+=" and "+str_2;})* {return str;}
+    ExpressionLess()
+    (<AND>ExpressionLess() #AND(2))*
 
 }
 
-String ExpressionLess() #void: {Token t; String str,str_2;}
+void ExpressionLess() #void: {}
 {
-    str= ExpressionAddSub()
-    (<LESS> str_2=ExpressionAddSub() {str+=" less "+str_2;})* {return str;}
+    ExpressionAddSub()
+    (<LESS> ExpressionAddSub()#LESS(2))*
 
 }
 
-String ExpressionAddSub() #void: {Token t; String str,str_2;}
+void ExpressionAddSub() #void: {Token t;}
 {
-    str= ExpressionMultDiv()
-    (   (t=<ADD>|t=<MINUS>) str_2=ExpressionMultDiv() {str+=t.image+str_2;})* {return str;}
+    ExpressionMultDiv()
+    (   (t=<ADD>|t=<MINUS>) ExpressionMultDiv() {jjtThis.put("op",t.image);} #OPERATION(2))*
 }
 
-String ExpressionMultDiv() #void: {Token t; String str,str_2;}
+void ExpressionMultDiv() #void: {Token t;}
 {
-    str= ExpressionArray()
-    (  (t=<MULT>|t=<DIV>) str_2=ExpressionArray() {str+=t.image+str_2;})* {return str;}
+    ExpressionArray()
+    (  (t=<MULT>|t=<DIV>) ExpressionArray() {jjtThis.put("op",t.image);} #OPERATION(2))*
 }
-String ExpressionArray() #void: {Token t; String str,str_2;}
+void ExpressionArray() #void: {}
 {
-    str= ExpressionExc()
-    [str_2 = Array() {str = str+str_2;}] {return str;}
-}
-
-String Array() #void: {Token t; String str;}
-{
-    <LSQUAREBRACKET> str=ExpressionAnd() <RSQUAREBRACKET> {return "["+str+"]";}
+    ExpressionExc()
+    [Array() #ARRAY_ACCESS(2)]
 }
 
-String ExpressionExc() #void: {Token t; String str;}
+void Array() #void: {}
 {
-    (str= ExpressionDot()
-    | (<EXCLAMATION> str=ExpressionExc()) {str="!"+str;}) {return str;}
+    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET>
 }
 
-String ExpressionDot() #void: {Token t; String str,str_2, str_3="";}
+void ExpressionExc() #void: {}
 {
-    str = Expression()
+    ExpressionDot()
+    | (<EXCLAMATION> ExpressionExc() #EXCLAMATION(1))
+}
+
+void ExpressionDot() #void: {}
+{
+    Expression()
    ( <DOT>
-        ( <LENGTH> {str_2="length";}
-          | t=<IDENTIFIER> {str_2=t.image;} <LPARENTHESES> [str_3 = Params()] <RPARENTHESES>
-        ){jjtThis.put("object",str); jjtThis.put("function",str_2); str=str+"."+str_2; if(str_3!="") jjtThis.put("params",str_3);}
-        #OBJECT_METHOD
-    )* {return str;}
+        ( <LENGTH> #LENGTH
+          | MethodCall()
+        )
+        #OBJECT_METHOD(2)
+    )*
 }
 
-String Params() #void: {String str, str_2;}
+void MethodCall() #METHOD_CALL: {Token t;}
 {
-    str = ExpressionAnd() (<COLON> str_2= ExpressionAnd() {str+=","+str_2;})* {return str;}
+    t=<IDENTIFIER> {jjtThis.put("name",t.image);} <LPARENTHESES> [Params()] <RPARENTHESES>
 }
 
-String Expression() #void: {Token t; String str;}
+void Params() #void: {}
 {
-     t=<INTEGERLITERAL>{return t.image;}
-    | <TRUE> {return "true";}
-    | <FALSE> {return "false";}
-    | t=<IDENTIFIER>{return t.image;}
-    | <THIS>{return "this";}
-    | <LPARENTHESES> {par_count++;} str=ExpressionAnd() <RPARENTHESES> {par_count--;} {return "("+str+")";}
-    | <NEW> (<INT> str=Array() {return "new int"+str;} | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES> {return "new "+t.image;})
+    ExpressionAnd() (<COLON> ExpressionAnd() )*
+}
+
+void Expression() #void: {Token t;}
+{
+     t=<INTEGERLITERAL>{jjtThis.put("value",t.image);} #INT
+    | <TRUE> #TRUE
+    | <FALSE> #FALSE
+    | t=<IDENTIFIER>{jjtThis.put("name",t.image);} #IDENTIFIER
+    | <THIS>#THIS
+    | <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
+    | <NEW> (<INT> Array() #ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES> {jjtThis.put("name",t.image);} #OBJECT) #NEW(1)
 
 }
 

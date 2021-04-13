@@ -2,6 +2,7 @@
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsIo;
 
@@ -17,7 +18,7 @@ public class Main implements JmmParser {
 		
 		try {
 		    Jmm myParser = new Jmm(new StringReader(jmmCode));
-    		SimpleNode root = myParser.Program(); // returns reference to root node
+			SimpleNode root = myParser.Program(); // returns reference to root node
             	
     		//if (root != null) root.dump(""); // prints the tree on the screen
     	
