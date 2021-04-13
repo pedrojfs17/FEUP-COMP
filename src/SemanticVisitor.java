@@ -17,19 +17,22 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         addVisit("OBJECT_METHOD", this::dealWithOBJECTMETHOD);
         addVisit("METHOD_CALL", this::dealWithMETHODCALL);
         addVisit("OPERATION", this::dealWithOPERATION);
-        addVisit("ARRAY", this::dealWithARRAY);
-        addVisit("ARRAY_ACCESS", this::dealWithARRAY);
         setDefaultVisit(this::defaultVisit);
     }
 
     private Boolean dealWithOBJECTMETHOD(JmmNode jmmNode, List<Report> reports) {
         var children = jmmNode.getChildren();
+        Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
+
         if (children.get(0).getKind().equals("THIS")) {
             if (symbolTable.getMethod(children.get(1).get("name")) == null)
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() isn't declared"));
             else if (children.get(1).getChildren().size() != symbolTable.getMethod(children.get(1).get("name")).getParameters().size())
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() has the wrong number of arguments"));
-        } else if (children.get(1).getKind().equals("LENGTH") && !children.get(0).getKind().equals("IDENTIFIER")) {
+        } else if (children.get(1).getKind().equals("LENGTH")) {
+            if (!children.get(0).getKind().equals("IDENTIFIER"))
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
+            else if (!symbolTable.getVariable(children.get(0).get("name"), ancestor.get().get("name")).getType().getName().equals("int array"))
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
         }
         visit(jmmNode.getChildren().get(1), reports);
@@ -48,8 +51,10 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
                 if (symbol.getType()!=symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType())
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Argument " + child.get("name") + " is of wrong type, "+symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType().getName()+" expected."));
             }
-            else if (i<symbolTable.getMethod(jmmNode.get("name")).getParameters().size() && !symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType().equals(toType(child)))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Argument is of wrong type, "+symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType().getName()+" expected."));
+            else if (i<symbolTable.getMethod(jmmNode.get("name")).getParameters().size() && !symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType().getName().equals(toType(child).getName())) {
+                // Esta parte esta mal pq se for por exemplo "true", o tipo vai ser "true" enquanto devia ser "boolean"
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Argument is of wrong type, " + symbolTable.getMethod(jmmNode.get("name")).getParameters().get(i).getType().getName() + " expected."));
+            }
             visit(child, reports);
             i++;
         }
@@ -62,16 +67,6 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
             return new Type("int",true);
         }
         return new Type(node.getKind().toLowerCase(),false);
-    }
-
-    private Boolean dealWithARRAY(JmmNode jmmNode, List<Report> reports) {
-        for (JmmNode child : jmmNode.getChildren()) {
-            if (!child.getKind().equals("OPERATION") && !child.getKind().equals("INT"))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Array access/initialization must be done with integer - " + child.getKind() + " isn't type int"));
-            visit(child, reports);
-        }
-
-        return true;
     }
 
     private Boolean defaultVisit(JmmNode jmmNode, List<Report> reports) {

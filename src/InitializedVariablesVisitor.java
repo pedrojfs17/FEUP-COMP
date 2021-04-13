@@ -27,7 +27,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("VAR_DECLARATION", this::dealWithVarDeclaration);
         addVisit("NEW", this::dealWithNew);
         addVisit("ARRAY", this::dealWithArray);
-        addVisit("ARRAY_ACCESS", this::dealWithInt);
+        addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         addVisit("LENGTH", this::dealWithInt);
         addVisit("OBJECT_METHOD", this::dealWithObjectMethod);
         addVisit("METHOD_CALL", this::dealWithMethodCall);
@@ -49,7 +49,18 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     }
 
     private String dealWithArray(JmmNode jmmNode, List<Report> reports) {
-        visit(jmmNode.getChildren().get(0), reports);
+        String arrSize = visit(jmmNode.getChildren().get(0), reports);
+
+        if (!arrSize.equals("int")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(jmmNode.get("line")),
+                    Integer.parseInt(jmmNode.get("col")),
+                    "Array length must be of type int."
+            ));
+        }
+
         return "int array";
     }
 
@@ -64,11 +75,57 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     private String dealWithMethodCall(JmmNode jmmNode, List<Report> reports) {
         for (JmmNode child : jmmNode.getChildren())
             visit(child, reports);
-        return symbolTable.getReturnType(jmmNode.get("name")).getName();
+
+        if (symbolTable.getMethod(jmmNode.get("name")) != null)
+            return symbolTable.getReturnType(jmmNode.get("name")).getName();
+        else
+            return "";
     }
 
     private String dealWithNew(JmmNode jmmNode, List<Report> reports) {
         return visit(jmmNode.getChildren().get(0), reports);
+    }
+
+    private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
+        JmmNode identifier = jmmNode.getChildren().get(0);
+        JmmNode idx = jmmNode.getChildren().get(1);
+
+        String identifierType = visit(identifier, reports);
+        String idxType = visit(idx, reports);
+
+        if (!identifier.getKind().equals("IDENTIFIER")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(identifier.get("line")),
+                    Integer.parseInt(identifier.get("col")),
+                    "\"" + identifier.getKind() + "\" is not a variable."
+            ));
+            return "<Unknown>";
+        }
+
+        if (!identifierType.equals("int array")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(identifier.get("line")),
+                    Integer.parseInt(identifier.get("col")),
+                    "Variable \"" + identifier.get("name") + "\" is not an array."
+            ));
+            return "<Unknown>";
+        }
+
+        if (!idxType.equals("int")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(idx.get("line")),
+                    Integer.parseInt(idx.get("col")),
+                    "Array index must be of type int."
+            ));
+        }
+
+        return "int";
     }
 
     private String dealWithOperation(JmmNode jmmNode, List<Report> reports) {
@@ -84,7 +141,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in operation. " + lhsType + " != " + rhsType
+                    "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
             ));
         }
 
@@ -143,7 +200,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in assignment. " + lhsType + " != " + rhsType
+                    "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
             ));
         }
         else {

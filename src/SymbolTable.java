@@ -155,6 +155,12 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.methods.get(methodName);
     }
 
+    public Symbol getVariable(String variableName, String methodName) {
+        Symbol globalVar = this.getField(variableName);
+        Symbol localVar = this.getMethod(methodName).getLocalVariable(variableName);
+        return localVar != null ? localVar : globalVar;
+    }
+
     @Override
     public Type getReturnType(String methodName) {
         return methods.get(methodName).getType();
