@@ -2,15 +2,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.OllirErrorException;
+import org.specs.comp.ollir.*;
 
+import org.specs.comp.ollir.Method;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
-import pt.up.fe.specs.util.SpecsIo;
 
 /**
  * Copyright 2021 SPeCS.
@@ -41,7 +40,8 @@ public class BackendStage implements JasminBackend {
             ollirClass.show(); // print to console main information about the input OLLIR
 
             // Convert the OLLIR to a String containing the equivalent Jasmin code
-            String jasminCode = ""; // Convert node ...
+            String jasminCode = generateClass(ollirClass);
+            System.out.println("\n\n---------\n" + jasminCode + "\n---------\n\n");
 
             // More reports from this stage
             List<Report> reports = new ArrayList<>();
@@ -53,6 +53,75 @@ public class BackendStage implements JasminBackend {
                     Arrays.asList(Report.newError(Stage.GENERATION, -1, -1, "Exception during Jasmin generation", e)));
         }
 
+    }
+
+    private String generateClass(ClassUnit classUnit) {
+        StringBuilder jasminCode = new StringBuilder(classHeader(classUnit));
+
+        for (Method method: classUnit.getMethods()) {
+            if (method.isConstructMethod())
+                jasminCode.append("\n").append(generateConstructor());
+            else
+                jasminCode.append("\n").append(generateMethod(method));
+        }
+        return jasminCode.toString();
+    }
+
+    private String classHeader(ClassUnit classUnit) {
+        StringBuilder jasminCode = new StringBuilder(".class");
+
+        if (classUnit.getClassAccessModifier() == AccessModifiers.DEFAULT)
+            jasminCode.append(" public");
+        else
+            jasminCode.append(" ").append(classUnit.getClassAccessModifier().toString().toLowerCase());
+
+        jasminCode.append(" ").append(classUnit.getClassName()).append("\n")
+                .append(".super java/lang/Object\n");
+
+        return jasminCode.toString();
+    }
+
+    private String generateConstructor() {
+        return ".method public <init>()V\n" +
+                "   aload_0\n" +
+                "   invokenonvirtual java/lang/Object/<init>()V\n" +
+                "   return\n" +
+                ".end method\n";
+    }
+
+    private String generateMethod(Method method) {
+        StringBuilder jasminCode = new StringBuilder(".method");
+
+        if (method.getMethodAccessModifier() == AccessModifiers.DEFAULT)
+            jasminCode.append(" public");
+        else
+            jasminCode.append(" ").append(method.getMethodAccessModifier().toString().toLowerCase());
+
+        if (method.isStaticMethod())
+            jasminCode.append(" static");
+        if (method.isFinalMethod())
+            jasminCode.append(" final");
+
+        jasminCode.append(" ").append(method.getMethodName()).append("(");
+        for (Element param: method.getParams())
+            jasminCode.append(getDescriptor(param.getType()));
+        jasminCode.append(")").append(getDescriptor(method.getReturnType())).append("\n");
+
+        jasminCode.append(".end method\n");
+        return jasminCode.toString();
+    }
+
+    private String getDescriptor(Type type) {
+        switch (type.getTypeOfElement()) {
+            case INT32:
+                return "I";
+            case ARRAYREF:
+                return "[I";
+            case VOID:
+                return "V";
+            default:
+                return "ERROR";
+        }
     }
 
 }
