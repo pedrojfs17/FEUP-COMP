@@ -31,6 +31,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("LENGTH", this::dealWithInt);
         addVisit("OBJECT_METHOD", this::dealWithObjectMethod);
         addVisit("METHOD_CALL", this::dealWithMethodCall);
+        addVisit("LESS", this::dealWithLess);
         setDefaultVisit(this::defaultVisit);
     }
 
@@ -148,6 +149,44 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         return lhsType;
     }
 
+    private String dealWithLess(JmmNode jmmNode, List<Report> reports) {
+        JmmNode lhs = jmmNode.getChildren().get(0);
+        JmmNode rhs = jmmNode.getChildren().get(1);
+
+        String lhsType = visit(lhs, reports);
+        String rhsType = visit(rhs, reports);
+
+        if (!lhsType.equals(rhsType)) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(rhs.get("line")),
+                    Integer.parseInt(rhs.get("col")),
+                    "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
+            ));
+        }
+        if (!lhsType.equals("int")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(lhs.get("line")),
+                    Integer.parseInt(lhs.get("col")),
+                    "Type mismatch in less. <" + lhsType + "> should be <int>"
+            ));
+        }
+        if (!rhsType.equals("int")) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(rhs.get("line")),
+                    Integer.parseInt(rhs.get("col")),
+                    "Type mismatch in operation. <" + rhsType + "> should be <int>"
+            ));
+        }
+        return "boolean";
+    }
+
+
     private String dealWithIdentifier(JmmNode jmmNode, List<Report> reports) {
         Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
         Symbol localVar = symbolTable.getMethod(ancestor.get().get("name")).getLocalVariable(jmmNode.get("name"));
@@ -159,7 +198,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(jmmNode.get("line")),
                     Integer.parseInt(jmmNode.get("col")),
-                    "Variable \"" +  jmmNode.get("name") + "\" is undefined."
+                    "Variable \"" + jmmNode.get("name") + "\" is undefined."
             ));
             return "<Unknown>";
         }
@@ -170,7 +209,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(jmmNode.get("line")),
                     Integer.parseInt(jmmNode.get("col")),
-                    "Variable \"" +  jmmNode.get("name") + "\" has not been initialized."
+                    "Variable \"" + jmmNode.get("name") + "\" has not been initialized."
             ));
         }
 
@@ -202,8 +241,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Integer.parseInt(rhs.get("col")),
                     "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
             ));
-        }
-        else {
+        } else {
             if (lhs.getKind().equals("IDENTIFIER"))
                 initializedVariables.add(lhs.get("name"));
             else
