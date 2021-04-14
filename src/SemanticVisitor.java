@@ -16,7 +16,6 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         this.symbolTable = symbolTable;
         addVisit("OBJECT_METHOD", this::dealWithOBJECTMETHOD);
         addVisit("METHOD_CALL", this::dealWithMETHODCALL);
-        addVisit("OPERATION", this::dealWithOPERATION);
         addVisit("AND", this::dealWithAND);
         setDefaultVisit(this::defaultVisit);
     }
@@ -78,26 +77,6 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         return true;
     }
 
-
-    private Boolean dealWithOPERATION(JmmNode jmmNode, List<Report> reports) {
-        var children = jmmNode.getChildren();
-
-        for (JmmNode child : children) {
-            if (child.getKind().equals("IDENTIFIER")) {
-                Optional<JmmNode> method = child.getAncestor("MAIN").isPresent() ? child.getAncestor("MAIN") : child.getAncestor("METHOD_DECLARATION");
-                Symbol symbol = symbolTable.getVariable(child.get("name"), method.get().get("name"));
-                if (!symbol.getType().getName().equals("int")) {
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Variable \"" + child.get("name") + "\" isn't type int"));
-                }
-
-            } else if (!child.getKind().equals("INT")) {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), child.getKind() + " can't be in a arithmetic operation"));
-            }
-            visit(child, reports);
-        }
-
-        return true;
-    }
 
     private Boolean dealWithAND(JmmNode jmmNode, List<Report> reports) {
         var children = jmmNode.getChildren();
