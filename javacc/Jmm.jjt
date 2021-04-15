@@ -1,0 +1,291 @@
+options 
+{
+    LOOKAHEAD=1;
+    NODE_SCOPE_HOOK=true;
+}
+
+PARSER_BEGIN(Jmm)
+
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import pt.up.fe.comp.jmm.report.*;
+import pt.up.fe.comp.jmm.analysis.*;
+import pt.up.fe.comp.jmm.ast.*;
+
+public class Jmm{
+
+    public static HashMap<String, Integer> var = new HashMap<String, Integer>();
+    public static int par_count=0;
+    public static ArrayList<Report> reports = new ArrayList<Report>();
+    public static void main(String[] args) throws ParseException {
+        System.out.println("Parser for a file.");
+        System.out.println("Write a file name");
+        try{
+
+            Jmm parser = new Jmm(System.in);
+            JmmNodeImpl root = (JmmNodeImpl) parser.Program().sanitize();
+
+
+            System.out.println("Parsed.");
+        } catch (Exception e) {
+            System.out.println("Couldn't parse file");
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Report> getReports() {
+        return reports;
+    }
+
+    void jjtreeOpenNodeScope(Node n) {
+            ((SimpleNode)n).put("line", Integer.toString(getToken(1).beginLine));
+            ((SimpleNode)n).put("col", Integer.toString(getToken(1).beginColumn));
+    }
+
+    void jjtreeCloseNodeScope(Node n) {
+    }
+}
+
+PARSER_END(Jmm)
+
+SKIP : 
+{
+    " " | "\t" | "\n" | "\r" | <"//"(~["\r","\n"])*> | <"/*">: MLCOMMENT
+}
+
+<MLCOMMENT> SKIP :
+{
+    <"*/"> : DEFAULT
+    | <~[]>
+}
+
+TOKEN : 
+{
+    <INTEGERLITERAL : (["0" - "9"])+ >
+    | <IMPORT: "import">
+    | <CLASS: "class">
+    | <PUBLIC: "public">
+    | <STATIC: "static">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <STRING: "String">
+    | <EXTENDS: "extends">
+    | <RETURN: "return">
+    | <INT: "int">
+    | <BOOLEAN: "boolean">
+    | <ELIF: <ELSE> <IF>>
+    | <IF: "if">
+    | <ELSE: "else">
+    | <WHILE: "while">
+    | <SOUT: "System.out.println">
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <THIS: "this">
+    | <NEW: "new">
+    | <LENGTH: "length">
+    | <LBRACKET: "{">
+    | <RBRACKET: "}">
+    | <LPARENTHESES: "(">
+    | <RPARENTHESES: ")">
+    | <LSQUAREBRACKET: "[">
+    | <RSQUAREBRACKET: "]">
+    | <COLON: ",">
+    | <SEMICOLON: ";">
+    | <DOT: ".">
+    | <MINUS: "-">
+    | <ADD: "+">
+    | <EQ : "=">
+    | <MULT: "*">
+    | <DIV: "/">
+    | <LESS: "<">
+    | <EXCLAMATION: "!">
+    | <AND: "&&">
+    | <IDENTIFIER: ["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*>
+}
+
+SimpleNode Program() #PROGRAM : {}
+{
+    try {
+        (ImportDeclaration())* ClassDeclaration() <EOF> { return jjtThis; }
+    } catch(Exception e) {
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, getToken(0).beginColumn, e.getMessage()));
+        { return null; }
+    }
+}
+
+void ImportDeclaration() #IMPORT: {Token t,t1;}
+{
+    <IMPORT> t=<IDENTIFIER> [SubImport() ] <SEMICOLON> {jjtThis.put("name",t.image);}
+}
+
+void SubImport() #SUB_IMPORT: {Token t;}
+{
+    <DOT> t=<IDENTIFIER> {jjtThis.put("name",t.image);} [SubImport() ]
+}
+
+void ClassDeclaration() #CLASS_DECLARATION: {Token t,t1;}
+{
+    <CLASS> t=<IDENTIFIER> {jjtThis.put("name",t.image);} [<EXTENDS> t1=<IDENTIFIER> {jjtThis.put("super",t1.image);} ]
+    <LBRACKET>
+    (VarDeclaration())*
+    (MethodDeclaration())*
+    <RBRACKET>
+}
+
+void MethodDeclaration() #void: {}
+{
+    <PUBLIC> (MainDeclaration() | OtherMethodDeclaration())
+}
+
+void MainDeclaration() #MAIN: {Token t;}
+{
+    <STATIC> <VOID> <MAIN> <LPARENTHESES> <STRING> <LSQUAREBRACKET> <RSQUAREBRACKET> t=<IDENTIFIER> { jjtThis.put("name", "main"); jjtThis.put("param",t.image);} <RPARENTHESES> <LBRACKET>
+    MethodBody()
+    <RBRACKET>
+}
+
+void OtherMethodDeclaration() #METHOD_DECLARATION: {String str; Token t;}
+{
+    str=Type() {jjtThis.put("return",str);} t=<IDENTIFIER> {jjtThis.put("name",t.image);}<LPARENTHESES> [ (ParameterDeclaration() (<COLON> ParameterDeclaration())*) ]  <RPARENTHESES> <LBRACKET>
+    MethodBody()
+    <RETURN> ExpressionAnd()  <SEMICOLON> <RBRACKET> #RETURN(1)
+}
+
+void ParameterDeclaration() #PARAMETER: {Token t; String str;}
+{
+    str=Type() t=<IDENTIFIER>{jjtThis.put("type",str); jjtThis.put("name",t.image);}
+}
+
+void MethodBody() #METHOD_BODY: {Token t;}
+{
+    (LOOKAHEAD(2) VarDeclaration())*
+    (Statement())*
+}
+
+void VarDeclaration() #VAR_DECLARATION: {Token t; String str;}
+{
+    str=Type() t=<IDENTIFIER>{jjtThis.put("name",t.image); jjtThis.put("type",str);} <SEMICOLON>
+}
+
+String Type() #void: {Token t;}
+{
+     t=<INT> [<LSQUAREBRACKET> <RSQUAREBRACKET> {return "int array";}]  {return "int";}
+    | t=<BOOLEAN> {return "boolean";}
+    | t=<IDENTIFIER> {return t.image;}
+}
+
+void Statement() #void: {Token t;}
+{
+    <LBRACKET> (Statement())* <RBRACKET>
+    | ifStatement()
+    | whileStatement()
+    | ExpressionAnd() [ <EQ> ExpressionAnd() #ASSIGNMENT(2)] <SEMICOLON>
+}
+
+void ifStatement() #void: {Token t; String str;}
+{
+    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() #IF(2)
+    <ELSE> Statement() #ELSE
+}
+
+void whileStatement() #WHILE: {Token t;}
+{
+    try {
+        <WHILE> <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
+    } catch (ParseException e) {
+        reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, getToken(0).beginColumn, e.getMessage()));
+
+        while(par_count>0) {
+             error_skipto(RPARENTHESES);
+             par_count--;
+        }
+    }
+
+    Statement() #WHILE_BODY
+}
+
+// Operations
+
+void ExpressionAnd() #void: {Token t;}
+{
+    ExpressionLess()
+    (<AND>ExpressionLess() #AND(2))*
+
+}
+
+void ExpressionLess() #void: {}
+{
+    ExpressionAddSub()
+    (<LESS> ExpressionAddSub()#LESS(2))*
+
+}
+
+void ExpressionAddSub() #void: {Token t;}
+{
+    ExpressionMultDiv()
+    (   (t=<ADD>|t=<MINUS>) ExpressionMultDiv() {jjtThis.put("op",t.image);} #OPERATION(2))*
+}
+
+void ExpressionMultDiv() #void: {Token t;}
+{
+    ExpressionArray()
+    (  (t=<MULT>|t=<DIV>) ExpressionArray() {jjtThis.put("op",t.image);} #OPERATION(2))*
+}
+void ExpressionArray() #void: {}
+{
+    ExpressionExc()
+    [Array() #ARRAY_ACCESS(2)]
+}
+
+void Array() #void: {}
+{
+    <LSQUAREBRACKET> ExpressionAnd() <RSQUAREBRACKET>
+}
+
+void ExpressionExc() #void: {}
+{
+    ExpressionDot()
+    | (<EXCLAMATION> ExpressionExc() #EXCLAMATION(1))
+}
+
+void ExpressionDot() #void: {}
+{
+    Expression()
+   ( <DOT>
+        ( <LENGTH> #LENGTH
+          | MethodCall()
+        )
+        #OBJECT_METHOD(2)
+    )*
+}
+
+void MethodCall() #METHOD_CALL: {Token t;}
+{
+    t=<IDENTIFIER> {jjtThis.put("name",t.image);} <LPARENTHESES> [Params()] <RPARENTHESES>
+}
+
+void Params() #void: {}
+{
+    ExpressionAnd() (<COLON> ExpressionAnd() )*
+}
+
+void Expression() #void: {Token t;}
+{
+     t=<INTEGERLITERAL>{jjtThis.put("value",t.image);} #INT
+    | <TRUE> #TRUE
+    | <FALSE> #FALSE
+    | t=<IDENTIFIER>{jjtThis.put("name",t.image);} #IDENTIFIER
+    | <THIS>#THIS
+    | <LPARENTHESES> {par_count++;} ExpressionAnd() <RPARENTHESES> {par_count--;}
+    | <NEW> (<INT> Array() #ARRAY | t=<IDENTIFIER> <LPARENTHESES> <RPARENTHESES> {jjtThis.put("name",t.image);} #OBJECT) #NEW(1)
+
+}
+
+JAVACODE
+void error_skipto(int kind) {
+      Token t;
+      do {
+            t = getNextToken();
+      } while (t.kind != kind && t.kind!=0);
+}

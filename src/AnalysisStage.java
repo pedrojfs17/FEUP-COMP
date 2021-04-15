@@ -1,7 +1,5 @@
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -33,31 +31,36 @@ public class AnalysisStage implements JmmAnalysis {
             return new JmmSemanticsResult(parserResult, null, Arrays.asList(errorReport));
         }
 
-        JmmNode node = parserResult.getRootNode();
+        JmmNode node = parserResult.getRootNode().sanitize();
 
-        System.out.println("Dump tree with Visitor where you control tree traversal");
+        //System.out.println("Dump tree with Visitor where you control tree traversal");
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");
-        System.out.println(visitor.visit(node, ""));
+        //System.out.println(visitor.visit(node, ""));
 
-        System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
-        var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
-        System.out.println(preOrderVisitor.visit(node, ""));
+        //System.out.println("Dump tree with Visitor that automatically performs preorder tree traversal");
+        //var preOrderVisitor = new ExamplePreorderVisitor("Identifier", "id");
+        SymbolTable symbolTable = new SymbolTable(visitor.visit(node, ""));
+        SemanticVisitor semanticVisitor = new SemanticVisitor(symbolTable);
+        List<Report> reports = new ArrayList<>();
+        semanticVisitor.visit(node, reports);
 
-        System.out.println(
-                "Create histogram of node kinds with Visitor that automatically performs postorder tree traversal");
-        var postOrderVisitor = new ExamplePostorderVisitor();
-        var kindCount = new HashMap<String, Integer>();
-        postOrderVisitor.visit(node, kindCount);
-        System.out.println("Kinds count: " + kindCount + "\n");
+        InitializedVariablesVisitor variablesVisitor = new InitializedVariablesVisitor(symbolTable);
+        variablesVisitor.visit(node, reports);
 
-        System.out.println(
-                "Print variables name and line, and their corresponding parent with Visitor that automatically performs preorder tree traversal");
-        var varPrinter = new ExamplePrintVariables("Variable", "name", "line");
-        varPrinter.visit(node, null);
+        //System.out.println(preOrderVisitor.visit(node, ""));
+        //System.out.println("Create histogram of node kinds with Visitor that automatically performs postorder tree traversal");
+        //var postOrderVisitor = new ExamplePostorderVisitor();
+        //var kindCount = new HashMap<String, Integer>();
+        //postOrderVisitor.visit(node, kindCount);
+        //System.out.println("Kinds count: " + kindCount + "\n");
 
-        // No Symbol Table being calculated yet
-        return new JmmSemanticsResult(parserResult, null, new ArrayList<>());
+        //System.out.println("Print variables name and line, and their corresponding parent with Visitor that automatically performs preorder tree traversal");
+        //var varPrinter = new ExamplePrintVariables("Variable", "name", "line");
+        //varPrinter.visit(node, null);
 
+        reports.sort(Comparator.comparing(Report::getLine));
+
+        return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }
 
 }
