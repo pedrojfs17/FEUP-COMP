@@ -21,4 +21,5 @@ public class OllirAccesser {
         return callInstruction.invocationType;
     }
     public static HashMap<String, Descriptor> getVarTable(Method method) { return method.varTable;}
+    public static HashMap<String, Instruction> getMethodLabels(Method method) { return method.methodLabels; }
 }

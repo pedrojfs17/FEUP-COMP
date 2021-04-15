@@ -93,10 +93,15 @@ public class BackendStage implements JasminBackend {
         StringBuilder jasminCode = new StringBuilder(methodHeader(method));
 
         HashMap<String, Descriptor> varTable = OllirAccesser.getVarTable(method);
-        Stack<String> stack = new Stack<>();
 
+        HashMap<String, Instruction> labels = OllirAccesser.getMethodLabels(method);
         for (Instruction instruction: method.getInstructions()) {
-            jasminCode.append(generateInstruction(instruction, varTable, stack));
+            for (String s : labels.keySet()) {
+                if(labels.get(s) == instruction) {
+                    jasminCode.append(s).append(":\n");
+                }
+            }
+            jasminCode.append(generateInstruction(instruction, varTable));
         }
 
         jasminCode.append(".end method\n");
@@ -124,80 +129,146 @@ public class BackendStage implements JasminBackend {
         return jasminCode.toString();
     }
 
-    private String generateInstruction(Instruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
+    private String generateInstruction(Instruction instruction, HashMap<String, Descriptor> varTable) {
         switch(instruction.getInstType()) {
             case ASSIGN:
-                return assignInstruction((AssignInstruction) instruction, varTable, stack);
+                return assignInstruction((AssignInstruction) instruction, varTable);
             case BRANCH:
-                return branchInstruction((CondBranchInstruction) instruction, varTable, stack);
+                return branchInstruction((CondBranchInstruction) instruction, varTable);
             case GOTO:
-                return goToInstruction((GotoInstruction) instruction, varTable, stack);
+                return goToInstruction((GotoInstruction) instruction, varTable);
             case RETURN:
-                return returnInstruction((ReturnInstruction) instruction, varTable, stack);
+                return returnInstruction((ReturnInstruction) instruction, varTable);
             case NOPER:
-                return singleOpInstruction((SingleOpInstruction) instruction, varTable, stack);
+                return singleOpInstruction((SingleOpInstruction) instruction, varTable);
+            case CALL:
+                return callInstruction((CallInstruction) instruction, varTable);
+            case BINARYOPER:
+                return binaryOpInstruction((BinaryOpInstruction) instruction, varTable);
             default:
                 return "ERROR";
         }
     }
 
-    private String assignInstruction(AssignInstruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
-        StringBuilder jasminCode  = new StringBuilder(generateInstruction(instruction.getRhs(), varTable, stack));
+    private String assignInstruction(AssignInstruction instruction, HashMap<String, Descriptor> varTable) {
+        StringBuilder jasminCode  = new StringBuilder(generateInstruction(instruction.getRhs(), varTable));
 
         Operand o = (Operand) instruction.getDest();
         int reg = varTable.get(o.getName()).getVirtualReg();
-        jasminCode.append("\tistore_").append(reg).append("\n");
-        stack.push("_" + reg);
+
+        if( o.getType().getTypeOfElement() == ElementType.INT32)
+            jasminCode.append("\tistore_");
+        else
+            jasminCode.append("\tastore_");
+
+        jasminCode.append(reg).append("\n");
 
         return jasminCode.toString();
     }
 
-    private String branchInstruction(CondBranchInstruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
+    private String branchInstruction(CondBranchInstruction instruction, HashMap<String, Descriptor> varTable) {
+        StringBuilder jasminCode = new StringBuilder();
+
+        jasminCode.append(loadElement(instruction.getLeftOperand(), varTable))
+                .append(loadElement(instruction.getRightOperand(), varTable));
+
+        jasminCode.append("\tif_icmp");
+
+        Operation op = instruction.getCondOperation();
+        switch(op.getOpType()) {
+            case GTE:
+                jasminCode.append("ge");
+                break;
+            default:
+                jasminCode.append("ERROR");
+        }
+
+        jasminCode.append(" ").append(instruction.getLabel()).append("\n");
+
+        return jasminCode.toString();
+    }
+
+    private String goToInstruction(GotoInstruction instruction, HashMap<String, Descriptor> varTable) {
         return "\n";
     }
 
-    private String goToInstruction(GotoInstruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
-        return "\n";
-    }
-
-    private String returnInstruction(ReturnInstruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
+    private String returnInstruction(ReturnInstruction instruction, HashMap<String, Descriptor> varTable) {
         if (instruction.hasReturnValue())
             return "\treturn";
 
         StringBuilder jasminCode = new StringBuilder();
 
-        Element e = instruction.getOperand();
-        if (e.isLiteral()){
-            jasminCode.append(loadLiteral((LiteralElement) e));
-        }
-        else {
-            Descriptor d = varTable.get(((Operand) e).getName());
-            if (!stack.peek().equals("_" + d.getVirtualReg())) {
-                jasminCode.append(loadDescriptor(d));
-            }
-
-        }
-
-        jasminCode.append("\tireturn\n");
+        jasminCode.append(loadElement(instruction.getOperand(), varTable));
 
         return jasminCode.toString();
     }
 
-    private String singleOpInstruction(SingleOpInstruction instruction, HashMap<String, Descriptor> varTable, Stack<String> stack) {
+    private String singleOpInstruction(SingleOpInstruction instruction, HashMap<String, Descriptor> varTable) {
         Element singleOperand = instruction.getSingleOperand();
         if (singleOperand.isLiteral()) {
             String val = ((LiteralElement) singleOperand).getLiteral();
-            stack.push(val);
+
             return "\tldc " + val + "\n";
         }
 
         Operand o = (Operand) singleOperand;
         int reg = varTable.get(o.getName()).getVirtualReg();
-        stack.push("_" + reg);
+
         if (o.getType().getTypeOfElement() == ElementType.INT32)
             return "\tiload_" + reg + "\n";
         else
             return "\taload_" + reg + "\n";
+    }
+
+    private String callInstruction(CallInstruction instruction, HashMap<String, Descriptor> varTable) {
+        StringBuilder jasminCode = new StringBuilder();
+
+        jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
+
+        jasminCode.append("\t").append(OllirAccesser.getCallInvocation(instruction)).append("\n");
+
+        return jasminCode.toString();
+    }
+
+    private String binaryOpInstruction(BinaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
+        StringBuilder jasminCode = new StringBuilder(loadElement(instruction.getLeftOperand(), varTable));
+        jasminCode.append(loadElement(instruction.getRightOperand(), varTable));
+
+        if(instruction.getUnaryOperation().getOpType() == null)
+            jasminCode.append("\tiadd (but like ???)\n");
+        else {
+            switch (instruction.getUnaryOperation().getOpType()) {
+                case ADD:
+                    jasminCode.append("\tiadd\n");
+                case MUL:
+                    jasminCode.append("\timul\n");
+                default:
+                    jasminCode.append("ERROR\n");
+            }
+        }
+        return jasminCode.toString();
+    }
+
+    private String unaryOpInstruction(UnaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
+        StringBuilder jasminCode = new StringBuilder();
+        jasminCode.append(loadElement(instruction.getRightOperand(), varTable));
+
+        switch (instruction.getUnaryOperation().getOpType()) {
+            case ADD:
+                jasminCode.append("\tiadd\n");
+            default:
+                jasminCode.append("ERROR\n");
+        }
+
+        return jasminCode.toString();
+    }
+
+    private String loadElement(Element e, HashMap<String, Descriptor> varTable) {
+        if (e.isLiteral())
+            return loadLiteral((LiteralElement) e);
+
+        Descriptor d = varTable.get(((Operand) e).getName());
+        return loadDescriptor(d);
     }
 
     private String loadDescriptor(Descriptor descriptor) {
@@ -205,12 +276,22 @@ public class BackendStage implements JasminBackend {
 
         switch(descriptor.getVarType().getTypeOfElement()) {
             case INT32:
-                jasminCode.append("\tiload");
+                jasminCode.append("\tiload_");
+                break;
             case STRING:
-                jasminCode.append("\taload");
+                jasminCode.append("\taload_");
+                break;
+            case ARRAYREF:
+                jasminCode.append("\taload_");
+                break;
+            default:
+                jasminCode.append("ERROR");
+                break;
         }
 
-        jasminCode.append(" ").append(descriptor.getVirtualReg()).append("\n");
+        int reg = descriptor.getVirtualReg();
+
+        jasminCode.append(reg).append("\n");
 
         return jasminCode.toString();
     }
