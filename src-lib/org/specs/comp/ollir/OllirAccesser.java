@@ -20,6 +20,16 @@ public class OllirAccesser {
     public static CallType getCallInvocation(CallInstruction callInstruction) {
         return callInstruction.invocationType;
     }
-    public static HashMap<String, Descriptor> getVarTable(Method method) { return method.varTable;}
-    public static HashMap<String, Instruction> getMethodLabels(Method method) { return method.methodLabels; }
+
+    public static boolean isParameter(Operand operand) {
+        return operand.isParameter;
+    }
+
+    public static HashMap<String, Descriptor> getVarTable(Method method) {
+        return method.varTable;
+    }
+
+    public static HashMap<String, Instruction> getMethodLabels(Method method) {
+        return method.methodLabels;
+    }
 }
