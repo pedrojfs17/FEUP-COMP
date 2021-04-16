@@ -45,4 +45,24 @@ public class BackendTest {
         System.out.println(output);
         //assertEquals("Hello, World!", output.trim());
     }
+
+    @Test
+    public void testMyClass2() {
+        var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/myclass2.ollir")), null, new ArrayList<>()));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        System.out.println(output);
+    }
+
+    @Test
+    public void testMyClass3() {
+        var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/myclass3.ollir")), null, new ArrayList<>()));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        System.out.println(output);
+    }
 }
