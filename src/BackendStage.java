@@ -136,7 +136,7 @@ public class BackendStage implements JasminBackend {
             case BRANCH:
                 return branchInstruction((CondBranchInstruction) instruction, varTable);
             case GOTO:
-                return goToInstruction((GotoInstruction) instruction, varTable);
+                return goToInstruction((GotoInstruction) instruction);
             case RETURN:
                 return returnInstruction((ReturnInstruction) instruction, varTable);
             case NOPER:
@@ -188,17 +188,22 @@ public class BackendStage implements JasminBackend {
         return jasminCode.toString();
     }
 
-    private String goToInstruction(GotoInstruction instruction, HashMap<String, Descriptor> varTable) {
-        return "\n";
+    private String goToInstruction(GotoInstruction instruction) {
+        return "\tgoto " + instruction.getLabel() + "\n";
     }
 
     private String returnInstruction(ReturnInstruction instruction, HashMap<String, Descriptor> varTable) {
         if (instruction.hasReturnValue())
-            return "\treturn";
+            return "\treturn\n";
 
         StringBuilder jasminCode = new StringBuilder();
 
         jasminCode.append(loadElement(instruction.getOperand(), varTable));
+
+        if (instruction.getElementType() == ElementType.INT32)
+            jasminCode.append("\tireturn\n");
+        else
+            jasminCode.append("\tareturn\n");
 
         return jasminCode.toString();
     }
@@ -235,7 +240,7 @@ public class BackendStage implements JasminBackend {
         jasminCode.append(loadElement(instruction.getRightOperand(), varTable));
 
         if(instruction.getUnaryOperation().getOpType() == null)
-            jasminCode.append("\tiadd (but like ???)\n");
+            jasminCode.append("\tiadd\n"); // (but like ???)
         else {
             switch (instruction.getUnaryOperation().getOpType()) {
                 case ADD:
