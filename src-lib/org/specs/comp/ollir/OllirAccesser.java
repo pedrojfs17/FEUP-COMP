@@ -32,4 +32,8 @@ public class OllirAccesser {
     public static HashMap<String, Instruction> getMethodLabels(Method method) {
         return method.methodLabels;
     }
+
+    public static Type getFieldType(GetFieldInstruction instruction) {
+        return instruction.fieldType;
+    }
 }

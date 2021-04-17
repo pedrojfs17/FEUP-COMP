@@ -118,7 +118,7 @@ public class BackendStage implements JasminBackend {
             jasminCode.append(generateInstruction(instruction, varTable));
         }
 
-        if (method.isConstructMethod())
+        if (method.getReturnType().getTypeOfElement() == ElementType.VOID)
             jasminCode.append("\treturn\n");
 
         jasminCode.append(".end method\n");
@@ -167,8 +167,10 @@ public class BackendStage implements JasminBackend {
                 return binaryOpInstruction((BinaryOpInstruction) instruction, varTable);
             case PUTFIELD:
                 return putFieldInstruction((PutFieldInstruction) instruction, varTable);
+            case GETFIELD:
+                return getFieldInstruction((GetFieldInstruction) instruction, varTable);
             default:
-                return "ERROR instruction not known";
+                return "ERROR instruction not known\n";
         }
     }
 
@@ -183,8 +185,9 @@ public class BackendStage implements JasminBackend {
                 jasminCode.append("\tiastore_");
             else
                 jasminCode.append("\tistore_");
-        else
+        else {
             jasminCode.append("\tastore_");
+        }
 
         jasminCode.append(reg).append("\n");
 
@@ -257,20 +260,52 @@ public class BackendStage implements JasminBackend {
         CallType func = OllirAccesser.getCallInvocation(instruction);
 
         if (func == CallType.NEW) {
-            for (Element e: instruction.getListOfOperands())
-                jasminCode.append(loadElement(e, varTable));
-            jasminCode.append("\t").append(func.toString().toLowerCase())
-                    .append(((Operand)instruction.getFirstArg()).getName())
-                    .append(" ").append(/*instruction.getReturnType().getTypeOfElement()*/"int").append("\n");
+            if (instruction.getReturnType().getTypeOfElement() == ElementType.OBJECTREF) {
+                for (Element e: instruction.getListOfOperands())
+                    jasminCode.append(loadElement(e, varTable));
+                jasminCode.append("\tnew ")
+                        .append(((Operand) instruction.getFirstArg()).getName()).append("\n")
+                        .append("\tdup\n");
+            } else
+                jasminCode.append("\tnew (not implemented)\n");
         } else if(func == CallType.invokespecial) {
             jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
             jasminCode.append("\t").append(func)
                     .append(" ").append("java/lang/Object.<init>()V;")
                     .append("\n");
         }
-        else {
+        else if (func == CallType.invokevirtual) {
+            jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
+            for (Element e: instruction.getListOfOperands())
+                jasminCode.append(loadElement(e, varTable));
+            jasminCode.append("\tinvokevirtual ")
+                    .append(((Operand)instruction.getFirstArg()).getName())
+                    .append(".").append(((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", ""))
+                    .append("(");
+            for (Element e: instruction.getListOfOperands())
+                jasminCode.append(getDescriptor(e.getType()));
+            jasminCode.append(")").append(getDescriptor(instruction.getReturnType())).append("\n");
+        }
+        else if (func == CallType.invokestatic) {
+            for (Element e: instruction.getListOfOperands())
+                jasminCode.append(loadElement(e, varTable));
+            jasminCode.append("\tinvokestatic ")
+                    .append(((Operand)instruction.getFirstArg()).getName())
+                    .append(".").append(((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", ""))
+                    .append("(");
+            for (Element e: instruction.getListOfOperands())
+                jasminCode.append(getDescriptor(e.getType()));
+            jasminCode.append(")").append(getDescriptor(instruction.getReturnType())).append("\n");
+        }
+        else if (func == CallType.ldc) {
+            jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
+        }
+        else if (func == CallType.arraylength){
             jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
             jasminCode.append("\t").append(func).append("\n");
+        }
+        else {
+            jasminCode.append("\tcall func not implemented\n");
         }
 
         return jasminCode.toString();
@@ -311,15 +346,13 @@ public class BackendStage implements JasminBackend {
     }
 
     private String putFieldInstruction(PutFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
-        StringBuilder jasminCode = new StringBuilder("\n");
-
-        return jasminCode.toString();
+        return "\tputfield ???\n";
     }
 
     private String getFieldInstruction(GetFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
-        StringBuilder jasminCode = new StringBuilder();
-
-        return jasminCode.toString();
+        return loadElement(instruction.getFirstOperand(), varTable) +
+                "\tgetfield " + getDescriptor(OllirAccesser.getFieldType(instruction)) +
+                " " + ((Operand) instruction.getSecondOperand()).getName() + "\n";
     }
 
     private String loadElement(Element e, HashMap<String, Descriptor> varTable) {
@@ -331,33 +364,31 @@ public class BackendStage implements JasminBackend {
     }
 
     private String loadDescriptor(Descriptor descriptor) {
-        StringBuilder jasminCode = new StringBuilder();
+        ElementType t = descriptor.getVarType().getTypeOfElement();
+        if (t == ElementType.THIS)
+            return "\taload_0\n";
 
-        switch(descriptor.getVarType().getTypeOfElement()) {
-            case INT32:
-                jasminCode.append("\tiload_");
-                break;
-            case STRING:
-                jasminCode.append("\taload_");
-                break;
-            case ARRAYREF:
-                jasminCode.append("\taload_");
-                break;
-            case THIS:
-                return "\taload_0\n";
-            default:
-                jasminCode.append("ERROR");
-                break;
-        }
+        StringBuilder jasminCode = new StringBuilder();
+        if (t == ElementType.INT32)
+            jasminCode.append("\tiload_");
+        else if (t == ElementType.STRING || t == ElementType.ARRAYREF || t == ElementType.OBJECTREF)
+            jasminCode.append("\taload_");
+        else
+            jasminCode.append("ERROR descriptor not implemented");
 
         int reg = descriptor.getVirtualReg();
-
         jasminCode.append(reg).append("\n");
 
         return jasminCode.toString();
     }
 
     private String loadLiteral(LiteralElement element) {
+        if (element.getType().getTypeOfElement() == ElementType.INT32) {
+            if (Integer.parseInt(element.getLiteral()) <= 5)
+                return "\ticonst_" + element.getLiteral() + "\n";
+            else
+                return "\tbipush " + element.getLiteral() + "\n";
+        }
         return "\tldc " + element.getLiteral() + "\n";
     }
 
@@ -369,8 +400,10 @@ public class BackendStage implements JasminBackend {
                 return "[I";
             case VOID:
                 return "V";
+            case STRING:
+                return "Ljava/lang/String;";
             default:
-                return "ERROR";
+                return "ERROR descriptor not implemented";
         }
     }
 
