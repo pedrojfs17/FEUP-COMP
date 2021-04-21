@@ -195,25 +195,10 @@ public class BackendStage implements JasminBackend {
     }
 
     private String branchInstruction(CondBranchInstruction instruction, HashMap<String, Descriptor> varTable) {
-        StringBuilder jasminCode = new StringBuilder();
-
-        jasminCode.append(loadElement(instruction.getLeftOperand(), varTable))
-                .append(loadElement(instruction.getRightOperand(), varTable));
-
-        jasminCode.append("\tif_icmp");
-
-        Operation op = instruction.getCondOperation();
-        switch(op.getOpType()) {
-            case GTE:
-                jasminCode.append("ge");
-                break;
-            default:
-                jasminCode.append("ERROR");
-        }
-
-        jasminCode.append(" ").append(instruction.getLabel()).append("\n");
-
-        return jasminCode.toString();
+        return loadElement(instruction.getLeftOperand(), varTable) +
+                loadElement(instruction.getRightOperand(), varTable) +
+                "\t" + getOperation(instruction.getCondOperation()) +
+                " " + instruction.getLabel() + "\n";
     }
 
     private String goToInstruction(GotoInstruction instruction) {
@@ -312,41 +297,20 @@ public class BackendStage implements JasminBackend {
     }
 
     private String binaryOpInstruction(BinaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
-        StringBuilder jasminCode = new StringBuilder(loadElement(instruction.getLeftOperand(), varTable));
-        jasminCode.append(loadElement(instruction.getRightOperand(), varTable));
-
-
-        switch (instruction.getUnaryOperation().getOpType()) {
-            case ADD:
-                jasminCode.append("\tiadd\n");
-                break;
-            case MUL:
-                jasminCode.append("\timul\n");
-                break;
-            default:
-                jasminCode.append("ERROR\n");
-                break;
-        }
-
-        return jasminCode.toString();
+        return loadElement(instruction.getLeftOperand(), varTable) +
+                unaryOpInstruction(instruction, varTable);
     }
 
     private String unaryOpInstruction(UnaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
-        StringBuilder jasminCode = new StringBuilder();
-        jasminCode.append(loadElement(instruction.getRightOperand(), varTable));
-
-        switch (instruction.getUnaryOperation().getOpType()) {
-            case ADD:
-                jasminCode.append("\tiadd\n");
-            default:
-                jasminCode.append("ERROR\n");
-        }
-
-        return jasminCode.toString();
+        return loadElement(instruction.getRightOperand(), varTable) +
+                "\t" + getOperation(OllirAccesser.getUnaryInstructionOp(instruction)) + "\n";
     }
 
     private String putFieldInstruction(PutFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
-        return "\tputfield ???\n";
+        return loadElement(instruction.getFirstOperand(), varTable) +
+                loadElement(instruction.getThirdOperand(), varTable) +
+                "\tputfield " + ((Operand) instruction.getSecondOperand()).getName() + " " + getDescriptor(instruction.getSecondOperand().getType()) + "\n";
+
     }
 
     private String getFieldInstruction(GetFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
@@ -402,8 +366,27 @@ public class BackendStage implements JasminBackend {
                 return "V";
             case STRING:
                 return "Ljava/lang/String;";
+            case BOOLEAN:
+                return "Z";
             default:
                 return "ERROR descriptor not implemented";
+        }
+    }
+
+    private String getOperation(Operation operation) {
+        switch(operation.getOpType()) {
+            case GTE:
+                return "if_icmpge";
+            case LTH:
+                return "if_icmplt";
+            case ADD:
+                return "iadd";
+            case MUL:
+                return "imul";
+            case SUB:
+                return "isub";
+            default:
+                return "ERROR operation not implemented yet";
         }
     }
 

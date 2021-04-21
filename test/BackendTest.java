@@ -65,4 +65,24 @@ public class BackendTest {
         var output = result.run();
         System.out.println(output);
     }
+
+    @Test
+    public void testMyClass4() {
+        var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/myclass4.ollir")), null, new ArrayList<>()));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        System.out.println(output);
+    }
+
+    @Test
+    public void testFac() {
+        var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/Fac.ollir")), null, new ArrayList<>()));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        System.out.println(output);
+    }
 }

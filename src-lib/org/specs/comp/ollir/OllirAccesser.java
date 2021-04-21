@@ -36,4 +36,8 @@ public class OllirAccesser {
     public static Type getFieldType(GetFieldInstruction instruction) {
         return instruction.fieldType;
     }
+
+    public static Operation getUnaryInstructionOp(UnaryOpInstruction instruction) {
+        return instruction.operation;
+    }
 }
