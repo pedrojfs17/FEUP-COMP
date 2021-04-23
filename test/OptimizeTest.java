@@ -24,4 +24,10 @@ public class OptimizeTest {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
         TestUtils.noErrors(result.getReports());
     }
+
+    @Test
+    public void testSimple() {
+        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Simple.jmm"));
+        TestUtils.noErrors(result.getReports());
+    }
 }

@@ -26,6 +26,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("VAR_DECLARATION", this::dealWithVarDeclaration);
         addVisit("NEW", this::dealWithNew);
+        addVisit("OBJECT", this::dealWithObject);
         addVisit("ARRAY", this::dealWithArray);
         addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         addVisit("LENGTH", this::dealWithInt);
@@ -105,6 +106,10 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
 
     private String dealWithNew(JmmNode jmmNode, List<Report> reports) {
         return visit(jmmNode.getChildren().get(0), reports);
+    }
+
+    private String dealWithObject(JmmNode jmmNode, List<Report> reports) {
+        return jmmNode.get("name");
     }
 
     private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
@@ -265,7 +270,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             return "<Unknown>";
         }
 
-        if (jmmNode.getParent().getKind().equals("OPERATION") && !initializedVariables.contains(jmmNode.get("name"))) {
+        if (jmmNode.getParent().getKind().equals("OPERATION") && !initializedVariables.contains(jmmNode.get("name")) && !symbolTable.getMethod(ancestor.get().get("name")).containsParameter(jmmNode.get("name"))) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,

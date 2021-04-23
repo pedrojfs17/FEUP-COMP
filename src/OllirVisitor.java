@@ -14,6 +14,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
         addVisit("CLASS_DECLARATION", this::dealWithClass);
         addVisit("MAIN", this::dealWithMain);
+        addVisit("METHOD_DECLARATION", this::dealWithMethodDeclaration);
         addVisit("OBJECT_METHOD", this::dealWithObjectMethod);
         setDefaultVisit(this::defaultVisit);
     }
@@ -26,12 +27,23 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         // Visitar filhos da call
         // Construir lista de argumentos
 
-        if (symbolTable.checkVariableInImports(identifier.get("name"))) {
+        if (identifier.getKind().equals("IDENTIFIER") && symbolTable.checkVariableInImports(identifier.get("name"))) {
             methodStr.append("invokestatic(" + identifier.get("name") + ", \"" + call.get("name")+ "\"");
             // Inserir argumentos
             methodStr.append(").V;\n");
         }
-        System.out.println(methodStr);
+        else {
+            String varName = !identifier.getKind().equals("THIS") ? identifier.get("name") : "this";
+            String callName = !call.getKind().equals("LENGTH") ? call.get("name") : "length";
+            methodStr.append("invokevirtual(" + varName + ", \"" + callName + "\"");
+            if(callName.equals("length")) methodStr.append(").i32;\n");
+            else {
+
+                // Inserir argumentos
+                methodStr.append(").V;\n");
+            }
+
+        }
         return methodStr.toString();
     }
 
@@ -46,6 +58,35 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         mainStr.append("}\n");
 
         return mainStr.toString();
+    }
+
+    private String dealWithMethodDeclaration(JmmNode jmmNode, List<Report> reports) {
+        StringBuilder mainStr = new StringBuilder();
+        mainStr.append("\n.method public "+jmmNode.get("name")+"(");
+
+        for (JmmNode child : jmmNode.getChildren()) {
+            if(child.getKind().equals("PARAMETER")) {
+                mainStr.append(child.get("name")+"."+parseType(child.get("type"))+", ");
+            } else
+                continue;
+        }
+        mainStr.delete(mainStr.length()-2,mainStr.length());
+        mainStr.append(")."+parseType(jmmNode.get("return"))+"{\n");
+        for (JmmNode child : jmmNode.getChildren()) {
+            if(child.getKind().equals("PARAMETER")) continue;
+            mainStr.append(visit(child, reports));
+        }
+        mainStr.append("}\n");
+
+        return mainStr.toString();
+    }
+
+    private String parseType(String type) {
+        if(type.equals("int"))
+            return "i32";
+        else if(type.equals("void"))
+            return "V";
+        return type;
     }
 
     private String defaultVisit(JmmNode jmmNode, List<Report> reports) {

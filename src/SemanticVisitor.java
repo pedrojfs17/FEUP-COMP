@@ -24,18 +24,18 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         var children = jmmNode.getChildren();
         Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
 
-        if (children.get(0).getKind().equals("THIS")) {
+        if (children.get(1).getKind().equals("LENGTH")) {
+            if (!children.get(0).getKind().equals("IDENTIFIER"))
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
+            else if (!symbolTable.getVariable(children.get(0).get("name"), ancestor.get().get("name")).getType().getName().equals("int array"))
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
+        } else if (children.get(0).getKind().equals("THIS")) {
             if (symbolTable.getMethod(children.get(1).get("name")) == null) {
                 if (symbolTable.getSuper() == null)
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() isn't declared"));
             }
             else if (children.get(1).getChildren().size() != symbolTable.getMethod(children.get(1).get("name")).getParameters().size())
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() has the wrong number of arguments"));
-        } else if (children.get(1).getKind().equals("LENGTH")) {
-            if (!children.get(0).getKind().equals("IDENTIFIER"))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
-            else if (!symbolTable.getVariable(children.get(0).get("name"), ancestor.get().get("name")).getType().getName().equals("int array"))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(0).get("line") != null ? Integer.parseInt(children.get(0).get("line")) : 0, Integer.parseInt(children.get(0).get("col")), "Length does not exist over simple types"));
         }
         visit(jmmNode.getChildren().get(1), reports);
         return true;
