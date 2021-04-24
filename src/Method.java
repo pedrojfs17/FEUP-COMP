@@ -29,7 +29,17 @@ public class Method {
         for( Symbol symbol: localVariables) {
             if(symbol.getName().equals(varName)) return symbol;
         }
+        for (Symbol symbol: parameters) {
+            if(symbol.getName().equals(varName)) return symbol;
+        }
         return null;
+    }
+
+    public boolean containsParameter(String varName) {
+        for (Symbol symbol: parameters) {
+            if(symbol.getName().equals(varName)) return true;
+        }
+        return false;
     }
 
     public Symbol getLocalVariable(int index) {

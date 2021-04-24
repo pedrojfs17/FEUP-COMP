@@ -26,6 +26,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("VAR_DECLARATION", this::dealWithVarDeclaration);
         addVisit("NEW", this::dealWithNew);
+        addVisit("OBJECT", this::dealWithObject);
         addVisit("ARRAY", this::dealWithArray);
         addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         addVisit("LENGTH", this::dealWithInt);
@@ -33,11 +34,12 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("METHOD_CALL", this::dealWithMethodCall);
         addVisit("LESS", this::dealWithLess);
         addVisit("AND", this::dealWithAnd);
-        addVisit("NOT", this::dealWithNot);
+        addVisit("EXCLAMATION", this::dealWithExclamation);
         addVisit("WHILE", this::dealWithCondition);
         addVisit("IF", this::dealWithCondition);
         setDefaultVisit(this::defaultVisit);
     }
+
 
     private String defaultVisit(JmmNode jmmNode, List<Report> reports) {
         for (JmmNode child : jmmNode.getChildren())
@@ -53,7 +55,10 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         return "int";
     }
 
-    private String dealWithNot(JmmNode jmmNode, List<Report> reports) {
+
+
+
+    private String dealWithExclamation(JmmNode jmmNode, List<Report> reports) {
         String expressionType = visit(jmmNode.getChildren().get(0), reports);
 
         if (!expressionType.equals("boolean")) {
@@ -66,7 +71,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        return "int array";
+        return "boolean";
     }
 
     private String dealWithArray(JmmNode jmmNode, List<Report> reports) {
@@ -88,7 +93,6 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     private String dealWithObjectMethod(JmmNode jmmNode, List<Report> reports) {
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode method = jmmNode.getChildren().get(1);
-
         visit(identifier, reports);
         return visit(method, reports);
     }
@@ -96,15 +100,33 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     private String dealWithMethodCall(JmmNode jmmNode, List<Report> reports) {
         for (JmmNode child : jmmNode.getChildren())
             visit(child, reports);
-
+        
         if (symbolTable.getMethod(jmmNode.get("name")) != null)
             return symbolTable.getReturnType(jmmNode.get("name")).getName();
+        else if(!jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).getKind().equals("THIS")) {
+            if(symbolTable.getImports().contains(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name")))
+                return "import";
+            else if(symbolTable.getSuper()!=null) {
+                Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
+                Symbol symbol = symbolTable.getVariable(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name"),ancestor.get().get("name"));
+                if(symbol.getType().getName().equals(symbolTable.getClassName()))
+                    return "extends";
+                else
+                    return "";
+            }
+            else
+                return "";
+        }
         else
             return "";
     }
 
     private String dealWithNew(JmmNode jmmNode, List<Report> reports) {
         return visit(jmmNode.getChildren().get(0), reports);
+    }
+
+    private String dealWithObject(JmmNode jmmNode, List<Report> reports) {
+        return jmmNode.get("name");
     }
 
     private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
@@ -182,7 +204,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
+                    "Type mismatch in less. <" + lhsType + "> to <" + rhsType + ">"
             ));
         }
 
@@ -202,7 +224,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in operation. <" + rhsType + "> should be <int>"
+                    "Type mismatch in less. <" + rhsType + "> should be <int>"
             ));
         }
 
@@ -216,13 +238,18 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         String lhsType = visit(lhs, reports);
         String rhsType = visit(rhs, reports);
 
+        System.out.println(lhs);
+        System.out.println(lhsType);
+        System.out.println(rhs);
+        System.out.println(rhsType);
+
         if (!lhsType.equals(rhsType)) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in operation. <" + lhsType + "> to <" + rhsType + ">"
+                    "Type mismatch in and. <" + lhsType + "> to <" + rhsType + ">"
             ));
         }
 
@@ -232,7 +259,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(lhs.get("line")),
                     Integer.parseInt(lhs.get("col")),
-                    "Type mismatch in less. <" + lhsType + "> should be <int>"
+                    "Type mismatch in and. <" + lhsType + "> should be <boolean>"
             ));
         }
 
@@ -242,7 +269,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     Stage.SEMANTIC,
                     Integer.parseInt(rhs.get("line")),
                     Integer.parseInt(rhs.get("col")),
-                    "Type mismatch in operation. <" + rhsType + "> should be <int>"
+                    "Type mismatch in and. <" + rhsType + "> should be <boolean>"
             ));
         }
 
@@ -265,7 +292,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             return "<Unknown>";
         }
 
-        if (jmmNode.getParent().getKind().equals("OPERATION") && !initializedVariables.contains(jmmNode.get("name"))) {
+        if (jmmNode.getParent().getKind().equals("OPERATION") && !initializedVariables.contains(jmmNode.get("name")) && !symbolTable.getMethod(ancestor.get().get("name")).containsParameter(jmmNode.get("name"))) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -282,7 +309,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         JmmNode lhs = jmmNode.getChildren().get(0);
         JmmNode rhs = jmmNode.getChildren().get(1);
 
-        if (!lhs.getKind().equals("IDENTIFIER") && !lhs.getKind().equals("ARRAY")) {
+        if (!lhs.getKind().equals("IDENTIFIER") && !lhs.getKind().equals("ARRAY_ACCESS")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -295,7 +322,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         String lhsType = visit(lhs, reports);
         String rhsType = visit(rhs, reports);
 
-        if (!lhsType.equals(rhsType)) {
+        if (!lhsType.equals(rhsType) && !rhsType.equals("import") && !rhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -315,7 +342,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
 
     private String dealWithCondition(JmmNode jmmNode, List<Report> reports) {
         String condition = visit(jmmNode.getChildren().get(0), reports);
-
+        System.out.println(jmmNode);
         if (!condition.equals("boolean")) {
             reports.add(new Report(
                     ReportType.ERROR,
