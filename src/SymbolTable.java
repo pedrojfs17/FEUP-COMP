@@ -57,32 +57,13 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
             System.out.println(node);
             if(node.contains("PARAMETER"))this.addParamOrVar(method,node, true);
             else if(node.contains("VAR_DECLARATION"))this.addParamOrVar(method,node,false);
-            //else if(node.contains("ASSIGNMENT"))this.verifyAssignment(method,node);
             i++;
             node=arr[i];
         }
         this.methods.put(name,method);
         return --i;
     }
-    /*
-    private void verifyAssignment(Method method, String node) {
-        String var = (node.substring(node.indexOf("=")+1,node.indexOf(","))).trim();
-        if(!method.getLocalVarNames().contains(var))
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0, "Variable "+var+" isn't declared"));
-        String[] assignment = (node.substring(node.lastIndexOf("=")+1,node.lastIndexOf("]"))).trim().split("[+ -\*\/&&]+");
-        System.out.println(var+" assigned "+ Arrays.toString(assignment));
-        for (String s : assignment) {
-            if(s.equals("true")||s.equals("false")||s.equals("this"))
-                continue;
-            try {
-                Integer.parseInt(s);
-            } catch (Exception e) {
-                continue;
-            }
-            if(!method.getLocalVarNames().contains(s))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0 ,"Variable "+s+" isn't declared"));
-        }
-    }*/
+
 
     private void addParamOrVar(Method method, String node, boolean isParam) {
         String name = (node.substring(node.indexOf("name=")+5,node.lastIndexOf(","))).trim();

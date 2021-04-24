@@ -46,7 +46,11 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode assignment = jmmNode.getChildren().get(1);
         Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
-        Symbol var = symbolTable.getVariable(identifier.get("name"), ancestor.get().get("name"));
+        Symbol var;
+        if(identifier.getKind().equals("ARRAY_ACCESS"))
+            var = symbolTable.getVariable(identifier.getChildren().get(0).get("name"), ancestor.get().get("name"));
+        else
+            var = symbolTable.getVariable(identifier.get("name"), ancestor.get().get("name"));
 
 
         // Visitar filhos do assignment
@@ -57,8 +61,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         if (assignment.getKind().equals("INT")) {
             methodStr.append(assignment.get("value") + ".i32\n");
         } else if (assignment.getKind().equals("NEW")) {
-            methodStr.append("new(" + assignment.getChildren().get(0).get("name") + ")." + assignment.getChildren().get(0).get("name") + "\n");
-            methodStr.append("\t\tinvokespecial(" + identifier.get("name") + "." + assignment.getChildren().get(0).get("name") + ", \"<init>\").V\n");
+            if (assignment.getChildren().get(0).getKind().equals("ARRAY")) {
+                methodStr.append("new(array, " + assignment.getChildren().get(0).getChildren().get(0).get("value") + ".i32).array.i32\n");
+            } else if (assignment.getChildren().get(0).getKind().equals("IDENTIFIER")) {
+                methodStr.append("new(" + assignment.getChildren().get(0).get("name") + ")." + assignment.getChildren().get(0).get("name") + "\n");
+                methodStr.append("\t\tinvokespecial(" + identifier.get("name") + "." + assignment.getChildren().get(0).get("name") + ", \"<init>\").V\n");
+            }
+
         } else if (assignment.getKind().equals("TRUE") || assignment.getKind().equals("FALSE")) {
             methodStr.append(parseType(assignment.getKind()) + "\n");
         } else if (assignment.getKind().equals("OBJECT_METHOD")) {
@@ -108,7 +117,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                     grandchildren = true;
                     if (grandchild.getKind().equals("IDENTIFIER")) {
                         Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
-                        Symbol var = symbolTable.getVariable(identifier.get("name"), ancestor.get().get("name"));
+                        Symbol var = symbolTable.getVariable(grandchild.get("name"), ancestor.get().get("name"));
                         methodStr.append(var.getName() + "." + parseType(var.getType().getName()) + ", ");
                     } else if (grandchild.getKind().equals("INT")) {
                         methodStr.append(grandchild.get("value") + ".i32\n");
@@ -171,21 +180,20 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             return "0.bool";
         else if (type.equals("TRUE"))
             return "1.bool";
+        else if (type.equals("int array"))
+            return "array.i32";
         return type;
     }
 
     private String defaultVisit(JmmNode jmmNode, List<Report> reports) {
         StringBuilder visitStr = new StringBuilder();
-        System.out.println(jmmNode.getKind());
         for (JmmNode child : jmmNode.getChildren()) {
-            System.out.println(child.getKind());
             visitStr.append(visit(child, reports));
         }
         return visitStr.toString();
     }
 
     private String dealWithClass(JmmNode jmmNode, List<Report> reports) {
-        System.out.println("VISITANDUWU");
         StringBuilder classStr = new StringBuilder();
         String className = jmmNode.get("name");
         classStr.append(className + " {\n" +
