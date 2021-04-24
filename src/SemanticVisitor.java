@@ -16,7 +16,6 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         this.symbolTable = symbolTable;
         addVisit("OBJECT_METHOD", this::dealWithOBJECTMETHOD);
         addVisit("METHOD_CALL", this::dealWithMETHODCALL);
-        addVisit("OPERATION", this::dealWithOPERATION);
         addVisit("AND", this::dealWithAND);
         setDefaultVisit(this::defaultVisit);
     }
@@ -26,8 +25,10 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
         Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
 
         if (children.get(0).getKind().equals("THIS")) {
-            if (symbolTable.getMethod(children.get(1).get("name")) == null)
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() isn't declared"));
+            if (symbolTable.getMethod(children.get(1).get("name")) == null) {
+                if (symbolTable.getSuper() == null)
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() isn't declared"));
+            }
             else if (children.get(1).getChildren().size() != symbolTable.getMethod(children.get(1).get("name")).getParameters().size())
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, children.get(1).get("line") != null ? Integer.parseInt(children.get(1).get("line")) : 0, Integer.parseInt(children.get(1).get("col")), "Method " + children.get(1).get("name") + "() has the wrong number of arguments"));
         } else if (children.get(1).getKind().equals("LENGTH")) {
@@ -77,26 +78,6 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
     }
 
 
-    private Boolean dealWithOPERATION(JmmNode jmmNode, List<Report> reports) {
-        var children = jmmNode.getChildren();
-
-        for (JmmNode child : children) {
-            if (child.getKind().equals("IDENTIFIER")) {
-                Optional<JmmNode> method = child.getAncestor("MAIN").isPresent() ? child.getAncestor("MAIN") : child.getAncestor("METHOD_DECLARATION");
-                Symbol symbol = symbolTable.getVariable(child.get("name"), method.get().get("name"));
-                if (!symbol.getType().getName().equals("int")) {
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Variable \"" + child.get("name") + "\" isn't type int"));
-                }
-
-            } else if (!child.getKind().equals("INT")) {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), child.getKind() + " can't be in a operation"));
-            }
-            visit(child, reports);
-        }
-
-        return true;
-    }
-
     private Boolean dealWithAND(JmmNode jmmNode, List<Report> reports) {
         var children = jmmNode.getChildren();
 
@@ -105,11 +86,11 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
                 Optional<JmmNode> method = child.getAncestor("MAIN").isPresent() ? child.getAncestor("MAIN") : child.getAncestor("METHOD_DECLARATION");
                 Symbol symbol = symbolTable.getVariable(child.get("name"), method.get().get("name"));
                 if (!symbol.getType().getName().equals("boolean")) {
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Variable \"" + child.get("name") + "\" isn't type int"));
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Variable \"" + child.get("name") + "\" isn't type boolean"));
                 }
 
             } else if (!child.getKind().equals("TRUE") && !child.getKind().equals("FALSE") ) {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), child.getKind() + " can't be in a operation"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), child.getKind() + " can't be in a logical operation"));
             }
             visit(child, reports);
         }

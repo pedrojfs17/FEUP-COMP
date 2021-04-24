@@ -107,10 +107,9 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
 
     private void addClassName(String node) {
         if(node.contains("super")) {
-            this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf(",")));
-            this.superClass = (node.substring(node.indexOf("super=")+6,node.lastIndexOf("]")));
+            this.superClass = (node.substring(node.indexOf("super=")+6,node.indexOf(",")));
         }
-        else this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf("]")));
+        this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf("]")));
     }
 
     private void addImport(String node) {
@@ -159,6 +158,13 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         Symbol globalVar = this.getField(variableName);
         Symbol localVar = this.getMethod(methodName).getLocalVariable(variableName);
         return localVar != null ? localVar : globalVar;
+    }
+
+    public boolean checkVariableInImports(String variableName) {
+        for (String imp : imports) {
+            if (imp.equals(variableName)) return true;
+        }
+        return false;
     }
 
     @Override

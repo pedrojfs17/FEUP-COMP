@@ -1,8 +1,5 @@
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -61,9 +58,9 @@ public class AnalysisStage implements JmmAnalysis {
         //var varPrinter = new ExamplePrintVariables("Variable", "name", "line");
         //varPrinter.visit(node, null);
 
-        // No Symbol Table being calculated yet
-        return new JmmSemanticsResult(parserResult, symbolTable, reports);
+        reports.sort(Comparator.comparing(Report::getLine));
 
+        return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }
 
 }
