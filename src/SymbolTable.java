@@ -57,32 +57,13 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
             System.out.println(node);
             if(node.contains("PARAMETER"))this.addParamOrVar(method,node, true);
             else if(node.contains("VAR_DECLARATION"))this.addParamOrVar(method,node,false);
-            //else if(node.contains("ASSIGNMENT"))this.verifyAssignment(method,node);
             i++;
             node=arr[i];
         }
         this.methods.put(name,method);
         return --i;
     }
-    /*
-    private void verifyAssignment(Method method, String node) {
-        String var = (node.substring(node.indexOf("=")+1,node.indexOf(","))).trim();
-        if(!method.getLocalVarNames().contains(var))
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0, "Variable "+var+" isn't declared"));
-        String[] assignment = (node.substring(node.lastIndexOf("=")+1,node.lastIndexOf("]"))).trim().split("[+ -\*\/&&]+");
-        System.out.println(var+" assigned "+ Arrays.toString(assignment));
-        for (String s : assignment) {
-            if(s.equals("true")||s.equals("false")||s.equals("this"))
-                continue;
-            try {
-                Integer.parseInt(s);
-            } catch (Exception e) {
-                continue;
-            }
-            if(!method.getLocalVarNames().contains(s))
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0 ,"Variable "+s+" isn't declared"));
-        }
-    }*/
+
 
     private void addParamOrVar(Method method, String node, boolean isParam) {
         String name = (node.substring(node.indexOf("name=")+5,node.lastIndexOf(","))).trim();
@@ -107,10 +88,9 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
 
     private void addClassName(String node) {
         if(node.contains("super")) {
-            this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf(",")));
-            this.superClass = (node.substring(node.indexOf("super=")+6,node.lastIndexOf("]")));
+            this.superClass = (node.substring(node.indexOf("super=")+6,node.indexOf(",")));
         }
-        else this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf("]")));
+        this.className = (node.substring(node.indexOf("name=")+5,node.lastIndexOf("]")));
     }
 
     private void addImport(String node) {
@@ -159,6 +139,13 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         Symbol globalVar = this.getField(variableName);
         Symbol localVar = this.getMethod(methodName).getLocalVariable(variableName);
         return localVar != null ? localVar : globalVar;
+    }
+
+    public boolean checkVariableInImports(String variableName) {
+        for (String imp : imports) {
+            if (imp.equals(variableName)) return true;
+        }
+        return false;
     }
 
     @Override
