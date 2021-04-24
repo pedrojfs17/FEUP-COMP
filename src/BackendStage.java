@@ -72,9 +72,7 @@ public class BackendStage implements JasminBackend {
     private String classHeader(ClassUnit classUnit) {
         StringBuilder jasminCode = new StringBuilder(".class");
 
-        if (classUnit.getClassAccessModifier() == AccessModifiers.DEFAULT)
-            jasminCode.append(" public");
-        else
+        if (classUnit.getClassAccessModifier() != AccessModifiers.DEFAULT)
             jasminCode.append(" ").append(classUnit.getClassAccessModifier().toString().toLowerCase());
 
         jasminCode.append(" ").append(classUnit.getClassName()).append("\n")
@@ -155,7 +153,7 @@ public class BackendStage implements JasminBackend {
             jasminCode.append(" final");
 
         if(method.isConstructMethod())
-            jasminCode.append("<init>");
+            jasminCode.append(" <init>");
         else
             jasminCode.append(" ").append(method.getMethodName());
 
@@ -311,7 +309,7 @@ public class BackendStage implements JasminBackend {
         } else if(func == CallType.invokespecial) {
             jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
             jasminCode.append("\t").append(func)
-                    .append(" ").append("java/lang/Object.<init>()V;")
+                    .append(" ").append("java/lang/Object/<init>()V")
                     .append("\n");
             limitStack(1);
         }
@@ -421,17 +419,26 @@ public class BackendStage implements JasminBackend {
     }
 
     private String getDescriptor(Type type) {
-        switch (type.getTypeOfElement()) {
+        ElementType elementType;
+        String jasminCode;
+        if (type.getTypeOfElement() == ElementType.ARRAYREF) {
+            elementType = ((ArrayType) type).getTypeOfElements();
+            jasminCode = "[";
+        }
+        else {
+            elementType = type.getTypeOfElement();
+            jasminCode = "";
+        }
+
+        switch (elementType) {
             case INT32:
-                return "I";
-            case ARRAYREF:
-                return "[I";
+                return jasminCode + "I";
             case VOID:
-                return "V";
+                return jasminCode + "V";
             case STRING:
-                return "Ljava/lang/String;";
+                return jasminCode + "Ljava/lang/String;";
             case BOOLEAN:
-                return "Z";
+                return jasminCode + "Z";
             default:
                 return "ERROR descriptor not implemented";
         }
