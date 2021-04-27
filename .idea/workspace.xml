@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="61d0262a-78db-47d1-8b94-a3478b4a1821" name="Default Changelist" comment="Fixing errors but starting to work">
+    <list default="true" id="61d0262a-78db-47d1-8b94-a3478b4a1821" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +84,7 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Gradle.BackendTest.testMyClass3">
+  <component name="RunManager" selected="Gradle.OptimizeTest">
     <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -206,11 +205,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.OptimizeTest" />
         <item itemvalue="Gradle.BackendTest.testMyClass3" />
         <item itemvalue="Gradle.BackendTest.testMyClass4" />
         <item itemvalue="Gradle.BackendTest.testMyClass2" />
         <item itemvalue="Gradle.BackendTest.testMyClass1" />
-        <item itemvalue="Gradle.OptimizeTest" />
       </list>
     </recent_temporary>
   </component>
@@ -241,7 +240,7 @@
       <workItem from="1619280369505" duration="1502000" />
       <workItem from="1619285437901" duration="24000" />
       <workItem from="1619341265658" duration="8551000" />
-      <workItem from="1619444652904" duration="10238000" />
+      <workItem from="1619444652904" duration="11688000" />
     </task>
     <task id="LOCAL-00001" summary="Started jasmin generation">
       <created>1618397680007</created>
@@ -299,7 +298,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619190838058</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="More error fixing">
+      <created>1619519919614</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1619519919615</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -318,6 +324,7 @@
     <MESSAGE value="Small changes" />
     <MESSAGE value="Added missing descriptors and operators and limit stack and locals" />
     <MESSAGE value="Fixing errors but starting to work" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing errors but starting to work" />
+    <MESSAGE value="More error fixing" />
+    <option name="LAST_COMMIT_MESSAGE" value="More error fixing" />
   </component>
 </project>

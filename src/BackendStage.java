@@ -116,7 +116,7 @@ public class BackendStage implements JasminBackend {
         HashMap<String, Descriptor> varTable = OllirAccesser.getVarTable(method);
 
         StringBuilder instructions = new StringBuilder();
-        HashMap<String, Instruction> labels = OllirAccesser.getMethodLabels(method);
+        HashMap<String, Instruction> labels = OllirAccesser.getLabels(method);
         for (Instruction instruction: method.getInstructions()) {
             for (String s : labels.keySet()) {
                 if(labels.get(s) == instruction) {
