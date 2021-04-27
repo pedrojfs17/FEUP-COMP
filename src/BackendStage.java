@@ -26,7 +26,9 @@ import javax.swing.text.AbstractDocument;
 
 public class BackendStage implements JasminBackend {
     int conditionals;
+    int comparisons;
     int stacklimit;
+    String className;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -59,6 +61,7 @@ public class BackendStage implements JasminBackend {
 
     private String generateClass(ClassUnit classUnit) {
         StringBuilder jasminCode = new StringBuilder(classHeader(classUnit));
+        className = classUnit.getClassName();
 
         for (Field field: classUnit.getFields())
             jasminCode.append("\n").append(generateField(field));
@@ -106,6 +109,7 @@ public class BackendStage implements JasminBackend {
     private String generateMethod(Method method) {
         conditionals = 0;
         stacklimit = 0;
+        comparisons = 0;
 
         StringBuilder jasminCode = new StringBuilder(methodHeader(method));
 
@@ -122,14 +126,11 @@ public class BackendStage implements JasminBackend {
             instructions.append(generateInstruction(instruction, varTable));
         }
 
-        int count = 0;
-        for (Descriptor d: varTable.values()) {
-            if (d.getScope() == VarScope.LOCAL)
-                count++;
-        }
-
         jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
-        jasminCode.append("\t.limit locals ").append(count).append("\n\n");
+        int locals = varTable.size();
+        if (!method.isConstructMethod())
+            locals++;
+        jasminCode.append("\t.limit locals ").append(locals).append("\n\n");
 
         jasminCode.append(instructions);
 
@@ -193,6 +194,17 @@ public class BackendStage implements JasminBackend {
     private String assignInstruction(AssignInstruction instruction, HashMap<String, Descriptor> varTable) {
         StringBuilder jasminCode = new StringBuilder();
 
+        Operand o = (Operand) instruction.getDest();
+        int reg = varTable.get(o.getName()).getVirtualReg();
+
+        if(varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
+            && o.getType().getTypeOfElement() != ElementType.ARRAYREF) {
+            ArrayOperand arrayOp = (ArrayOperand) o;
+            Element index = arrayOp.getIndexOperands().get(0);
+            jasminCode.append(loadDescriptor(varTable.get(o.getName()))).append(loadElement(index, varTable));
+            limitStack(3);
+        }
+
         if (instruction.getDest().getType().getTypeOfElement() == ElementType.BOOLEAN
             && instruction.getRhs().getInstType() == InstructionType.BINARYOPER) {
             conditionals++;
@@ -210,17 +222,22 @@ public class BackendStage implements JasminBackend {
         else
             jasminCode.append(generateInstruction(instruction.getRhs(), varTable));
 
-        Operand o = (Operand) instruction.getDest();
-        int reg = varTable.get(o.getName()).getVirtualReg();
 
-        if(o.getType().getTypeOfElement() == ElementType.INT32)
-            if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF)
-                jasminCode.append("\tiastore_");
+        if(o.getType().getTypeOfElement() == ElementType.INT32 || o.getType().getTypeOfElement() == ElementType.BOOLEAN)
+            if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
+                jasminCode.append("\tiastore\n");
+                return jasminCode.toString();
+            }
             else
-                jasminCode.append("\tistore_");
+                jasminCode.append("\tistore");
         else {
-            jasminCode.append("\tastore_");
+            jasminCode.append("\tastore");
         }
+
+        if (reg <= 3)
+            jasminCode.append("_");
+        else
+            jasminCode.append(" ");
 
         jasminCode.append(reg).append("\n");
 
@@ -228,6 +245,16 @@ public class BackendStage implements JasminBackend {
     }
 
     private String branchInstruction(CondBranchInstruction instruction, HashMap<String, Descriptor> varTable) {
+        if (instruction.getCondOperation().getOpType() == OperationType.ANDB) {
+            comparisons++;
+            return loadElement(instruction.getLeftOperand(), varTable) +
+                    "\tifeq False" + comparisons + "\n" +
+                    loadElement(instruction.getRightOperand(), varTable) +
+                    "\tifeq False" + comparisons + "\n" +
+                    "\tgoto " + instruction.getLabel() + "\n" +
+                    "False" + comparisons + ":\n";
+        }
+
         String jasminCode = loadElement(instruction.getLeftOperand(), varTable) +
                 loadElement(instruction.getRightOperand(), varTable);
 
@@ -243,7 +270,7 @@ public class BackendStage implements JasminBackend {
     }
 
     private String returnInstruction(ReturnInstruction instruction, HashMap<String, Descriptor> varTable) {
-        if (instruction.hasReturnValue())
+        if (!instruction.hasReturnValue())
             return "\treturn\n";
 
         StringBuilder jasminCode = new StringBuilder();
@@ -251,8 +278,9 @@ public class BackendStage implements JasminBackend {
         jasminCode.append(loadElement(instruction.getOperand(), varTable));
         limitStack(1);
 
-        Element returnValue = instruction.getOperand();
-        if (returnValue.isLiteral() || ((Operand) returnValue).getType().getTypeOfElement() == ElementType.INT32)
+        ElementType returnType = instruction.getOperand().getType().getTypeOfElement();
+
+        if (returnType == ElementType.INT32 || returnType == ElementType.BOOLEAN)
             jasminCode.append("\tireturn\n");
         else
             jasminCode.append("\tareturn\n");
@@ -261,31 +289,7 @@ public class BackendStage implements JasminBackend {
     }
 
     private String singleOpInstruction(SingleOpInstruction instruction, HashMap<String, Descriptor> varTable) {
-        Element singleOperand = instruction.getSingleOperand();
-
-        if (singleOperand.isLiteral()) {
-            limitStack(1);
-            return loadLiteral((LiteralElement) singleOperand);
-        }
-
-        Operand o = (Operand) singleOperand;
-        Descriptor e = varTable.get(o.getName());
-
-        if (o.getType().getTypeOfElement() != ElementType.ARRAYREF &&
-                e.getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
-            ArrayOperand arrayOp = (ArrayOperand)singleOperand;
-            Element index = arrayOp.getIndexOperands().get(0);
-            limitStack(3);
-            return loadDescriptor(e) + loadElement(index, varTable) + "\tiaload\n";
-        }
-
-        int reg = e.getVirtualReg();
-        limitStack(1);
-
-        if (o.getType().getTypeOfElement() == ElementType.INT32)
-            return "\tiload_" + reg + "\n";
-        else
-            return "\taload_" + reg + "\n";
+        return loadElement(instruction.getSingleOperand(), varTable);
     }
 
     private String callInstruction(CallInstruction instruction, HashMap<String, Descriptor> varTable) {
@@ -300,17 +304,34 @@ public class BackendStage implements JasminBackend {
                 jasminCode.append("\tnew ")
                         .append(((Operand) instruction.getFirstArg()).getName()).append("\n")
                         .append("\tdup\n");
-                if(instruction.getNumOperands() > 1)
-                    limitStack(instruction.getNumOperands());
-                else
-                    limitStack(1);
+
+                limitStack(Math.max(instruction.getNumOperands(), 1));
+            } else if(instruction.getReturnType().getTypeOfElement() == ElementType.ARRAYREF) {
+                for (Element e: instruction.getListOfOperands())
+                    jasminCode.append(loadElement(e, varTable));
+
+                jasminCode.append("\tnewarray ");
+                switch (instruction.getListOfOperands().get(0).getType().getTypeOfElement()) {
+                    case INT32:
+                        jasminCode.append("int\n");
+                        break;
+                    default:
+                        jasminCode.append("array type not implemented\n");
+                }
+
+
+                limitStack(Math.max(instruction.getNumOperands(), 1));
             } else
                 jasminCode.append("\tnew (not implemented)\n");
+
         } else if(func == CallType.invokespecial) {
             jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
             jasminCode.append("\t").append(func)
-                    .append(" ").append("java/lang/Object/<init>()V")
-                    .append("\n");
+                    .append(" ").append(getFuncName(((LiteralElement)instruction.getSecondArg()).getLiteral()))
+                    .append("(");
+            for (Element e : instruction.getListOfOperands())
+                jasminCode.append(getDescriptor(e.getType()));
+            jasminCode.append(")").append(getDescriptor(instruction.getReturnType())).append("\n");
             limitStack(1);
         }
         else if (func == CallType.invokevirtual) {
@@ -319,7 +340,7 @@ public class BackendStage implements JasminBackend {
                 jasminCode.append(loadElement(e, varTable));
             limitStack(instruction.getNumOperands() + 1);
             jasminCode.append("\tinvokevirtual ")
-                    .append(((Operand)instruction.getFirstArg()).getName())
+                    .append(getObjectName(((ClassType)instruction.getFirstArg().getType()).getName()))
                     .append(".").append(((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", ""))
                     .append("(");
             for (Element e: instruction.getListOfOperands())
@@ -331,7 +352,7 @@ public class BackendStage implements JasminBackend {
                 jasminCode.append(loadElement(e, varTable));
             limitStack(instruction.getNumOperands());
             jasminCode.append("\tinvokestatic ")
-                    .append(((Operand)instruction.getFirstArg()).getName())
+                    .append(getObjectName(((Operand)instruction.getFirstArg()).getName()))
                     .append(".").append(((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", ""))
                     .append("(");
             for (Element e: instruction.getListOfOperands())
@@ -370,15 +391,21 @@ public class BackendStage implements JasminBackend {
         limitStack(2);
         return loadElement(instruction.getFirstOperand(), varTable) +
                 loadElement(instruction.getThirdOperand(), varTable) +
-                "\tputfield " + ((Operand) instruction.getSecondOperand()).getName() + " " + getDescriptor(instruction.getSecondOperand().getType()) + "\n";
+                "\tputfield " +
+                getObjectName(((Operand) instruction.getFirstOperand()).getName()) +
+                "/" + ((Operand) instruction.getSecondOperand()).getName() +
+                " " + getDescriptor(instruction.getSecondOperand().getType()) + "\n";
 
     }
 
     private String getFieldInstruction(GetFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
         limitStack(1);
+
         return loadElement(instruction.getFirstOperand(), varTable) +
-                "\tgetfield " + getDescriptor(OllirAccesser.getFieldType(instruction)) +
-                " " + ((Operand) instruction.getSecondOperand()).getName() + "\n";
+                "\tgetfield " +
+                getObjectName(((Operand) instruction.getSecondOperand()).getName()) +
+                "/" + ((Operand) instruction.getSecondOperand()).getName() +
+                " " + getDescriptor(OllirAccesser.getFieldType(instruction)) + "\n";
     }
 
     private String loadElement(Element e, HashMap<String, Descriptor> varTable) {
@@ -386,6 +413,14 @@ public class BackendStage implements JasminBackend {
             return loadLiteral((LiteralElement) e);
 
         Descriptor d = varTable.get(((Operand) e).getName());
+
+        if (e.getType().getTypeOfElement() != ElementType.ARRAYREF
+                && d.getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
+            ArrayOperand arrayOp = (ArrayOperand) e;
+            Element index = arrayOp.getIndexOperands().get(0);
+            return loadDescriptor(d) + loadElement(index, varTable) + "\tiaload\n";
+        }
+
         return loadDescriptor(d);
     }
 
@@ -396,20 +431,24 @@ public class BackendStage implements JasminBackend {
 
         StringBuilder jasminCode = new StringBuilder();
         if (t == ElementType.INT32 || t == ElementType.BOOLEAN)
-            jasminCode.append("\tiload_");
+            jasminCode.append("\tiload");
         else if (t == ElementType.STRING || t == ElementType.ARRAYREF || t == ElementType.OBJECTREF)
-            jasminCode.append("\taload_");
+            jasminCode.append("\taload");
         else
             jasminCode.append("ERROR descriptor not implemented");
 
         int reg = descriptor.getVirtualReg();
+        if (reg <= 3)
+            jasminCode.append("_");
+        else
+            jasminCode.append(" ");
         jasminCode.append(reg).append("\n");
 
         return jasminCode.toString();
     }
 
     private String loadLiteral(LiteralElement element) {
-        if (element.getType().getTypeOfElement() == ElementType.INT32) {
+        if (element.getType().getTypeOfElement() == ElementType.INT32 || element.getType().getTypeOfElement() == ElementType.BOOLEAN) {
             if (Integer.parseInt(element.getLiteral()) <= 5)
                 return "\ticonst_" + element.getLiteral() + "\n";
             else
@@ -419,15 +458,12 @@ public class BackendStage implements JasminBackend {
     }
 
     private String getDescriptor(Type type) {
-        ElementType elementType;
-        String jasminCode;
-        if (type.getTypeOfElement() == ElementType.ARRAYREF) {
+        ElementType elementType = type.getTypeOfElement();
+        String jasminCode = "";
+
+        if (elementType == ElementType.ARRAYREF) {
             elementType = ((ArrayType) type).getTypeOfElements();
-            jasminCode = "[";
-        }
-        else {
-            elementType = type.getTypeOfElement();
-            jasminCode = "";
+            jasminCode += "[";
         }
 
         switch (elementType) {
@@ -450,8 +486,6 @@ public class BackendStage implements JasminBackend {
                 return "if_icmpge";
             case LTH:
                 return "if_icmplt";
-            case ANDB:
-                return "iand ???";
             case ADD:
                 return "iadd";
             case MUL:
@@ -468,6 +502,18 @@ public class BackendStage implements JasminBackend {
     private void limitStack(int s) {
         if (s > stacklimit)
             stacklimit = s;
+    }
+
+    private String getObjectName(String name) {
+        if (name.equals("this"))
+            return className;
+        return name;
+    }
+
+    private String getFuncName(String name) {
+        if (name.equals("\"<init>\""))
+            return "java/lang/Object/<init>";
+        return name;
     }
 
 }

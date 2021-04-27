@@ -36,6 +36,16 @@ public class BackendTest {
     }
 
     @Test
+    public void testMonteCarloPi() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/MonteCarloPi.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("28", output.trim());
+    }
+
+    @Test
     public void testMyClass1() {
         var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/myclass1.ollir")), null, new ArrayList<>()));
 
