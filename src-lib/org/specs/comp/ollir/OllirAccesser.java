@@ -29,10 +29,6 @@ public class OllirAccesser {
         return method.varTable;
     }
 
-    public static HashMap<String, Instruction> getMethodLabels(Method method) {
-        return method.methodLabels;
-    }
-
     public static Type getFieldType(GetFieldInstruction instruction) {
         return instruction.fieldType;
     }
@@ -40,4 +36,8 @@ public class OllirAccesser {
     public static Operation getUnaryInstructionOp(UnaryOpInstruction instruction) {
         return instruction.operation;
     }
+    public static HashMap<String, Instruction> getLabels(Method method) {
+        return method.methodLabels;
+    }
+
 }
