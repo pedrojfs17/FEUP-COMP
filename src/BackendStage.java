@@ -29,6 +29,7 @@ public class BackendStage implements JasminBackend {
     int comparisons;
     int stacklimit;
     String className;
+    String superClass;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -60,8 +61,13 @@ public class BackendStage implements JasminBackend {
     }
 
     private String generateClass(ClassUnit classUnit) {
-        StringBuilder jasminCode = new StringBuilder(classHeader(classUnit));
         className = classUnit.getClassName();
+        if (classUnit.getSuperClass() == null)
+            superClass = "java/lang/Object";
+        else
+            superClass = classUnit.getSuperClass();
+
+        StringBuilder jasminCode = new StringBuilder(classHeader(classUnit));
 
         for (Field field: classUnit.getFields())
             jasminCode.append("\n").append(generateField(field));
@@ -79,7 +85,7 @@ public class BackendStage implements JasminBackend {
             jasminCode.append(" ").append(classUnit.getClassAccessModifier().toString().toLowerCase());
 
         jasminCode.append(" ").append(classUnit.getClassName()).append("\n")
-                .append(".super java/lang/Object\n");
+                .append(".super ").append(superClass).append("\n");
 
         return jasminCode.toString();
     }
@@ -326,8 +332,14 @@ public class BackendStage implements JasminBackend {
 
         } else if(func == CallType.invokespecial) {
             jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
+            String funcName;
+            if (instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS)
+                funcName = superClass;
+            else
+                funcName = className;
+            funcName += ".<init>";
             jasminCode.append("\t").append(func)
-                    .append(" ").append(getFuncName(((LiteralElement)instruction.getSecondArg()).getLiteral()))
+                    .append(" ").append(funcName)
                     .append("(");
             for (Element e : instruction.getListOfOperands())
                 jasminCode.append(getDescriptor(e.getType()));
@@ -451,6 +463,10 @@ public class BackendStage implements JasminBackend {
         if (element.getType().getTypeOfElement() == ElementType.INT32 || element.getType().getTypeOfElement() == ElementType.BOOLEAN) {
             if (Integer.parseInt(element.getLiteral()) <= 5)
                 return "\ticonst_" + element.getLiteral() + "\n";
+            else if (Integer.parseInt(element.getLiteral()) > 255)
+                return "\tldc " + element.getLiteral() + "\n";
+            else if (Integer.parseInt(element.getLiteral()) > 127)
+                return "\tsipush " + element.getLiteral() + "\n";
             else
                 return "\tbipush " + element.getLiteral() + "\n";
         }
@@ -512,7 +528,7 @@ public class BackendStage implements JasminBackend {
 
     private String getFuncName(String name) {
         if (name.equals("\"<init>\""))
-            return "java/lang/Object/<init>";
+            return "java/lang/Object.<init>";
         return name;
     }
 
