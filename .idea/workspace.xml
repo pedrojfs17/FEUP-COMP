@@ -78,6 +78,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../grammar.jj" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -240,7 +241,7 @@
       <workItem from="1619373200828" duration="591000" />
       <workItem from="1619392891390" duration="594000" />
       <workItem from="1619443565437" duration="591000" />
-      <workItem from="1619613835778" duration="13102000" />
+      <workItem from="1619613835778" duration="16337000" />
     </task>
     <servers />
   </component>

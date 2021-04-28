@@ -81,8 +81,17 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         String str="";
         List<String> ret = new ArrayList<>();
         if(isOp(node) || node.getKind().equals("OBJECT_METHOD")) {
-            String substring = nodeString.substring(nodeString.lastIndexOf("."), nodeString.length() - 1);
-            str = "t"+tempVar+ substring +" :="+ substring +" "+nodeString+"\n";
+            String substring;
+            String before = "";
+            if(!nodeString.contains(":=."))
+                substring = nodeString.substring(nodeString.lastIndexOf("."), nodeString.length() - 1);
+            else {
+                substring = nodeString.substring(nodeString.indexOf("."), nodeString.indexOf(" "));
+                before = nodeString.substring(0,nodeString.lastIndexOf("\n")+1);
+                nodeString = nodeString.substring(nodeString.lastIndexOf("\n")+1);
+            }
+
+            str = before+"t"+tempVar+ substring +" :="+ substring +" "+nodeString+"\n";
             nodeString = "t"+tempVar+ substring;
             tempVar++;
         }
