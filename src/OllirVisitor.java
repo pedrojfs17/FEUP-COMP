@@ -47,12 +47,20 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         String whileString = "\t\tLoop"+localLabel+":\n";
         if(condition.getKind().equals("OBJECT_METHOD")) {
             whileString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
-            condString = "t"+tempVar+".bool ==.bool 1.bool;";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
             tempVar++;
+        } else if(condition.getKind().equals("IDENTIFIER")) {
+            condString+= " !.bool "+condString;
         }
         if (condString.contains("\n")) {
-            whileString+="\t\t\t"+condString.substring(0,condString.lastIndexOf("\n"))+"\n";
-            condString = condString.substring(condString.lastIndexOf("\n")+1);
+            whileString+=condString.substring(0,condString.lastIndexOf("\n"));
+            whileString += "t"+tempVar+".bool :=.bool "+ condString.substring(condString.lastIndexOf("\n")+1)+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if (containsOps(condString)){
+            whileString += "t"+tempVar+".bool :=.bool "+ condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
         }
         if(condString.contains(";"))
             condString = condString.substring(0,condString.length()-1);
@@ -84,14 +92,20 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         labelCount++;
         if(condition.getKind().equals("OBJECT_METHOD")) {
             ifString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
-            condString = "t"+tempVar+".bool ==.bool 1.bool;";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
             tempVar++;
         } else if(condition.getKind().equals("IDENTIFIER")) {
-            condString+= " ==.bool 1.bool";
+            condString+= " !.bool "+condString;
         }
         if (condString.contains("\n")) {
             ifString+=condString.substring(0,condString.lastIndexOf("\n"));
-            condString = condString.substring(condString.lastIndexOf("\n")+1);
+            ifString += "t"+tempVar+".bool :=.bool "+ condString.substring(condString.lastIndexOf("\n")+1)+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if (containsOps(condString)){
+            ifString += "t"+tempVar+".bool :=.bool "+ condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
         }
         if(condString.contains(";"))
             condString = condString.substring(0,condString.length()-1);
@@ -102,6 +116,10 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         }
         return ifString;
 
+    }
+
+    private boolean containsOps(String condString) {
+        return condString.contains("+") || condString.contains("-") || condString.contains("*") || condString.contains("/") || condString.contains("<") || condString.contains("&&") ;
     }
 
     private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
@@ -347,6 +365,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             if(ancestor.getKind().equals("ASSIGNMENT")) {
                 String var = visit(ancestor.getChildren().get(0));
                 type= var.contains(";") ? var.substring(var.indexOf("."),var.indexOf(" ")): var.substring(var.lastIndexOf("."));
+            } else if(ancestor.getKind().equals("IF") || ancestor.getKind().equals("WHILE")) {
+                type= ".bool";
             }
             methodStr.append(")"+type);
         } else {
@@ -369,16 +389,21 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 if (grandchildren)
                     methodStr.delete(methodStr.length() - 2, methodStr.length());
                 // Inserir argumentos
-                Method method = symbolTable.getMethod(call.get("name"));
+                Method method = symbolTable.getMethod(callName);
                 String methodType=".V";
                 JmmNode ancestor = jmmNode.getParent();
-                if(method==null)
+
+                if(method==null) {
                     if(ancestor.getKind().equals("ASSIGNMENT")) {
                         String var = visit(ancestor.getChildren().get(0));
                         methodType= var.contains(";") ? var.substring(var.indexOf("."),var.indexOf(" ")): var.substring(var.lastIndexOf("."));
+                    } else if(ancestor.getKind().equals("IF") || ancestor.getKind().equals("WHILE")) {
+                        methodType= ".bool";
                     }
+                }
                 else
                     methodType = "."+parseType(method.getType().getName());
+                System.out.println(methodType);
                 methodStr.append(")" + methodType);
             }
 
