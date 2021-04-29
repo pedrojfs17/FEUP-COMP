@@ -11,6 +11,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
     SymbolTable symbolTable;
     String ollirStr;
     int tempVar=1;
+    int labelCount=0;
+    int ifCount;
 
     public OllirVisitor(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
@@ -30,8 +32,74 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("LESS", this::dealWithOperation);
         addVisit("AND", this::dealWithOperation);
+        addVisit("IF", this::dealWithIf);
+        addVisit("ELSE", this::dealWithElse);
+        addVisit("WHILE", this::dealWithWhile);
         addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         setDefaultVisit(this::defaultVisit);
+    }
+
+    private String dealWithWhile(JmmNode jmmNode, List<Report> reports) {
+        JmmNode condition = jmmNode.getChildren().get(0);
+        String condString = visit(condition);
+        int localLabel = labelCount;
+        labelCount++;
+        String whileString = "\t\tLoop"+localLabel+":\n";
+        if(condition.getKind().equals("OBJECT_METHOD")) {
+            whileString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
+            condString = "t"+tempVar+".bool ==.bool 1.bool;";
+            tempVar++;
+        }
+        if (condString.contains("\n")) {
+            whileString+="\t\t\t"+condString.substring(0,condString.lastIndexOf("\n"))+"\n";
+            condString = condString.substring(condString.lastIndexOf("\n")+1);
+        }
+        if(condString.contains(";"))
+            condString = condString.substring(0,condString.length()-1);
+        whileString += "\t\t\tif("+condString+") goto Body"+localLabel+";\n\t\t\tgoto EndLoop"+localLabel+";\n\t\tBody"+localLabel+":\n";
+
+        for (JmmNode child: jmmNode.getChildren().get(1).getChildren()) {
+            whileString+= "\t"+visit(child);
+        }
+        whileString += "\t\tgoto Loop"+localLabel+";\n\t\tEndLoop"+localLabel+":\n";
+        return whileString;
+    }
+
+    private String dealWithElse(JmmNode jmmNode, List<Report> reports) {
+        int localLabel = ifCount;
+        String elseString = "\t\telse"+localLabel+":\n";
+        for (JmmNode child: jmmNode.getChildren()) {
+            elseString+="\t"+visit(child);
+        }
+        elseString+="\t\tendif"+localLabel+":\n";
+        return elseString;
+    }
+
+    private String dealWithIf(JmmNode jmmNode, List<Report> reports) {
+        JmmNode condition = jmmNode.getChildren().get(0);
+        String condString = visit(condition);
+        String ifString = "";
+        int localLabel = labelCount;
+        ifCount = localLabel;
+        labelCount++;
+        if(condition.getKind().equals("OBJECT_METHOD")) {
+            ifString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
+            condString = "t"+tempVar+".bool ==.bool 1.bool;";
+            tempVar++;
+        }
+        if (condString.contains("\n")) {
+            ifString+=condString.substring(0,condString.lastIndexOf("\n"));
+            condString = condString.substring(condString.lastIndexOf("\n")+1);
+        }
+        if(condString.contains(";"))
+            condString = condString.substring(0,condString.length()-1);
+        ifString += "\t\tif ("+condString+") goto else"+localLabel+";\n";
+
+        for (int i = 1; i< jmmNode.getNumChildren();i++) {
+            ifString+= "\t"+visit(jmmNode.getChildren().get(i));
+        }
+        return ifString;
+
     }
 
     private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
@@ -80,15 +148,23 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
     private List<String> checkForNested(JmmNode node, String nodeString) {
         String str="";
         List<String> ret = new ArrayList<>();
+
         if(isOp(node) || node.getKind().equals("OBJECT_METHOD")) {
+
             String substring;
             String before = "";
             if(!nodeString.contains(":=."))
                 substring = nodeString.substring(nodeString.lastIndexOf("."), nodeString.length() - 1);
             else {
                 substring = nodeString.substring(nodeString.indexOf("."), nodeString.indexOf(" "));
-                before = nodeString.substring(0,nodeString.lastIndexOf("\n")+1);
-                nodeString = nodeString.substring(nodeString.lastIndexOf("\n")+1);
+                if(nodeString.contains("\n")) {
+                    before = nodeString.substring(0,nodeString.lastIndexOf("\n")+1);
+                    nodeString = nodeString.substring(nodeString.lastIndexOf("\n")+1);
+                } else {
+                    nodeString = nodeString.substring(nodeString.lastIndexOf(" "));
+                }
+                System.out.println(nodeString);
+
             }
 
             str = before+"t"+tempVar+ substring +" :="+ substring +" "+nodeString+"\n";
@@ -196,12 +272,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             else if(grandchild.getKind().equals("OBJECT_METHOD")) {
                 param = visitString.substring(0, visitString.length() - 1);
                 visitString ="";
+            } else if(grandchild.getKind().equals("ARRAY_ACCESS")) {
+                param = visitString.substring(0,visitString.indexOf(" "));
             }
             else {
                 param = visitString;
                 visitString ="";
             }
-
 
             params.add(param);
             methodStr.append(visitString);
@@ -223,7 +300,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             String type = !varName.equalsIgnoreCase("this") ? varName+"." : "";
 
             if (callName.equals("length")) {
-                methodStr.append("t"+tempVar+".i32 :=.i32 arraylength(" + type +"array.i32).i32;");
+                methodStr.append("t"+tempVar+".i32 :=.i32 arraylength(" + type +"array.i32).i32");
             }
             else {
                 methodStr.append("invokevirtual(" + type +  getVariableType(varName,jmmNode)+ ", \"" + callName + "\"");
@@ -241,7 +318,6 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
         }
         methodStr.append(";");
-        System.out.println(methodStr.toString());
         return methodStr.toString();
     }
 
@@ -271,7 +347,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             mainStr.append(visit(child, reports));
         }
 
-        mainStr.append("\t}\n");
+        mainStr.append("\t\tret.V;\n\t}\n");
 
         return mainStr.toString();
     }
@@ -280,11 +356,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         StringBuilder mainStr = new StringBuilder();
         mainStr.append("\t.method public " + jmmNode.get("name") + "(");
         boolean children = false;
+        boolean hasReturn = false;
         for (JmmNode child : jmmNode.getChildren()) {
             if (child.getKind().equals("PARAMETER")) {
                 children = true;
                 mainStr.append(child.get("name") + "." + parseType(child.get("type")) + ", ");
-            }
+            } else if (child.getKind().equals("RETURN"))
+                hasReturn = true;
         }
         if (children)
             mainStr.delete(mainStr.length() - 2, mainStr.length());
@@ -293,7 +371,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             if (child.getKind().equals("PARAMETER")) continue;
             mainStr.append(visit(child, reports));
         }
-        mainStr.append("\t}\n");
+        String returnString = hasReturn ? "" : "\tret.V;\n\t";
+        mainStr.append("\t"+returnString+"}\n");
 
         return mainStr.toString();
     }
