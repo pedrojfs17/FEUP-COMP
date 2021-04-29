@@ -3,6 +3,7 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +30,23 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("LESS", this::dealWithOperation);
         addVisit("AND", this::dealWithOperation);
+        addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         setDefaultVisit(this::defaultVisit);
     }
+
+    private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
+        JmmNode identifier = jmmNode.getChildren().get(0);
+        JmmNode access = jmmNode.getChildren().get(1);
+        String acc = "";
+        if(access.getKind().equals("INT"))
+            acc = access.get("value");
+        else if (access.getKind().equals("IDENTIFIER"))
+            acc = access.get("name");
+        String ret ="\t\tt"+tempVar+".i32 :=.i32 "+identifier.get("name")+"["+acc+".i32].i32;";
+        tempVar++;
+        return ret;
+    }
+
 
     private String dealWithOperation(JmmNode jmmNode, List<Report> reports) {
         String str="";
@@ -38,24 +54,41 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         JmmNode rhs = jmmNode.getChildren().get(1);
         String lhsString = visit(lhs);
         String rhsString = visit(rhs);
-        if(isOp(lhs) || lhs.getKind().equals("OBJECT_METHOD") ) {
-            str += "t"+tempVar+lhsString.substring(lhsString.lastIndexOf("."),lhsString.length()-1)+" :=" +lhsString.substring(lhsString.lastIndexOf("."),lhsString.length()-1)+" " +lhsString+"\n";
-            lhsString = "t"+tempVar+lhsString.substring(lhsString.lastIndexOf("."),lhsString.length()-1);
-            tempVar++;
-        }
-        if(isOp(rhs) || rhs.getKind().equals("OBJECT_METHOD")) {
-            str += "t"+tempVar+rhsString.substring(rhsString.lastIndexOf("."),rhsString.length()-1)+" :="+rhsString.substring(rhsString.lastIndexOf("."),rhsString.length()-1)+" "+rhsString+"\n";
-            rhsString = "t"+tempVar+rhsString.substring(rhsString.lastIndexOf("."),rhsString.length()-1);
-            tempVar++;
-        }
-        // IF CHILD IS: OP, LESS, AND OR OBJECT_METHOD -> COLLECT STRING, ASSIGN TO TEMP VARIABLE, REPLACE THE STRING BY THE TEMP VAR
-        str += lhsString+" "+jmmNode.get("op");
+        List<String> lhsResult = checkForNested(lhs,lhsString);
+        List<String> rhsResult = checkForNested(rhs,rhsString);
+        str += lhsResult.get(0);
+        lhsString = lhsResult.get(1);
+        str += rhsResult.get(0);
+        rhsString = rhsResult.get(1);
+
+        str += lhsString+" "+getOperator(jmmNode);
         if(jmmNode.getKind().equals("OPERATION"))
             str+=".i32 ";
         else
             str+=".bool ";
         str +=rhsString+";";
         return str;
+    }
+
+    private String getOperator(JmmNode jmmNode) {
+        if(jmmNode.getKind().equals("LESS"))
+            return " <";
+        if(jmmNode.getKind().equals("AND"))
+            return " &&";
+        return jmmNode.get("op");
+    }
+    private List<String> checkForNested(JmmNode node, String nodeString) {
+        String str="";
+        List<String> ret = new ArrayList<>();
+        if(isOp(node) || node.getKind().equals("OBJECT_METHOD")) {
+            String substring = nodeString.substring(nodeString.lastIndexOf("."), nodeString.length() - 1);
+            str = "t"+tempVar+ substring +" :="+ substring +" "+nodeString+"\n";
+            nodeString = "t"+tempVar+ substring;
+            tempVar++;
+        }
+        ret.add(str);
+        ret.add(nodeString);
+        return ret;
     }
 
     private boolean isOp(JmmNode jmmNode) {
@@ -103,8 +136,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                     .append(", \"<init>\").V;\n");
         }
         else {
+            String assignString = visit(assignment);
+            if(assignment.getKind().equals("ARRAY_ACCESS")) {
+                methodStr.append(assignString+"\n");
+                assignString = assignString.substring(0, assignString.indexOf(' '));
+            }
             methodStr.append("\t\t" + var.getName() + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ");
-            methodStr.append(visit(assignment));
+            methodStr.append(assignString);
             if(!assignment.getKind().equals("OBJECT_METHOD"))
                 methodStr.append(";");
             methodStr.append("\n");
@@ -112,6 +150,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
         return methodStr.toString();
     }
+
 
     private Optional<JmmNode> getAncestor(JmmNode jmmNode) {
         return jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
@@ -132,24 +171,33 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             boolean grandchildren = false;
             for (JmmNode grandchild : call.getChildren()) {
                 grandchildren = true;
-                methodStr.append(visit(grandchild)+", ");
+                String visitString = visit(grandchild);
+                if(grandchild.getKind().equals("OBJECT_METHOD"))
+                    visitString = visitString.substring(0,visitString.length()-1);
+                methodStr.append(visitString+", ");
             }
             if (grandchildren)
                 methodStr.delete(methodStr.length() - 2, methodStr.length());
             methodStr.append(").V");
         } else {
-            String varName = !identifier.getKind().equals("THIS") ? identifier.get("name") : "this";
+            String varName = this.getVarName(identifier);
             String callName = !call.getKind().equals("LENGTH") ? call.get("name") : "length";
             String type = !varName.equalsIgnoreCase("this") ? varName+"." : "";
-            methodStr.append("invokevirtual(" + type +  getVariableTtype(varName,jmmNode)+ ", \"" + callName + "\"");
-            if (callName.equals("length")) methodStr.append(").i32;");
+
+            if (callName.equals("length")) {
+                methodStr.append("t"+tempVar+".i32 :=.i32 arraylength(" + type +"array.i32).i32;");
+            }
             else {
+                methodStr.append("invokevirtual(" + type +  getVariableType(varName,jmmNode)+ ", \"" + callName + "\"");
                 if (call.getChildren().size() > 0)
                     methodStr.append(", ");
                 boolean grandchildren = false;
                 for (JmmNode grandchild : call.getChildren()) {
                     grandchildren = true;
-                    methodStr.append(visit(grandchild)+", ");
+                    String visitString = visit(grandchild);
+                    if(grandchild.getKind().equals("OBJECT_METHOD"))
+                        visitString = visitString.substring(0,visitString.length()-1);
+                    methodStr.append(visitString+", ");
                 }
                 if (grandchildren)
                     methodStr.delete(methodStr.length() - 2, methodStr.length());
@@ -161,8 +209,19 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         methodStr.append(";");
         return methodStr.toString();
     }
-    private String getVariableTtype(String varName, JmmNode currentNode) {
+
+    private String getVarName(JmmNode identifier) {
+        if(identifier.getKind().equals("THIS"))
+            return "this";
+        if (identifier.getKind().equals("NEW"))
+            return identifier.getChildren().get(0).get("name");
+        return identifier.get("name");
+    }
+
+    private String getVariableType(String varName, JmmNode currentNode) {
         if(varName.equalsIgnoreCase("this"))
+            return varName;
+        if(varName.equals(symbolTable.getClassName()))
             return varName;
         Optional<JmmNode> ancestor = getAncestor(currentNode);
         return symbolTable.getVariable(varName, ancestor.get().get("name")).getType().getName();
@@ -233,6 +292,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
     private String parseType(String type) {
         switch (type) {
+            case "int array":
+                return "array.i32";
             case "int":
                 return "i32";
             case "void":
@@ -241,8 +302,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 return "0.bool";
             case "TRUE":
                 return "1.bool";
-            case "int array":
-                return "array.i32";
+
         }
         return type;
     }
