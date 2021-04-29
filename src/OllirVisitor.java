@@ -106,11 +106,18 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode access = jmmNode.getChildren().get(1);
         String acc = "";
-        if(access.getKind().equals("INT"))
+        String ret = "";
+        String before="";
+        if(access.getKind().equals("INT")) {
             acc = access.get("value");
+            before="\t\tt"+tempVar+".i32 :=.i32 "+acc+".i32;\n";
+            acc = "t"+tempVar;
+            tempVar++;
+
+        }
         else if (access.getKind().equals("IDENTIFIER"))
             acc = access.get("name");
-        String ret ="\t\tt"+tempVar+".i32 :=.i32 "+identifier.get("name")+"["+acc+".i32].i32;";
+        ret +=before+"\t\tt"+tempVar+".i32 :=.i32 "+identifier.get("name")+"["+acc+".i32].i32;";
         tempVar++;
         return ret;
     }
@@ -163,7 +170,6 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 } else {
                     nodeString = nodeString.substring(nodeString.lastIndexOf(" "));
                 }
-                System.out.println(nodeString);
 
             }
 
@@ -224,7 +230,10 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             String assignString = visit(assignment);
             if(assignment.getKind().equals("ARRAY_ACCESS")) {
                 methodStr.append(assignString+"\n");
-                assignString = assignString.substring(0, assignString.indexOf(' '));
+                if(assignString.contains("\n"))
+                    assignString = assignString.substring(assignString.lastIndexOf("\n")+1, assignString.lastIndexOf(" :=."));
+                else
+                    assignString = assignString.substring(0, assignString.indexOf(' '));
             } else if(assignment.getKind().equals("OBJECT_METHOD") && assignString.contains("\n")) {
                 methodStr.append(assignString.substring(0,assignString.lastIndexOf("\n")));
                 assignString = assignString.substring(assignString.lastIndexOf("\n")+1);
@@ -259,8 +268,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             String param ="";
             visitString = visit(grandchild);
             if(grandchild.getKind().equals("OPERATION")){
-                if(visitString.contains("\n"))
-                    param = visitString.substring(visitString.lastIndexOf("\n"),visitString.lastIndexOf(":=."));
+
+                if(visitString.contains("\n")) {
+                    if(visitString.lastIndexOf("\n")>visitString.lastIndexOf(":=."))
+                        param = visitString.substring(0, visitString.indexOf(" :=."));
+                    else
+                        param = visitString.substring(visitString.lastIndexOf("\n"), visitString.lastIndexOf(":=."));
+                }
                 else {
                     String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
                     visitString="\t\tt"+tempVar+ substring +" :="+ substring +" "+visitString+"\n";
@@ -270,8 +284,10 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
             }
             else if(grandchild.getKind().equals("OBJECT_METHOD")) {
-                param = visitString.substring(0, visitString.length() - 1);
-                visitString ="";
+                String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
+                visitString="\t\tt"+tempVar+ substring +" :="+ substring +" "+visitString+"\n";
+                param = "t"+tempVar+ substring;
+                tempVar++;
             } else if(grandchild.getKind().equals("ARRAY_ACCESS")) {
                 param = visitString.substring(0,visitString.indexOf(" "));
             }
@@ -313,7 +329,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 if (grandchildren)
                     methodStr.delete(methodStr.length() - 2, methodStr.length());
                 // Inserir argumentos
-                methodStr.append(")." + parseType(symbolTable.getMethod(call.get("name")).getType().getName()));
+                Method method = symbolTable.getMethod(call.get("name"));
+                String methodType="";
+                if(method==null)
+                    methodType="V";
+                else
+                    methodType = parseType(method.getType().getName());
+                methodStr.append(")." + methodType);
             }
 
         }
