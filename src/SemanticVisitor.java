@@ -67,6 +67,8 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
     private Type toType(JmmNode node) {
         if (node.getKind().equals("ARRAY"))
             return new Type("int", true);
+        else if (node.getKind().equals("ARRAY_ACCESS"))
+            return new Type("int", false);
         else if (node.getKind().equals("TRUE") || node.getKind().equals("FALSE"))
             return new Type("boolean", false);
         else if(node.getKind().equals("OPERATION"))

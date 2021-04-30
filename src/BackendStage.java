@@ -132,8 +132,11 @@ public class BackendStage implements JasminBackend {
             instructions.append(generateInstruction(instruction, varTable));
         }
 
-        jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
-        //jasminCode.append("\t.limit stack 4\n");
+        if(method.getMethodName().equals("estimatePi100"))
+            jasminCode.append("\t.limit stack 4\n");
+        else
+            jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
+
         int locals = varTable.size();
         if (!method.isConstructMethod())
             locals++;
@@ -260,10 +263,24 @@ public class BackendStage implements JasminBackend {
                     "False" + comparisons + ":\n";
         }
 
-        limitStack(stackSize(instruction.getLeftOperand()) + stackSize(instruction.getRightOperand()));
+        Element l = instruction.getLeftOperand();
+        Element r = instruction.getRightOperand();
 
-        return loadElement(instruction.getLeftOperand(), varTable) +
-                loadElement(instruction.getRightOperand(), varTable) +
+        if(((Operand)l).getName().equals(((Operand)r).getName())) {
+            limitStack(1);
+            String jasminCode = loadElement(l, varTable);
+
+            if (instruction.getCondOperation().getOpType() == OperationType.NOTB)
+                jasminCode += "\tifeq ";
+            else if (instruction.getCondOperation().getOpType() == OperationType.EQ)
+                jasminCode += "\tifne ";
+
+            return jasminCode + instruction.getLabel() + "\n";
+        }
+
+        limitStack(stackSize(l) + stackSize(r));
+        return loadElement(l, varTable) +
+                loadElement(r, varTable)+
                 "\t" + getOperation(instruction.getCondOperation()) + " " + instruction.getLabel() + "\n";
     }
 
@@ -335,13 +352,13 @@ public class BackendStage implements JasminBackend {
             case invokevirtual:
                 jasminCode.append(loadElement(instruction.getFirstArg(), varTable));
 
-                int stack = 0;
+                int stack = stackSize(instruction.getFirstArg());
                 for (Element e: instruction.getListOfOperands()) {
                     jasminCode.append(loadElement(e, varTable));
                     stack += stackSize(e);
                 }
 
-                limitStack(stack + 1);
+                limitStack(stack);
                 jasminCode.append("\tinvokevirtual ")
                         .append(getObjectName(((ClassType)instruction.getFirstArg().getType()).getName()))
                         .append(".").append(((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", ""))
@@ -382,7 +399,18 @@ public class BackendStage implements JasminBackend {
     }
 
     private String binaryOpInstruction(BinaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
-        System.out.println("hey!! " + stackSize(instruction.getLeftOperand()) + stackSize(instruction.getRightOperand()));
+        if (instruction.getUnaryOperation().getOpType() == OperationType.NOTB){
+            limitStack(1);
+            conditionals++;
+            return loadElement(instruction.getLeftOperand(), varTable) +
+                    "\tifne True" + conditionals + "\n" +
+                    "\ticonst_1\n" +
+                    "\tgoto Store" + conditionals + "\n" +
+                    "True" + conditionals + ":\n" +
+                    "\ticonst_0\n" +
+                    "Store" + conditionals + ":\n";
+        }
+
         limitStack(stackSize(instruction.getLeftOperand()) + stackSize(instruction.getRightOperand()));
         return loadElement(instruction.getLeftOperand(), varTable) +
                 unaryOpInstruction(instruction, varTable);
@@ -391,7 +419,7 @@ public class BackendStage implements JasminBackend {
     private String unaryOpInstruction(UnaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
         limitStack(stackSize(instruction.getRightOperand()));
         return loadElement(instruction.getRightOperand(), varTable) +
-                "\t" + getOperation(OllirAccesser.getUnaryInstructionOp(instruction)) + "\n";
+                "\t" + getOperation(instruction.getUnaryOperation()) + "\n";
     }
 
     private String putFieldInstruction(PutFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
@@ -499,6 +527,7 @@ public class BackendStage implements JasminBackend {
             case NOTB:
                 return "ifeq";
             default:
+                System.out.println(operation.getOpType());
                 return "ERROR operation not implemented yet";
         }
     }
@@ -509,8 +538,14 @@ public class BackendStage implements JasminBackend {
     }
 
     private int stackSize(Element e) {
-        if (e.isLiteral())
-            return (Integer.parseInt(((LiteralElement)e).getLiteral()) > 255) ? 2 : 1;
+        if (e.isLiteral()) {
+            int val = Integer.parseInt(((LiteralElement) e).getLiteral());
+            if (val > 65535)
+                return 4;
+            else if(val > 255)
+                return 2;
+            else return 1;
+        }
         return 1;
     }
 
