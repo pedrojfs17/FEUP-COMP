@@ -369,6 +369,14 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 type= ".bool";
             }
             methodStr.append(")"+type);
+        } else if (identifier.getKind().equals("NEW")){
+            String newVisit = visit(identifier);
+            String subString = newVisit.substring(newVisit.lastIndexOf("."));
+            methodStr.append("\t\tt"+tempVar+"."+subString + " :=."+subString+" "+newVisit+"\n");
+            methodStr.append("\t\tinvokespecial(").append("t"+tempVar+"."+subString).append(", \"<init>\").V;\n");
+
+            methodStr.append(visit(identifier));
+            tempVar++;
         } else {
             String varName = this.getVarName(identifier);
             String callName = !call.getKind().equals("LENGTH") ? call.get("name") : "length";
@@ -509,9 +517,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 return "1.bool";
             case "boolean":
                 return "bool";
-            default:
-                return "type not implemented";
         }
+        return type;
     }
 
 

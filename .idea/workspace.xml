@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ae1c448-20fc-499e-a8cd-662cd0793073" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
+    </list>
+    <list id="5deb66c0-4d3d-4ac2-b805-b3144b785b18" name="Changes by pedrojfs17" comment="">
+      <change beforePath="$PROJECT_DIR$/src/SemanticVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SemanticVisitor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +94,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
-  <component name="RunManager" selected="Gradle.OptimizeTest">
+  <component name="RunManager" selected="Gradle.BackendTest">
     <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -103,6 +107,27 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="BackendTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;BackendTest&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
     </configuration>
     <configuration name="OptimizeTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
@@ -188,41 +213,20 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="comp2021-4b [wrapper]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="wrapper" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
-    </configuration>
     <list>
-      <item itemvalue="Gradle.comp2021-4b [wrapper]" />
       <item itemvalue="Gradle.comp2021-4b [test]" />
       <item itemvalue="Gradle.OptimizeTest.testWhileAndIF" />
       <item itemvalue="Gradle.OptimizeTest" />
       <item itemvalue="Gradle.OptimizeTest.testSimple" />
+      <item itemvalue="Gradle.BackendTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.OptimizeTest" />
         <item itemvalue="Gradle.comp2021-4b [test]" />
+        <item itemvalue="Gradle.BackendTest" />
+        <item itemvalue="Gradle.OptimizeTest" />
         <item itemvalue="Gradle.OptimizeTest.testSimple" />
         <item itemvalue="Gradle.OptimizeTest.testWhileAndIF" />
-        <item itemvalue="Gradle.comp2021-4b [wrapper]" />
       </list>
     </recent_temporary>
   </component>
@@ -252,6 +256,21 @@
       <workItem from="1619613835778" duration="21358000" />
       <workItem from="1619686794524" duration="22732000" />
     </task>
+    <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
+      <created>1619775982438</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1619775982438</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Fixing errors">
+      <created>1619788509758</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1619788509759</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -272,12 +291,29 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/ollir" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Refactoring to not use ollir accesser" />
+    <MESSAGE value="Fixing errors" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixing errors" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
