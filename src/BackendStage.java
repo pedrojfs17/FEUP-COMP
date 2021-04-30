@@ -119,10 +119,10 @@ public class BackendStage implements JasminBackend {
 
         StringBuilder jasminCode = new StringBuilder(methodHeader(method));
 
-        HashMap<String, Descriptor> varTable = OllirAccesser.getVarTable(method);
+        HashMap<String, Descriptor> varTable = method.getVarTable();
 
         StringBuilder instructions = new StringBuilder();
-        HashMap<String, Instruction> labels = OllirAccesser.getLabels(method);
+        HashMap<String, Instruction> labels = method.getLabels();
         for (Instruction instruction: method.getInstructions()) {
             for (String s : labels.keySet()) {
                 if(labels.get(s) == instruction) {
@@ -288,7 +288,7 @@ public class BackendStage implements JasminBackend {
     private String callInstruction(CallInstruction instruction, HashMap<String, Descriptor> varTable) {
         StringBuilder jasminCode = new StringBuilder();
 
-        switch(OllirAccesser.getCallInvocation(instruction)) {
+        switch(instruction.getInvocationType()) {
             case NEW:
                 if (instruction.getReturnType().getTypeOfElement() == ElementType.OBJECTREF) {
                     for (Element e: instruction.getListOfOperands())

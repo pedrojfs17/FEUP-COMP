@@ -47,12 +47,7 @@ public class OllirAccesser {
         return method.varTable;
     }
 
-    /**
-     * @deprecated Use {@link org.specs.comp.ollir.Method#getLabels()} instead.
-     * @param method
-     * @return
-     */
-    @Deprecated
+
     public static Type getFieldType(GetFieldInstruction instruction) {
         return instruction.fieldType;
     }
@@ -60,6 +55,12 @@ public class OllirAccesser {
     public static Operation getUnaryInstructionOp(UnaryOpInstruction instruction) {
         return instruction.operation;
     }
+    /**
+     * @deprecated Use {@link org.specs.comp.ollir.Method#getLabels()} instead.
+     * @param method
+     * @return
+     */
+    @Deprecated
     public static HashMap<String, Instruction> getLabels(Method method) {
         return method.methodLabels;
     }
