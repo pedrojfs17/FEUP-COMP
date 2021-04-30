@@ -36,6 +36,45 @@ public class BackendTest {
     }
 
     @Test
+    public void testMonteCarloPi() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/MonteCarloPi.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+    @Test
+    public void testLazysort() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Lazysort.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+
+    @Test
+    public void testWhileAndIf() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/WhileAndIf.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+
+    @Test
+    public void testFindMaximum() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/FindMaximum.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+
+    @Test
     public void testSimple() {
         var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Simple.jmm"));
 

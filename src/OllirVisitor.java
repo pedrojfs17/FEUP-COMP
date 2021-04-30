@@ -507,9 +507,11 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 return "0.bool";
             case "TRUE":
                 return "1.bool";
-
+            case "boolean":
+                return "bool";
+            default:
+                return "type not implemented";
         }
-        return type;
     }
 
 
