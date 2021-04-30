@@ -1,5 +1,6 @@
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
+import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 
@@ -268,8 +269,12 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         JmmNode assignment = jmmNode.getChildren().get(1);
         Optional<JmmNode> ancestor = getAncestor(jmmNode, "MAIN", "METHOD_DECLARATION");
         Symbol var;
-        if (identifier.getKind().equals("ARRAY_ACCESS"))
+        boolean arrayAccess = false;
+        if (identifier.getKind().equals("ARRAY_ACCESS")) {
+            arrayAccess = true;
             var = symbolTable.getVariable(identifier.getChildren().get(0).get("name"), ancestor.get().get("name"));
+            var.setType(new Type("int",false));
+        }
         else
             var = symbolTable.getVariable(identifier.get("name"), ancestor.get().get("name"));
 
@@ -279,7 +284,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
             for (int i = 0; i < lines.length; i++) {
                 if (i == lines.length - 1) {
-                    methodStr.append(varAssign(var));
+                    methodStr.append(varAssign(identifier,var,arrayAccess));
                     methodStr.append(lines[i]).append("\n");
                 } else
                     methodStr.append("\t\t").append(lines[i]).append("\n");
@@ -290,7 +295,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 methodStr.append(assignmentString.substring(0,assignmentString.indexOf("\n")));
                 assignmentString = assignmentString.substring(assignmentString.indexOf("\n")+1);
             }
-            methodStr.append(varAssign(var));
+            methodStr.append(varAssign(identifier,var,arrayAccess));
             methodStr.append(assignmentString).append(";\n");
             methodStr.append("\t\tinvokespecial(").append(escapeVarName(var.getName())).append(".").append(parseType(var.getType().getName()))
                     .append(", \"<init>\").V;\n");
@@ -312,7 +317,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 }
 
             }
-            methodStr.append(varAssign(var));
+            methodStr.append(varAssign(identifier,var,arrayAccess));
             methodStr.append(assignString);
             if (!assignment.getKind().equals("OBJECT_METHOD"))
                 methodStr.append(";");
@@ -322,8 +327,18 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         return methodStr.toString();
     }
 
-    private String varAssign(Symbol var) {
-        return "\t\t" + escapeVarName(var.getName()) + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ";
+    private String varAssign(JmmNode node, Symbol var, boolean arrayAccess) {
+        if(!arrayAccess)
+            return "\t\t" + escapeVarName(var.getName()) + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ";
+
+        String access = visit(node);
+        String before="";
+        String ret="";
+        if(access.contains("\n"))
+            before=access.substring(0,access.lastIndexOf("\n"));
+        access=access.substring(access.lastIndexOf(" "),access.lastIndexOf(";"));
+        ret+=before+"\t\t"+access+" :=.i32 " ;
+        return ret;
     }
 
     private String escapeVarName(String varName) {
