@@ -41,7 +41,6 @@ public class JmmParserSemanticFailTest {
                 { "fail/semantic/var_exp_incomp.jmm" },
                 { "fail/semantic/var_lit_incomp.jmm" },
                 { "fail/semantic/var_undef.jmm" },
-                { "fail/semantic/varNotInit.jmm" },
                 { "fail/semantic/extra/miss_type.jmm" },
         });
     }

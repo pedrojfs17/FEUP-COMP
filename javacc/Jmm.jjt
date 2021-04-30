@@ -185,7 +185,7 @@ void Statement() #void: {Token t;}
 
 void ifStatement() #void: {Token t; String str;}
 {
-    <IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement() #IF(2)
+    (<IF> <LPARENTHESES> ExpressionAnd() <RPARENTHESES> Statement()) #IF
     <ELSE> Statement() #ELSE
 }
 

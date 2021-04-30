@@ -11,6 +11,8 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
     SymbolTable symbolTable;
     String ollirStr;
     int tempVar=1;
+    int labelCount=0;
+    int ifCount;
 
     public OllirVisitor(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
@@ -30,19 +32,112 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("LESS", this::dealWithOperation);
         addVisit("AND", this::dealWithOperation);
+        addVisit("IF", this::dealWithIf);
+        addVisit("ELSE", this::dealWithElse);
+        addVisit("WHILE", this::dealWithWhile);
         addVisit("ARRAY_ACCESS", this::dealWithArrayAccess);
         setDefaultVisit(this::defaultVisit);
+    }
+
+    private String dealWithWhile(JmmNode jmmNode, List<Report> reports) {
+        JmmNode condition = jmmNode.getChildren().get(0);
+        String condString = visit(condition);
+        int localLabel = labelCount;
+        labelCount++;
+        String whileString = "\t\tLoop"+localLabel+":\n";
+        if(condition.getKind().equals("OBJECT_METHOD")) {
+            whileString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if(condition.getKind().equals("IDENTIFIER")) {
+            condString+= " !.bool "+condString;
+        }
+        if (condString.contains("\n")) {
+            whileString+=condString.substring(0,condString.lastIndexOf("\n"));
+            whileString += "t"+tempVar+".bool :=.bool "+ condString.substring(condString.lastIndexOf("\n")+1)+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if (containsOps(condString)){
+            whileString += "t"+tempVar+".bool :=.bool "+ condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        }
+        if(condString.contains(";"))
+            condString = condString.substring(0,condString.length()-1);
+        whileString += "\t\t\tif ("+condString+") goto Body"+localLabel+";\n\t\t\tgoto EndLoop"+localLabel+";\n\t\tBody"+localLabel+":\n";
+
+        for (JmmNode child: jmmNode.getChildren().get(1).getChildren()) {
+            whileString+= "\t"+visit(child);
+        }
+        whileString += "\t\t\tgoto Loop"+localLabel+";\n\t\tEndLoop"+localLabel+":\n";
+        return whileString;
+    }
+
+    private String dealWithElse(JmmNode jmmNode, List<Report> reports) {
+        int localLabel = ifCount;
+        String elseString = "\t\telse"+localLabel+":\n";
+        for (JmmNode child: jmmNode.getChildren()) {
+            elseString+="\t"+visit(child);
+        }
+        elseString+="\t\tendif"+localLabel+":\n";
+        return elseString;
+    }
+
+    private String dealWithIf(JmmNode jmmNode, List<Report> reports) {
+        JmmNode condition = jmmNode.getChildren().get(0);
+        String condString = visit(condition);
+        String ifString = "";
+        int localLabel = labelCount;
+        ifCount = localLabel;
+        labelCount++;
+        if(condition.getKind().equals("OBJECT_METHOD")) {
+            ifString+="\t\tt"+tempVar+".bool :=.bool "+condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if(condition.getKind().equals("IDENTIFIER")) {
+            condString+= " !.bool "+condString;
+        }
+        if (condString.contains("\n")) {
+            ifString+=condString.substring(0,condString.lastIndexOf("\n"));
+            ifString += "t"+tempVar+".bool :=.bool "+ condString.substring(condString.lastIndexOf("\n")+1)+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        } else if (containsOps(condString)){
+            ifString += "t"+tempVar+".bool :=.bool "+ condString+"\n";
+            condString = "t"+tempVar+".bool !.bool t"+tempVar+".bool;";
+            tempVar++;
+        }
+        if(condString.contains(";"))
+            condString = condString.substring(0,condString.length()-1);
+        ifString += "\t\tif ("+condString+") goto else"+localLabel+";\n";
+
+        for (int i = 1; i< jmmNode.getNumChildren();i++) {
+            ifString+= "\t"+visit(jmmNode.getChildren().get(i));
+        }
+        return ifString;
+
+    }
+
+    private boolean containsOps(String condString) {
+        return condString.contains("+") || condString.contains("-") || condString.contains("*") || condString.contains("/") || condString.contains("<") || condString.contains("&&") ;
     }
 
     private String dealWithArrayAccess(JmmNode jmmNode, List<Report> reports) {
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode access = jmmNode.getChildren().get(1);
         String acc = "";
-        if(access.getKind().equals("INT"))
+        String ret = "";
+        String before="";
+        if(access.getKind().equals("INT")) {
             acc = access.get("value");
+            before="\t\tt"+tempVar+".i32 :=.i32 "+acc+".i32;\n";
+            acc = "t"+tempVar;
+            tempVar++;
+
+        }
         else if (access.getKind().equals("IDENTIFIER"))
             acc = access.get("name");
-        String ret ="\t\tt"+tempVar+".i32 :=.i32 "+identifier.get("name")+"["+acc+".i32].i32;";
+        ret +=before+"\t\tt"+tempVar+".i32 :=.i32 "+identifier.get("name")+"["+acc+".i32].i32;";
         tempVar++;
         return ret;
     }
@@ -80,15 +175,21 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
     private List<String> checkForNested(JmmNode node, String nodeString) {
         String str="";
         List<String> ret = new ArrayList<>();
-        if(isOp(node) || node.getKind().equals("OBJECT_METHOD")) {
+
+        if(isOp(node) || node.getKind().equals("OBJECT_METHOD")|| node.getKind().equals("ARRAY_ACCESS")) {
+
             String substring;
             String before = "";
             if(!nodeString.contains(":=."))
                 substring = nodeString.substring(nodeString.lastIndexOf("."), nodeString.length() - 1);
             else {
                 substring = nodeString.substring(nodeString.indexOf("."), nodeString.indexOf(" "));
-                before = nodeString.substring(0,nodeString.lastIndexOf("\n")+1);
-                nodeString = nodeString.substring(nodeString.lastIndexOf("\n")+1);
+                if(nodeString.contains("\n")) {
+                    before = nodeString.substring(0,nodeString.lastIndexOf("\n")+1);
+                    nodeString = nodeString.substring(nodeString.lastIndexOf("\n")+1);
+                } else {
+                    nodeString = nodeString.substring(nodeString.lastIndexOf(" "));
+                }
             }
 
             str = before+"t"+tempVar+ substring +" :="+ substring +" "+nodeString+"\n";
@@ -108,8 +209,16 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
     private String dealWithReturn(JmmNode jmmNode, List<Report> reports) {
         StringBuilder methodStr = new StringBuilder();
         JmmNode identifier = jmmNode.getChildren().get(0);
-        methodStr.append("\t\t" + "ret");
         String child = visit(identifier);
+        System.out.println("RETURN: "+child);
+        if(identifier.getKind().equals("OBJECT_METHOD")) {
+            String substring = child.substring(child.lastIndexOf("."),child.length()-1);
+            methodStr.append(child.substring(0,child.lastIndexOf("\n")));
+            methodStr.append("\t\tt"+tempVar+substring+" :="+substring+" "+child.substring(child.lastIndexOf("\n"))+"\n");
+            child = "\t\tt"+tempVar+substring;
+            tempVar++;
+        }
+        methodStr.append("\t\t" + "ret");
         methodStr.append(child.substring(child.indexOf("."))).append(" ").append(child).append(";\n");
 
         return methodStr.toString();
@@ -119,7 +228,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         StringBuilder methodStr = new StringBuilder();
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode assignment = jmmNode.getChildren().get(1);
-        Optional<JmmNode> ancestor = getAncestor(jmmNode);
+        Optional<JmmNode> ancestor = getAncestor(jmmNode, "MAIN","METHOD_DECLARATION");
         Symbol var;
         if(identifier.getKind().equals("ARRAY_ACCESS"))
             var = symbolTable.getVariable(identifier.getChildren().get(0).get("name"), ancestor.get().get("name"));
@@ -132,14 +241,14 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
             for (int i = 0; i < lines.length; i++) {
                 if (i == lines.length-1) {
-                    methodStr.append("\t\t" + var.getName() + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ");
+                    methodStr.append(varAssign(var));
                     methodStr.append(lines[i]).append("\n");
                 }
                 else
                     methodStr.append("\t\t").append(lines[i]).append("\n");
             }
         } else if(assignment.getKind().equals("NEW")) {
-            methodStr.append("\t\t" + var.getName() + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ");
+            methodStr.append(varAssign(var));
             methodStr.append(visit(assignment)).append(";\n");
             methodStr.append("\t\tinvokespecial(").append(var.getName()).append(".").append(parseType(var.getType().getName()))
                     .append(", \"<init>\").V;\n");
@@ -148,12 +257,21 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             String assignString = visit(assignment);
             if(assignment.getKind().equals("ARRAY_ACCESS")) {
                 methodStr.append(assignString+"\n");
-                assignString = assignString.substring(0, assignString.indexOf(' '));
-            } else if(assignment.getKind().equals("OBJECT_METHOD") && assignString.contains("\n")) {
-                methodStr.append(assignString.substring(0,assignString.lastIndexOf("\n")));
-                assignString = assignString.substring(assignString.lastIndexOf("\n")+1);
+                if(assignString.contains("\n"))
+                    assignString = assignString.substring(assignString.lastIndexOf("\n")+1, assignString.lastIndexOf(" :=."));
+                else
+                    assignString = assignString.substring(0, assignString.indexOf(' '));
+            } else if(assignment.getKind().equals("OBJECT_METHOD")) {
+                if(assignString.contains("\n")) {
+                    methodStr.append(assignString.substring(0,assignString.lastIndexOf("\n")));
+                    assignString = assignString.substring(assignString.lastIndexOf("\n")+1);
+                } else if(assignString.contains(":=.")) {
+                    methodStr.append(assignString);
+                    assignString = assignString.substring(0,assignString.indexOf(" "))+";";
+                }
+
             }
-            methodStr.append("\t\t" + var.getName() + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ");
+            methodStr.append(varAssign(var));
             methodStr.append(assignString);
             if(!assignment.getKind().equals("OBJECT_METHOD"))
                 methodStr.append(";");
@@ -163,9 +281,23 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         return methodStr.toString();
     }
 
+    private String varAssign(Symbol var) {
+        return "\t\t" + escapeVarName(var.getName()) + "." + parseType(var.getType().getName()) + " :=." + parseType(var.getType().getName()) + " ";
+    }
 
-    private Optional<JmmNode> getAncestor(JmmNode jmmNode) {
-        return jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
+    private String escapeVarName(String varName) {
+        if(varName.charAt(0) == '$')
+            return "d_"+varName.substring(1);
+        else if (varName.charAt(0) == '_')
+            return "u_"+varName.substring(1);
+        else if(varName.startsWith("ret"))
+            return "r_"+varName.substring(3);
+        return varName;
+    }
+
+
+    private Optional<JmmNode> getAncestor(JmmNode jmmNode, String globalScope, String specificScope) {
+        return jmmNode.getAncestor(globalScope).isPresent() ? jmmNode.getAncestor(globalScope) : jmmNode.getAncestor(specificScope);
     }
 
     private String dealWithObjectMethod(JmmNode jmmNode, List<Report> reports) {
@@ -183,8 +315,17 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             String param ="";
             visitString = visit(grandchild);
             if(grandchild.getKind().equals("OPERATION")){
-                if(visitString.contains("\n"))
-                    param = visitString.substring(visitString.lastIndexOf("\n"),visitString.lastIndexOf(":=."));
+                if(visitString.contains("\n")) {
+                    if(visitString.lastIndexOf("\n")>visitString.lastIndexOf(":=.")) {
+                        String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
+                        visitString="\t\t"+visitString.substring(0,visitString.lastIndexOf("\n")+1)+"\t\tt"+tempVar+ substring +" :="+ substring +" "+visitString.substring(visitString.lastIndexOf("\n")+1)+"\n";
+                        param = "t"+tempVar+ substring;
+                        tempVar++;
+                        //param = visitString.substring(0, visitString.indexOf(" :=."));
+                    }
+                    else
+                        param = visitString.substring(visitString.lastIndexOf("\n"), visitString.lastIndexOf(":=."));
+                }
                 else {
                     String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
                     visitString="\t\tt"+tempVar+ substring +" :="+ substring +" "+visitString+"\n";
@@ -194,14 +335,17 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
             }
             else if(grandchild.getKind().equals("OBJECT_METHOD")) {
-                param = visitString.substring(0, visitString.length() - 1);
-                visitString ="";
+                String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
+                visitString="\t\tt"+tempVar+ substring +" :="+ substring +" "+visitString+"\n";
+                param = "t"+tempVar+ substring;
+                tempVar++;
+            } else if(grandchild.getKind().equals("ARRAY_ACCESS")) {
+                param = visitString.substring(0,visitString.indexOf(" "));
             }
             else {
                 param = visitString;
                 visitString ="";
             }
-
 
             params.add(param);
             methodStr.append(visitString);
@@ -216,14 +360,23 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             }
             if (grandchildren)
                 methodStr.delete(methodStr.length() - 2, methodStr.length());
-            methodStr.append(").V");
+            JmmNode ancestor = jmmNode.getParent();
+            String type=".V";
+            if(ancestor.getKind().equals("ASSIGNMENT")) {
+                String var = visit(ancestor.getChildren().get(0));
+                type= var.contains(";") ? var.substring(var.indexOf("."),var.indexOf(" ")): var.substring(var.lastIndexOf("."));
+            } else if(ancestor.getKind().equals("IF") || ancestor.getKind().equals("WHILE")) {
+                type= ".bool";
+            }
+            methodStr.append(")"+type);
         } else {
             String varName = this.getVarName(identifier);
             String callName = !call.getKind().equals("LENGTH") ? call.get("name") : "length";
             String type = !varName.equalsIgnoreCase("this") ? varName+"." : "";
 
             if (callName.equals("length")) {
-                methodStr.append("t"+tempVar+".i32 :=.i32 arraylength(" + type +"array.i32).i32;");
+                methodStr.append("t"+tempVar+".i32 :=.i32 arraylength(" + type +"array.i32).i32");
+                tempVar++;
             }
             else {
                 methodStr.append("invokevirtual(" + type +  getVariableType(varName,jmmNode)+ ", \"" + callName + "\"");
@@ -236,12 +389,26 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 if (grandchildren)
                     methodStr.delete(methodStr.length() - 2, methodStr.length());
                 // Inserir argumentos
-                methodStr.append(")." + parseType(symbolTable.getMethod(call.get("name")).getType().getName()));
+                Method method = symbolTable.getMethod(callName);
+                String methodType=".V";
+                JmmNode ancestor = jmmNode.getParent();
+
+                if(method==null) {
+                    if(ancestor.getKind().equals("ASSIGNMENT")) {
+                        String var = visit(ancestor.getChildren().get(0));
+                        methodType= var.contains(";") ? var.substring(var.indexOf("."),var.indexOf(" ")): var.substring(var.lastIndexOf("."));
+                    } else if(ancestor.getKind().equals("IF") || ancestor.getKind().equals("WHILE")) {
+                        methodType= ".bool";
+                    }
+                }
+                else
+                    methodType = "."+parseType(method.getType().getName());
+                System.out.println(methodType);
+                methodStr.append(")" + methodType);
             }
 
         }
         methodStr.append(";");
-        System.out.println(methodStr.toString());
         return methodStr.toString();
     }
 
@@ -258,7 +425,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             return varName;
         if(varName.equals(symbolTable.getClassName()))
             return varName;
-        Optional<JmmNode> ancestor = getAncestor(currentNode);
+        Optional<JmmNode> ancestor = getAncestor(currentNode, "MAIN","METHOD_DECLARATION");
         return symbolTable.getVariable(varName, ancestor.get().get("name")).getType().getName();
 
     }
@@ -271,7 +438,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             mainStr.append(visit(child, reports));
         }
 
-        mainStr.append("\t}\n");
+        mainStr.append("\t\tret.V;\n\t}\n");
 
         return mainStr.toString();
     }
@@ -280,11 +447,13 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         StringBuilder mainStr = new StringBuilder();
         mainStr.append("\t.method public " + jmmNode.get("name") + "(");
         boolean children = false;
+        boolean hasReturn = false;
         for (JmmNode child : jmmNode.getChildren()) {
             if (child.getKind().equals("PARAMETER")) {
                 children = true;
                 mainStr.append(child.get("name") + "." + parseType(child.get("type")) + ", ");
-            }
+            } else if (child.getKind().equals("RETURN"))
+                hasReturn = true;
         }
         if (children)
             mainStr.delete(mainStr.length() - 2, mainStr.length());
@@ -293,15 +462,16 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             if (child.getKind().equals("PARAMETER")) continue;
             mainStr.append(visit(child, reports));
         }
-        mainStr.append("\t}\n");
+        String returnString = hasReturn ? "" : "\tret.V;\n\t";
+        mainStr.append("\t"+returnString+"}\n");
 
         return mainStr.toString();
     }
 
     private String dealWithIdentifier(JmmNode jmmNode, List<Report> reports) {
-        Optional<JmmNode> ancestor = getAncestor(jmmNode);
+        Optional<JmmNode> ancestor = getAncestor(jmmNode, "MAIN","METHOD_DECLARATION");
         Symbol var = symbolTable.getVariable(jmmNode.get("name"), ancestor.get().get("name"));
-        return var.getName() + "." + parseType(var.getType().getName());
+        return escapeVarName(var.getName()) + "." + parseType(var.getType().getName());
     }
 
     private String dealWithInt(JmmNode jmmNode, List<Report> reports) {
