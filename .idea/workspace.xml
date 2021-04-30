@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7ae1c448-20fc-499e-a8cd-662cd0793073" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build_test_arr.dot" beforeDir="false" afterPath="$PROJECT_DIR$/build_test_arr.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/analysis/table/Symbol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/analysis/table/Symbol.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
     </list>
     <list id="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" name="Changes by ineso" comment="" />
