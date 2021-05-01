@@ -61,7 +61,8 @@ public class BackendTest {
         TestUtils.noErrors(result.getReports());
 
         var output = result.run();
-        assertEquals("30", output.trim());
+
+        assertEquals(10, output.split("\n").length);
     }
 
     @Test

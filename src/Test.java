@@ -1,5 +1,8 @@
 public class Test {
-    void negate(boolean test) {
-        test = !test;
+    int[] negate(int a, int b, int c) {
+        int[] d;
+        d = new int[10];
+        d[c] = a-b;
+        return d;
     }
 }
