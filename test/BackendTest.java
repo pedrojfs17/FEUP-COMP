@@ -1,4 +1,4 @@
-
+//amega
 /**
  * Copyright 2021 SPeCS.
  * 
@@ -72,7 +72,7 @@ public class BackendTest {
         TestUtils.noErrors(result.getReports());
 
         var output = result.run();
-        assertEquals("30", output.trim());
+        assertEquals("Result: 28", output.trim());
     }
 
     @Test

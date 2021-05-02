@@ -5,22 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ae1c448-20fc-499e-a8cd-662cd0793073" name="Default Changelist" comment="Fixing errors">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beLazy.dot" beforeDir="false" afterPath="$PROJECT_DIR$/beLazy.dot" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build_test_arr.dot" beforeDir="false" afterPath="$PROJECT_DIR$/build_test_arr.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/find_maximum.dot" beforeDir="false" afterPath="$PROJECT_DIR$/find_maximum.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_array.dot" beforeDir="false" afterPath="$PROJECT_DIR$/get_array.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quicksort.dot" beforeDir="false" afterPath="$PROJECT_DIR$/quicksort.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SemanticVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SemanticVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SymbolTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SymbolTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OptimizationStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OptimizationStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sum.dot" beforeDir="false" afterPath="$PROJECT_DIR$/sum.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
     </list>
     <list id="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" name="Changes by ineso" comment="">
-      <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-lib/org/specs/comp/ollir/OllirAccesser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-lib/org/specs/comp/ollir/OllirAccesser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" afterDir="false" />
     </list>
-    <list id="5deb66c0-4d3d-4ac2-b805-b3144b785b18" name="Changes by pedrojfs17" comment="" />
+    <list id="c5466fea-a5e7-4d45-a573-36aad824b859" name="Changes by pedrojfs17" comment="">
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -86,6 +87,69 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/OllirVisitor2.java">
+      <ranges>
+        <range start1="3" end1="4" start2="3" end2="3" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="9" end1="10" start2="8" end2="9" changelist="c5466fea-a5e7-4d45-a573-36aad824b859" />
+        <range start1="11" end1="12" start2="10" end2="11" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+        <range start1="18" end1="19" start2="17" end2="18" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="24" end1="24" start2="23" end2="24" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+        <range start1="26" end1="26" start2="26" end2="27" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="27" end1="32" start2="28" end2="28" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="39" end1="40" start2="35" end2="45" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="43" end1="44" start2="48" end2="52" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="48" end1="51" start2="56" end2="59" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="58" end1="60" start2="66" end2="68" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="66" end1="70" start2="74" end2="78" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="74" end1="75" start2="82" end2="83" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="76" end1="77" start2="84" end2="85" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+        <range start1="79" end1="80" start2="87" end2="88" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="87" end1="88" start2="95" end2="98" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="101" end1="102" start2="111" end2="112" changelist="c5466fea-a5e7-4d45-a573-36aad824b859" />
+        <range start1="106" end1="107" start2="116" end2="117" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="115" end1="115" start2="125" end2="137" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+        <range start1="116" end1="117" start2="138" end2="254" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="120" end1="120" start2="257" end2="272" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="121" end1="122" start2="273" end2="297" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="124" end1="125" start2="299" end2="304" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="128" end1="133" start2="307" end2="317" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="134" end1="135" start2="318" end2="319" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="136" end1="143" start2="320" end2="322" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="146" end1="147" start2="325" end2="340" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="149" end1="151" start2="342" end2="346" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="152" end1="155" start2="347" end2="350" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="157" end1="158" start2="352" end2="353" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="159" end1="163" start2="354" end2="360" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="164" end1="171" start2="361" end2="363" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="173" end1="190" start2="365" end2="367" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="191" end1="191" start2="368" end2="372" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+        <range start1="192" end1="193" start2="373" end2="388" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="195" end1="195" start2="390" end2="391" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="197" end1="202" start2="393" end2="398" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="205" end1="206" start2="401" end2="402" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="208" end1="212" start2="404" end2="410" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="213" end1="214" start2="411" end2="414" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="215" end1="216" start2="415" end2="416" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="218" end1="220" start2="418" end2="421" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="222" end1="224" start2="423" end2="426" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="226" end1="227" start2="428" end2="437" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="228" end1="230" start2="438" end2="453" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="231" end1="251" start2="454" end2="463" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="252" end1="261" start2="464" end2="470" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="266" end1="266" start2="475" end2="489" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="296" end1="298" start2="519" end2="521" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="301" end1="302" start2="524" end2="525" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="304" end1="305" start2="527" end2="528" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/test/BackendTest.java">
+      <ranges>
+        <range start1="0" end1="1" start2="0" end2="1" changelist="7ae1c448-20fc-499e-a8cd-662cd0793073" />
+        <range start1="74" end1="75" start2="74" end2="75" changelist="b86666ff-7e31-45ec-82ec-f87bb4c0e41e" />
+      </ranges>
+    </file>
+  </component>
   <component name="ProjectId" id="1qqKFM9e7BOUAKV2z1iHY0G0LmE" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -105,13 +169,15 @@
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
   <component name="RunManager" selected="Gradle.comp2021-4b [test]">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -122,6 +188,27 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
         <option name="scriptParameters" value="--tests &quot;BackendTest&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="BackendTest.testMyClass1" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;BackendTest.testMyClass1&quot;" />
         <option name="taskDescriptions">
           <list />
         </option>
@@ -179,27 +266,6 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="OptimizeTest.testWhileAndIF" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="--tests &quot;OptimizeTest.testWhileAndIF&quot;" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
-    </configuration>
     <configuration name="comp2021-4b [test]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -223,18 +289,18 @@
     </configuration>
     <list>
       <item itemvalue="Gradle.comp2021-4b [test]" />
-      <item itemvalue="Gradle.OptimizeTest.testWhileAndIF" />
       <item itemvalue="Gradle.OptimizeTest" />
       <item itemvalue="Gradle.OptimizeTest.testSimple" />
       <item itemvalue="Gradle.BackendTest" />
+      <item itemvalue="Gradle.BackendTest.testMyClass1" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.OptimizeTest" />
+        <item itemvalue="Gradle.BackendTest.testMyClass1" />
         <item itemvalue="Gradle.BackendTest" />
         <item itemvalue="Gradle.OptimizeTest.testSimple" />
-        <item itemvalue="Gradle.OptimizeTest.testWhileAndIF" />
       </list>
     </recent_temporary>
   </component>
@@ -265,6 +331,7 @@
       <workItem from="1619686794524" duration="22732000" />
       <workItem from="1619868405703" duration="1975000" />
       <workItem from="1619887707873" duration="20732000" />
+      <workItem from="1619949909819" duration="28493000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>

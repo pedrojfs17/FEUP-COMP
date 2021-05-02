@@ -52,9 +52,6 @@ public class OllirAccesser {
         return instruction.fieldType;
     }
 
-    public static Operation getUnaryInstructionOp(UnaryOpInstruction instruction) {
-        return instruction.operation;
-    }
     /**
      * @deprecated Use {@link org.specs.comp.ollir.Method#getLabels()} instead.
      * @param method
