@@ -86,6 +86,36 @@ public class BackendTest {
     }
 
     @Test
+    public void testLife() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Life.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+
+    @Test
+    public void testTicTacToe() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/TicTacToe.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+
+    @Test
+    public void testQuicksort() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Quicksort.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        var output = result.run();
+        assertEquals("30", output.trim());
+    }
+/*
+    @Test
     public void testMyClass1() {
         var result = TestUtils.backend(new OllirResult(OllirUtils.parse(SpecsIo.getResource("fixtures/public/ollir/myclass1.ollir")), null, new ArrayList<>()));
 
@@ -145,5 +175,5 @@ public class BackendTest {
 
         var output = result.run();
         System.out.println(output);
-    }
+    }*/
 }

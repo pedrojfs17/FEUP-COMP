@@ -95,7 +95,7 @@ public class SemanticVisitor extends AJmmVisitor<List<Report>, Boolean> {
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), "Variable \"" + child.get("name") + "\" isn't type boolean"));
                 }
 
-            } else if (!child.getKind().equals("TRUE") && !child.getKind().equals("FALSE") && !child.getKind().equals("EXCLAMATION") && !child.getKind().equals("LESS") && !child.getKind().equals("OBJECT_METHOD") ) {
+            } else if (!child.getKind().equals("AND") && !child.getKind().equals("TRUE")  && !child.getKind().equals("FALSE") && !child.getKind().equals("EXCLAMATION") && !child.getKind().equals("LESS") && !child.getKind().equals("OBJECT_METHOD") ) {
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, child.get("line") != null ? Integer.parseInt(child.get("line")) : 0, Integer.parseInt(child.get("col")), child.getKind() + " can't be in a logical operation"));
             }
             visit(child, reports);

@@ -35,6 +35,13 @@ public class Method {
         return null;
     }
 
+    public Symbol getParameter(String varName) {
+        for (Symbol symbol: parameters) {
+            if(symbol.getName().equals(varName)) return symbol;
+        }
+        return null;
+    }
+
     public boolean containsParameter(String varName) {
         for (Symbol symbol: parameters) {
             if(symbol.getName().equals(varName)) return true;

@@ -134,10 +134,8 @@ public class BackendStage implements JasminBackend {
             instructions.append(generateInstruction(instruction, varTable));
         }
 
-        if(method.getMethodName().equals("estimatePi100"))
-            jasminCode.append("\t.limit stack 4\n");
-        else
-            jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
+        //jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
+        jasminCode.append("\t.limit stack 99\n");
 
         int locals = varTable.size();
         if (!method.isConstructMethod())
@@ -469,12 +467,19 @@ public class BackendStage implements JasminBackend {
             return loadLiteral((LiteralElement) e);
 
         Descriptor d = varTable.get(((Operand) e).getName());
+        if(d == null)
+            return "!!!" + ((Operand) e).getName();
 
-        if (e.getType().getTypeOfElement() != ElementType.ARRAYREF
-                && d.getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
-            ArrayOperand arrayOp = (ArrayOperand) e;
-            Element index = arrayOp.getIndexOperands().get(0);
-            return loadDescriptor(d) + loadElement(index, varTable) + "\tiaload\n";
+        try {
+            if (e.getType().getTypeOfElement() != ElementType.ARRAYREF
+                    && d.getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
+                ArrayOperand arrayOp = (ArrayOperand) e;
+                Element index = arrayOp.getIndexOperands().get(0);
+                return loadDescriptor(d) + loadElement(index, varTable) + "\tiaload\n";
+            }
+        } catch (NullPointerException | ClassCastException except) {
+            System.out.println(((Operand)e).getName());
+            System.out.println(d.getVirtualReg() + " " + d.getVarType());
         }
 
         return loadDescriptor(d);
@@ -482,13 +487,18 @@ public class BackendStage implements JasminBackend {
 
     private String loadDescriptor(Descriptor descriptor) {
         stack += 1;
-        ElementType t = descriptor.getVarType().getTypeOfElement();
-        if (t == ElementType.THIS)
-            return "\taload_0\n";
+        try {
+            ElementType t = descriptor.getVarType().getTypeOfElement();
+            if (t == ElementType.THIS)
+                return "\taload_0\n";
 
-        int reg = descriptor.getVirtualReg();
-        return "\t" + ((t == ElementType.INT32 || t == ElementType.BOOLEAN) ? "i" : "a") + "load" +
-                ((reg <= 3) ? "_" : " ") + reg + "\n";
+            int reg = descriptor.getVirtualReg();
+            return "\t" + ((t == ElementType.INT32 || t == ElementType.BOOLEAN) ? "i" : "a") + "load" +
+                    ((reg <= 3) ? "_" : " ") + reg + "\n";
+        } catch (NullPointerException except) {
+            System.out.println(descriptor.getVirtualReg());
+            return "merde";
+        }
     }
 
     private String loadLiteral(LiteralElement element) {

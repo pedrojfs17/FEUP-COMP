@@ -72,6 +72,10 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         else method.addLocalVariables(new Symbol(type,name));
     }
 
+    public boolean isParam(String methodName, String variableName) {
+        return this.getMethod(methodName).getParameter(variableName) != null;
+    }
+
     private void addField(String node) {
         String name = (node.substring(node.indexOf("name=")+5,node.lastIndexOf(","))).trim();
         Type type = parseType((node.substring(node.lastIndexOf("type=")+5,node.lastIndexOf("]"))));
@@ -79,7 +83,7 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         //if(this.fields.contains(field))
             //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0, "Variable "+name+" already declared"));
         //else
-            this.fields.add(field);
+        this.fields.add(field);
     }
 
     public Type parseType(String node) {
@@ -139,6 +143,17 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         Symbol globalVar = this.getField(variableName);
         Symbol localVar = this.getMethod(methodName).getLocalVariable(variableName);
         return localVar != null ? localVar : globalVar;
+    }
+
+    public boolean isGlobal(String variableName) {
+        return this.getField(variableName) !=null;
+    }
+
+    public int getGlobalIndex(String variableName) {
+        for(int i=0; i<fields.size();i++) {
+            if(fields.get(i).getName().equals(variableName)) return i+1;
+        }
+        return -1;
     }
 
     public boolean checkVariableInImports(String variableName) {
