@@ -273,19 +273,6 @@ public class BackendStage implements JasminBackend {
         Element l = instruction.getLeftOperand();
         Element r = instruction.getRightOperand();
 
-        if(((Operand)l).getName().equals(((Operand)r).getName())) {
-            String jasminCode = loadElement(l, varTable);
-            limitStack(stack);
-
-            if (instruction.getCondOperation().getOpType() == OperationType.NOTB)
-                jasminCode += "\tifeq ";
-            else if (instruction.getCondOperation().getOpType() == OperationType.EQ)
-                jasminCode += "\tifne ";
-
-            stack = 0;
-            return jasminCode + instruction.getLabel() + "\n";
-        }
-
         String jasminCode = loadElement(l, varTable) +
                 loadElement(r, varTable)+
                 "\t" + getOperation(instruction.getCondOperation()) + " " + instruction.getLabel() + "\n";
@@ -558,7 +545,7 @@ public class BackendStage implements JasminBackend {
             case DIV:
                 return "idiv";
             case NOTB:
-                return "ifeq";
+                return "if_icmpne";
             default:
                 System.out.println(operation.getOpType());
                 return "ERROR operation not implemented yet";

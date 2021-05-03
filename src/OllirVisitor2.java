@@ -142,16 +142,16 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         List<String> res = getLastLine(condString);
         int localLabel = labelCount;
         labelCount++;
-        StringBuilder expressionString = new StringBuilder("\t\tLoop" + localLabel + ":\n");
+        StringBuilder expressionString = new StringBuilder("Loop" + localLabel + ":\n");
         condString = this.buildCondition(res.get(1), true);
-        expressionString.append(res.get(0));
+        expressionString.append("\t\t\t").append(res.get(0));
 
         expressionString.append("\t\t\tif (").append(condString).append(") goto Body").append(localLabel).append(";\n\t\t\tgoto EndLoop").append(localLabel).append(";\n\t\tBody").append(localLabel).append(":\n");
 
         for (JmmNode child : jmmNode.getChildren().get(1).getChildren()) {
-            expressionString.append("\t").append(visit(child,false));
+            expressionString.append("\t\t\t").append(visit(child,false)).append("\n");
         }
-        expressionString.append("\t\t\tgoto Loop").append(localLabel).append(";\n\t\tEndLoop").append(localLabel).append(":\n");
+        expressionString.append("\t\t\tgoto Loop").append(localLabel).append(";\n\t\tEndLoop").append(localLabel).append(":");
         return expressionString.toString();
     }
 
@@ -162,7 +162,7 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         for (JmmNode child : jmmNode.getChildren()) {
             expressionString.append("\t").append(visit(child));
         }
-        expressionString.append("\t\tendif").append(localLabel).append(":\n");
+        expressionString.append("\t\tendif").append(localLabel).append(":");
         ifCount--;
         return expressionString.toString();
     }
@@ -176,14 +176,14 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         ifCount = localLabel;
         labelCount++;
         condString = this.buildCondition(res.get(1), false);
-        expressionString.append(res.get(0));
+        expressionString.append(res.get(0).isEmpty() ? "" : "\t\t").append(res.get(0));
 
         expressionString.append("\t\tif (").append(condString).append(") goto else").append(localLabel).append(";\n");
 
         for (int i = 1; i < jmmNode.getNumChildren(); i++) {
-            expressionString.append("\t").append(visit(jmmNode.getChildren().get(i)));
+            expressionString.append("\t\t\t").append(visit(jmmNode.getChildren().get(i))).append("\n");
         }
-        expressionString.append("\t\t\tgoto endif").append(localLabel).append(";\n");
+        expressionString.append("\t\t\tgoto endif").append(localLabel).append(";");
         return expressionString.toString();
 
     }
@@ -331,7 +331,7 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         if(result.get(1).contains("getfield"))
             result = getLastLine(createTempVar(identifierStr));
 
-        before = "\t\t" + result.get(0);
+        before = (result.get(0).isEmpty() ? "" : "\t\t") + result.get(0);
         identifierStr=result.get(1);
         String type = identifierStr.contains("array.i32") ? ".array.i32" : identifierStr.substring(identifierStr.lastIndexOf("."));
         return before+"\t\tret" + type + " " + identifierStr + appendColon(identifierStr) + "\n";
