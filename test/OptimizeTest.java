@@ -57,7 +57,7 @@ public class OptimizeTest {
 
     @Test
     public void testQuicksort() {
-        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Quicksort.jmm"));
+        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/QuickSort.jmm"));
         TestUtils.noErrors(result.getReports());
     }
 

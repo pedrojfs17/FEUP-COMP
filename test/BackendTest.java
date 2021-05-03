@@ -56,7 +56,7 @@ public class BackendTest {
 
     @Test
     public void testWhileAndIf() {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/WhileAndIf.jmm"));
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/WhileAndIF.jmm"));
 
         TestUtils.noErrors(result.getReports());
 
@@ -107,7 +107,7 @@ public class BackendTest {
 
     @Test
     public void testQuicksort() {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Quicksort.jmm"));
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/QuickSort.jmm"));
 
         TestUtils.noErrors(result.getReports());
 

@@ -380,11 +380,16 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         StringBuilder str = new StringBuilder(before + callName);
         for (JmmNode child : jmmNode.getChildren()) {
             String childVisit = visit(child,!child.getKind().equals("INT") && !child.getKind().equals("IDENTIFIER"));
-            if(child.getKind().equals("ARRAY_ACCESS") || childVisit.startsWith("getfield(")) childVisit = createTempVar(childVisit.trim());
+            System.out.println("CHILD:" + childVisit);
             List<String> result = getLastLine(childVisit);
             before.append(result.get(0)+"\n");
-            str.append(", ").append(result.get(1));
+            if(child.getKind().equals("ARRAY_ACCESS") || childVisit.startsWith("getfield(")) childVisit = createTempVar(result.get(1).trim());
+            result = getLastLine(childVisit);
+            before.append(result.get(0)+"\n");
+            str.append(", ").append(result.get(1).trim());
         }
+        System.out.println("BEFORE:" + before);
+        System.out.println("STR:" + str);
         return before.toString() +str;
     }
 

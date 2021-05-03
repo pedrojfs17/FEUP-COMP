@@ -21,7 +21,6 @@ class Simple {
 
     public int constInstr(){
         int c;
-        c = 1 + 2 + 3;
         c = 0;
         c = 4;
         c = 8;
