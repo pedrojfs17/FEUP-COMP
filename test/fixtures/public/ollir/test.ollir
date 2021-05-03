@@ -1,0 +1,81 @@
+.method public MoveRow([II)Z
+	.limit stack 99
+	.limit locals 15
+
+	iload_2
+	iconst_0
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore_3
+	iload_3
+	iconst_1
+	if_icmpne else0
+	iconst_0
+	istore 4
+	goto endif0
+else0:
+	iconst_2
+	iload_2
+	if_icmplt True2
+	iconst_0
+	goto Store2
+True2:
+	iconst_1
+Store2:
+	istore 5
+	iload 5
+	iconst_1
+	if_icmpne else1
+	iconst_0
+	istore 4
+	goto endif1
+else1:
+	iconst_0
+	aload_1
+	iload_2
+	iaload
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 6
+	iload 6
+	iconst_1
+	if_icmpne else2
+	iconst_0
+	istore 4
+	goto endif2
+else2:
+	aload_0
+	getfield TicTacToe/pieces [I
+	astore 7
+	aload_0
+	getfield TicTacToe/whoseturn I
+	istore 9
+	aload_1
+	iload_2
+	iastore
+	aload_0
+	getfield TicTacToe/movesmade I
+	istore 11
+	iload 11
+	iconst_1
+	iadd
+	istore 13
+	aload_0
+	iload 13
+	putfield TicTacToe/movesmade I
+	iconst_1
+	istore 4
+endif2:
+endif0:
+endif1:
+	iload 4
+	ireturn
+.end method

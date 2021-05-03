@@ -47,6 +47,11 @@ public class OllirAccesser {
         return method.varTable;
     }
 
+
+    public static Type getFieldType(GetFieldInstruction instruction) {
+        return instruction.fieldType;
+    }
+
     /**
      * @deprecated Use {@link org.specs.comp.ollir.Method#getLabels()} instead.
      * @param method
