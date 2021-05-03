@@ -52,7 +52,10 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
     private String dealWithClass(JmmNode jmmNode, Boolean tempVariable) {
         StringBuilder classStr = new StringBuilder();
         String className = jmmNode.get("name");
-        classStr.append(className).append(" {\n");
+        classStr.append(className);
+        if(jmmNode.getAttributes().contains("super"))
+            classStr.append(" extends ").append(jmmNode.get("super"));
+        classStr.append(" {\n");
 
         for (JmmNode child : jmmNode.getChildren()) {
             if (child.getKind().equals("VAR_DECLARATION"))
@@ -410,7 +413,7 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
             childVisit = visit(child,false);
         }
         List<String> result = getLastLine(childVisit);
-        str += result.get(0)+"\n";
+        str += result.get(0)+ (result.get(0).isEmpty() ? "" : "\n");
         str += "new(array, " + result.get(1) + ").array.i32";
 
         return str;
@@ -439,6 +442,10 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         String opType;
         if(text.contains("arraylength("))
             opType = ".i32";
+        else if (text.contains("new(array"))
+            opType = ".array.i32";
+        else if (text.contains("getfield") || text.contains("invokevirtual"))
+            opType = text.substring(text.lastIndexOf(").") + 1);
         else if(text.contains(").") || text.contains("]."))
             opType =text.substring(text.lastIndexOf("."));
         else if(text.contains("<")||text.contains("&&")||text.contains("!"))

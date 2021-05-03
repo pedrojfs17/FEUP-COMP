@@ -122,16 +122,22 @@ public class BackendStage implements JasminBackend {
         StringBuilder jasminCode = new StringBuilder(methodHeader(method));
 
         HashMap<String, Descriptor> varTable = method.getVarTable();
-
         StringBuilder instructions = new StringBuilder();
+
         HashMap<String, Instruction> labels = method.getLabels();
-        for (Instruction instruction: method.getInstructions()) {
+        for (int i = 0; i < method.getInstructions().size(); i++) {
+            Instruction instruction = method.getInstr(i);
             for (String s : labels.keySet()) {
                 if(labels.get(s) == instruction) {
                     instructions.append(s).append(":\n");
                 }
             }
+
             instructions.append(generateInstruction(instruction, varTable));
+            if (instruction.getInstType() == InstructionType.CALL) {
+                if (((CallInstruction)instruction).getReturnType().getTypeOfElement() != ElementType.VOID)
+                    instructions.append("\tpop\n");
+            }
         }
 
         //jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
@@ -214,24 +220,7 @@ public class BackendStage implements JasminBackend {
 
             jasminCode.append(loadDescriptor(varTable.get(o.getName())))
                     .append(loadElement(index, varTable));
-        }
-
-        if (o.getType().getTypeOfElement() == ElementType.BOOLEAN
-            && instruction.getRhs().getInstType() == InstructionType.BINARYOPER) {
-            conditionals++;
-
-            BinaryOpInstruction compare = (BinaryOpInstruction) instruction.getRhs();
-
-            jasminCode.append(loadElement(compare.getLeftOperand(), varTable))
-                    .append(loadElement(compare.getRightOperand(), varTable))
-                    .append("\t").append(getOperation(compare.getUnaryOperation())).append(" True").append(conditionals).append("\n")
-                    .append("\ticonst_0\n")
-                    .append("\tgoto Store").append(conditionals).append("\n")
-                    .append("True").append(conditionals).append(":\n")
-                    .append("\ticonst_1\n")
-                    .append("Store").append(conditionals).append(":\n");
-        }
-        else
+        } else
             jasminCode.append(generateInstruction(instruction.getRhs(), varTable));
 
         if(o.getType().getTypeOfElement() == ElementType.INT32 || o.getType().getTypeOfElement() == ElementType.BOOLEAN)
@@ -275,7 +264,7 @@ public class BackendStage implements JasminBackend {
 
         String jasminCode = loadElement(l, varTable) +
                 loadElement(r, varTable)+
-                "\t" + getOperation(instruction.getCondOperation()) + " " + instruction.getLabel() + "\n";
+                "\t" + getComparison(instruction.getCondOperation()) + " " + instruction.getLabel() + "\n";
 
         limitStack(stack);
         stack = 0;
@@ -397,14 +386,46 @@ public class BackendStage implements JasminBackend {
     }
 
     private String binaryOpInstruction(BinaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
-        if (instruction.getUnaryOperation().getOpType() == OperationType.NOTB){
+        if (instruction.getUnaryOperation().getOpType() == OperationType.ANDB){
             conditionals++;
-            String jasminCode = loadElement(instruction.getLeftOperand(), varTable) +
-                    "\tifne True" + conditionals + "\n" +
+            limitStack(1);
+            stack = 0;
+
+            return loadElement(instruction.getLeftOperand(), varTable) +
+                    "\tifeq False" + conditionals + "\n" +
+                    loadElement(instruction.getRightOperand(), varTable) +
+                    "\tifeq False" + conditionals + "\n" +
                     "\ticonst_1\n" +
                     "\tgoto Store" + conditionals + "\n" +
-                    "True" + conditionals + ":\n" +
+                    "False" + conditionals + ":\n" +
                     "\ticonst_0\n" +
+                    "Store" + conditionals + ":\n";
+        }
+
+        if (instruction.getUnaryOperation().getOpType() == OperationType.NOTB) {
+            conditionals++;
+            limitStack(1);
+            stack = 0;
+
+            return loadElement(instruction.getLeftOperand(), varTable) +
+                    loadElement(instruction.getRightOperand(), varTable) +
+                    "\t" + getComparison(instruction.getUnaryOperation()) + " True" + conditionals + "\n" +
+                    "\ticonst_0\n" +
+                    "\tgoto Store" + conditionals + "\n" +
+                    "True" + conditionals + ":\n" +
+                    "\ticonst_1\n" +
+                    "Store" + conditionals + ":\n";
+        }
+
+        if (instruction.getUnaryOperation().getOpType() == OperationType.LTH) {
+            conditionals++;
+            String jasminCode = loadElement(instruction.getLeftOperand(), varTable) +
+                    loadElement(instruction.getRightOperand(), varTable) +
+                    "\t" + getComparison(instruction.getUnaryOperation()) + " True" + conditionals + "\n" +
+                    "\ticonst_0\n" +
+                    "\tgoto Store" + conditionals + "\n" +
+                    "True" + conditionals + ":\n" +
+                    "\ticonst_1\n" +
                     "Store" + conditionals + ":\n";
 
             stack = 1;
@@ -530,25 +551,33 @@ public class BackendStage implements JasminBackend {
 
     private String getOperation(Operation operation) {
         switch(operation.getOpType()) {
-            case GTE:
-                return "if_icmpge";
-            case LTH:
-                return "if_icmplt";
             case ADD:
                 return "iadd";
             case MUL:
                 return "imul";
             case SUB:
                 return "isub";
-            case EQ:
-                return "if_icmpeq";
             case DIV:
                 return "idiv";
+            default:
+                System.out.println(operation.getOpType());
+                return "ERROR operation not implemented yet";
+        }
+    }
+
+    private String getComparison(Operation operation) {
+        switch(operation.getOpType()) {
+            case GTE:
+                return "if_icmpge";
+            case LTH:
+                return "if_icmplt";
+            case EQ:
+                return "if_icmpeq";
             case NOTB:
                 return "if_icmpne";
             default:
                 System.out.println(operation.getOpType());
-                return "ERROR operation not implemented yet";
+                return "ERROR comparison not implemented yet";
         }
     }
 

@@ -1,23 +1,81 @@
-.method public find_maximum(arr.array.i32).i32 {
-		i.i32 :=.i32 1.i32;
+.method public MoveRow([II)Z
+	.limit stack 99
+	.limit locals 15
 
-		t1.i32 :=.i32 0.i32;
-		maximum.i32 :=.i32 $2.arr[t1.i32].i32;
-		Loop0:
-			t2.i32 :=.i32 arraylength($2.arr.array.i32).i32;
-t3.bool :=.bool i.i32  <.bool t2.i32;
-			if (t3.bool ==.bool 1.bool) goto Body0;
-			goto EndLoop0;
-		Body0:
-			value.i32 :=.i32 $2.arr[i.i32].i32;
-					t4.bool :=.bool maximum.i32  <.bool value.i32;
-		if (t4.bool !.bool 1.bool) goto else1;
-			maximum.i32 :=.i32 value.i32;
-			goto endif1;
-					else1:
-		endif1:
-			i.i32 :=.i32 i.i32 +.i32 1.i32;
-			goto Loop0;
-		EndLoop0:
-		ret.i32 maximum.i32;
-	}
+	iload_2
+	iconst_0
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore_3
+	iload_3
+	iconst_1
+	if_icmpne else0
+	iconst_0
+	istore 4
+	goto endif0
+else0:
+	iconst_2
+	iload_2
+	if_icmplt True2
+	iconst_0
+	goto Store2
+True2:
+	iconst_1
+Store2:
+	istore 5
+	iload 5
+	iconst_1
+	if_icmpne else1
+	iconst_0
+	istore 4
+	goto endif1
+else1:
+	iconst_0
+	aload_1
+	iload_2
+	iaload
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 6
+	iload 6
+	iconst_1
+	if_icmpne else2
+	iconst_0
+	istore 4
+	goto endif2
+else2:
+	aload_0
+	getfield TicTacToe/pieces [I
+	astore 7
+	aload_0
+	getfield TicTacToe/whoseturn I
+	istore 9
+	aload_1
+	iload_2
+	iastore
+	aload_0
+	getfield TicTacToe/movesmade I
+	istore 11
+	iload 11
+	iconst_1
+	iadd
+	istore 13
+	aload_0
+	iload 13
+	putfield TicTacToe/movesmade I
+	iconst_1
+	istore 4
+endif2:
+endif0:
+endif1:
+	iload 4
+	ireturn
+.end method
