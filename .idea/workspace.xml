@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
+    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="If condition fix on backend">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.dot" beforeDir="false" afterPath="$PROJECT_DIR$/main.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuickSort.dot" beforeDir="false" afterPath="$PROJECT_DIR$/QuickSort.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/performSingleEstimate.dot" beforeDir="false" afterPath="$PROJECT_DIR$/performSingleEstimate.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quicksort.dot" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,20 +95,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
-  <component name="RunManager" selected="Gradle.BackendTest.testTicTacToe">
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Gradle.comp2021-4b [test]">
     <configuration name="BackendTest.testMyClass1" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -215,18 +202,18 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Gradle.comp2021-4b [test]" />
-      <item itemvalue="Gradle.OptimizeTest" />
       <item itemvalue="Gradle.BackendTest.testMyClass1" />
       <item itemvalue="Gradle.BackendTest.testQuicksort" />
       <item itemvalue="Gradle.BackendTest.testTicTacToe" />
+      <item itemvalue="Gradle.OptimizeTest" />
+      <item itemvalue="Gradle.comp2021-4b [test]" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.BackendTest.testTicTacToe" />
         <item itemvalue="Gradle.comp2021-4b [test]" />
-        <item itemvalue="Gradle.BackendTest.testQuicksort" />
         <item itemvalue="Gradle.OptimizeTest" />
+        <item itemvalue="Gradle.BackendTest.testTicTacToe" />
+        <item itemvalue="Gradle.BackendTest.testQuicksort" />
         <item itemvalue="Gradle.BackendTest.testMyClass1" />
       </list>
     </recent_temporary>
@@ -260,6 +247,7 @@
       <workItem from="1619887707873" duration="20732000" />
       <workItem from="1619949909819" duration="28493000" />
       <workItem from="1620058935234" duration="6628000" />
+      <workItem from="1620073832903" duration="1379000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
