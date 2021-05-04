@@ -220,8 +220,9 @@ public class BackendStage implements JasminBackend {
 
             jasminCode.append(loadDescriptor(varTable.get(o.getName())))
                     .append(loadElement(index, varTable));
-        } else
-            jasminCode.append(generateInstruction(instruction.getRhs(), varTable));
+        }
+
+        jasminCode.append(generateInstruction(instruction.getRhs(), varTable));
 
         if(o.getType().getTypeOfElement() == ElementType.INT32 || o.getType().getTypeOfElement() == ElementType.BOOLEAN)
             if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF) {

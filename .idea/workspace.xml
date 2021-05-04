@@ -6,10 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="If condition fix on backend">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuickSort.dot" beforeDir="false" afterPath="$PROJECT_DIR$/QuickSort.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/performSingleEstimate.dot" beforeDir="false" afterPath="$PROJECT_DIR$/performSingleEstimate.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quicksort.dot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
+    </list>
+    <list id="ed5669a6-ef10-4b8c-96aa-b81b9b61274c" name="Changes by up201806385" comment="">
+      <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,6 +49,11 @@
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="verification" type="c8890929:TasksNode$1" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="comp2021-4b" type="f1a62948:ProjectNode" />
+                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -77,6 +82,14 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/test/BackendTest.java">
+      <ranges>
+        <range start1="64" end1="65" start2="64" end2="65" changelist="5fc25134-38f1-43d5-9c5e-2821889dc6ed" />
+        <range start1="93" end1="94" start2="93" end2="94" changelist="ed5669a6-ef10-4b8c-96aa-b81b9b61274c" />
+      </ranges>
+    </file>
+  </component>
   <component name="ProjectId" id="1qqKFM9e7BOUAKV2z1iHY0G0LmE" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -88,20 +101,31 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="codeWithMe.voiceChat.enabledByDefault" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/grammar.jj" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
-  <component name="RunManager" selected="Gradle.comp2021-4b [test]">
-    <configuration name="BackendTest.testMyClass1" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.BackendTest">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BackendTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="--tests &quot;BackendTest.testMyClass1&quot;" />
+        <option name="scriptParameters" value="--tests &quot;BackendTest&quot;" />
         <option name="taskDescriptions">
           <list />
         </option>
@@ -117,12 +141,12 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="BackendTest.testQuicksort" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="BackendTest.testLife" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="--tests &quot;BackendTest.testQuicksort&quot;" />
+        <option name="scriptParameters" value="--tests &quot;BackendTest.testLife&quot;" />
         <option name="taskDescriptions">
           <list />
         </option>
@@ -202,19 +226,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Gradle.BackendTest.testMyClass1" />
-      <item itemvalue="Gradle.BackendTest.testQuicksort" />
       <item itemvalue="Gradle.BackendTest.testTicTacToe" />
       <item itemvalue="Gradle.OptimizeTest" />
       <item itemvalue="Gradle.comp2021-4b [test]" />
+      <item itemvalue="Gradle.BackendTest.testLife" />
+      <item itemvalue="Gradle.BackendTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.BackendTest" />
+        <item itemvalue="Gradle.BackendTest.testLife" />
         <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.OptimizeTest" />
         <item itemvalue="Gradle.BackendTest.testTicTacToe" />
-        <item itemvalue="Gradle.BackendTest.testQuicksort" />
-        <item itemvalue="Gradle.BackendTest.testMyClass1" />
       </list>
     </recent_temporary>
   </component>
@@ -248,6 +272,7 @@
       <workItem from="1619949909819" duration="28493000" />
       <workItem from="1620058935234" duration="6628000" />
       <workItem from="1620073832903" duration="1379000" />
+      <workItem from="1620124922581" duration="1840000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
