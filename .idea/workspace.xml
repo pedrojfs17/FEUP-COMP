@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="If condition fix on backend">
+    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
-    </list>
-    <list id="ed5669a6-ef10-4b8c-96aa-b81b9b61274c" name="Changes by up201806385" comment="">
+      <change beforePath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,13 +82,20 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/test/BackendTest.java">
-      <ranges>
-        <range start1="64" end1="65" start2="64" end2="65" changelist="5fc25134-38f1-43d5-9c5e-2821889dc6ed" />
-        <range start1="93" end1="94" start2="93" end2="94" changelist="ed5669a6-ef10-4b8c-96aa-b81b9b61274c" />
-      </ranges>
-    </file>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/ollir/Lazysort.txt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/ollir/Life.txt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/FindMaximum.jmm" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/TicTacToe.jmm" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/QuickSort.jmm" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/Lazysort.jmm" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/BackendTest.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/BackendStage.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/OptimizeTest.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/OllirVisitor2.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/ollir/findmaximum.txt" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1qqKFM9e7BOUAKV2z1iHY0G0LmE" />
   <component name="ProjectViewState">
@@ -109,17 +116,6 @@
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
   <component name="RunManager" selected="Gradle.BackendTest">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="BackendTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -226,19 +222,19 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Gradle.BackendTest" />
+      <item itemvalue="Gradle.BackendTest.testLife" />
       <item itemvalue="Gradle.BackendTest.testTicTacToe" />
       <item itemvalue="Gradle.OptimizeTest" />
       <item itemvalue="Gradle.comp2021-4b [test]" />
-      <item itemvalue="Gradle.BackendTest.testLife" />
-      <item itemvalue="Gradle.BackendTest" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.BackendTest" />
-        <item itemvalue="Gradle.BackendTest.testLife" />
         <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.OptimizeTest" />
         <item itemvalue="Gradle.BackendTest.testTicTacToe" />
+        <item itemvalue="Gradle.BackendTest.testLife" />
       </list>
     </recent_temporary>
   </component>
@@ -273,6 +269,8 @@
       <workItem from="1620058935234" duration="6628000" />
       <workItem from="1620073832903" duration="1379000" />
       <workItem from="1620124922581" duration="1840000" />
+      <workItem from="1620232896788" duration="22000" />
+      <workItem from="1620290416195" duration="2840000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>

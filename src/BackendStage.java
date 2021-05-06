@@ -408,9 +408,18 @@ public class BackendStage implements JasminBackend {
             limitStack(1);
             stack = 0;
 
-            return loadElement(instruction.getLeftOperand(), varTable) +
-                    loadElement(instruction.getRightOperand(), varTable) +
-                    "\t" + getComparison(instruction.getUnaryOperation()) + " True" + conditionals + "\n" +
+            String jasminCode = loadElement(instruction.getLeftOperand(), varTable);
+
+            if(((Operand)instruction.getRightOperand()).getName().equals(
+                    ((Operand)instruction.getLeftOperand()).getName())) {
+                jasminCode += "\tifeq";
+
+            } else {
+                jasminCode += loadElement(instruction.getRightOperand(), varTable) +
+                        "\t" + getComparison(instruction.getUnaryOperation());
+            }
+
+            return jasminCode + " True" + conditionals + "\n" +
                     "\ticonst_0\n" +
                     "\tgoto Store" + conditionals + "\n" +
                     "True" + conditionals + ":\n" +

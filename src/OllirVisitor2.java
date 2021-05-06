@@ -17,6 +17,7 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         this.symbolTable = symbolTable;
         paramCount = symbolTable.getFields().size() + 1;
 
+        addVisit("IMPORT", this::dealWithImport);
         addVisit("CLASS_DECLARATION", this::dealWithClass);
         addVisit("VAR_DECLARATION", this::dealWithVar);
         addVisit("MAIN", this::dealWithMain);
@@ -46,6 +47,9 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         setDefaultVisit(this::defaultVisit);
     }
 
+    private String dealWithImport(JmmNode jmmNode, Boolean tempVariable) {
+        return "import " + jmmNode.get("name") + ";\n";
+    }
 
     private String dealWithClass(JmmNode jmmNode, Boolean tempVariable) {
         StringBuilder classStr = new StringBuilder();
@@ -207,10 +211,14 @@ public class OllirVisitor2 extends AJmmVisitor<Boolean, String> {
         List<String> res = getLastLine(assignmentVisit);
         String assignmentValue = res.get(1);
         //quando invokestatic é preciso mudar o valor de retorno da funcao
-        if (!assignmentValue.substring(assignmentValue.lastIndexOf("."))
-                .equals(identifierVisit.substring(identifierVisit.lastIndexOf(".")))) {
-            assignmentValue = assignmentValue.substring(0, assignmentValue.lastIndexOf("."))
-                    + identifierVisit.substring(identifierVisit.lastIndexOf("."));
+        if (assignmentValue.startsWith("invokestatic")) {
+            assignmentValue = assignmentValue.substring(0, assignmentValue.lastIndexOf("."));
+            String type = identifierVisit;
+            if (identifierVisit.contains("$"))
+                type = type.substring(type.indexOf(".")+1);
+            if (identifierVisit.contains("]"))
+                type = type.substring(type.indexOf("]"));
+            assignmentValue += type.substring(type.indexOf("."));
         }
         if (identifierVisit.startsWith("getfield"))
             methodStr.append(res.get(0)).append((res.get(0).equals("")) ? "" : "\t\t").append("put").append(identifierVisit.substring(3, identifierVisit.indexOf(")"))).append(", ").append(assignmentValue).append(").V");
