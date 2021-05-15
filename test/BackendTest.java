@@ -1,4 +1,3 @@
-//amega
 /**
  * Copyright 2021 SPeCS.
  * 

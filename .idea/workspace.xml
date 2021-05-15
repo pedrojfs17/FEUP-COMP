@@ -6,11 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" afterDir="false" />
+    </list>
+    <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="">
+      <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -231,8 +232,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.BackendTest" />
-        <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.OptimizeTest" />
+        <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.BackendTest.testTicTacToe" />
         <item itemvalue="Gradle.BackendTest.testLife" />
       </list>
@@ -270,7 +271,11 @@
       <workItem from="1620073832903" duration="1379000" />
       <workItem from="1620124922581" duration="1840000" />
       <workItem from="1620232896788" duration="22000" />
-      <workItem from="1620290416195" duration="2840000" />
+      <workItem from="1620290416195" duration="2923000" />
+      <workItem from="1620306229442" duration="1617000" />
+      <workItem from="1620729434447" duration="1907000" />
+      <workItem from="1621088807518" duration="3349000" />
+      <workItem from="1621097043114" duration="1045000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
@@ -293,7 +298,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620049138583</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="All backend tests passing">
+      <created>1620293328300</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1620293328300</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -337,7 +349,8 @@
     <MESSAGE value="Refactoring to not use ollir accesser" />
     <MESSAGE value="Fixing errors" />
     <MESSAGE value="If condition fix on backend" />
-    <option name="LAST_COMMIT_MESSAGE" value="If condition fix on backend" />
+    <MESSAGE value="All backend tests passing" />
+    <option name="LAST_COMMIT_MESSAGE" value="All backend tests passing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

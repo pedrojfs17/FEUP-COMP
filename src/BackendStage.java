@@ -140,8 +140,8 @@ public class BackendStage implements JasminBackend {
             }
         }
 
-        //jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
-        jasminCode.append("\t.limit stack 99\n");
+        jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
+        //jasminCode.append("\t.limit stack 99\n");
 
         int locals = varTable.size();
         if (!method.isConstructMethod())
@@ -451,7 +451,7 @@ public class BackendStage implements JasminBackend {
                 "\t" + getOperation(instruction.getUnaryOperation()) + "\n";
 
         limitStack(stack);
-        stack -= stackSize(instruction.getRightOperand());
+        stack -= 1;
         return jasminCode;
     }
 
@@ -520,7 +520,7 @@ public class BackendStage implements JasminBackend {
     }
 
     private String loadLiteral(LiteralElement element) {
-        stack += stackSize(element);
+        stack += 1;
         String jasminCode = "\t";
         if (element.getType().getTypeOfElement() == ElementType.INT32 || element.getType().getTypeOfElement() == ElementType.BOOLEAN) {
             if (Integer.parseInt(element.getLiteral()) <= 5)
@@ -594,18 +594,6 @@ public class BackendStage implements JasminBackend {
     private void limitStack(int s) {
         if (s > stacklimit)
             stacklimit = s;
-    }
-
-    private int stackSize(Element e) {
-        if (e.isLiteral()) {
-            int val = Integer.parseInt(((LiteralElement) e).getLiteral());
-            if (val > 65535)
-                return 4;
-            else if(val > 255)
-                return 2;
-            else return 1;
-        }
-        return 1;
     }
 
     private String getObjectName(String name) {
