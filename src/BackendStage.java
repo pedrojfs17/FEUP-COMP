@@ -31,6 +31,7 @@ public class BackendStage implements JasminBackend {
     int stack;
     String className;
     String superClass;
+    ArrayList<String> imports;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -63,6 +64,7 @@ public class BackendStage implements JasminBackend {
 
     private String generateClass(ClassUnit classUnit) {
         className = classUnit.getClassName();
+        imports = classUnit.getImports();
         if (classUnit.getSuperClass() == null)
             superClass = "java/lang/Object";
         else
@@ -213,7 +215,7 @@ public class BackendStage implements JasminBackend {
         Operand o = (Operand) instruction.getDest();
         int reg = varTable.get(o.getName()).getVirtualReg();
 
-        if(varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
+        if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
             && o.getType().getTypeOfElement() != ElementType.ARRAYREF) {
             ArrayOperand arrayOp = (ArrayOperand) o;
             Element index = arrayOp.getIndexOperands().get(0);
@@ -543,6 +545,15 @@ public class BackendStage implements JasminBackend {
         if (elementType == ElementType.ARRAYREF) {
             elementType = ((ArrayType) type).getTypeOfElements();
             jasminCode += "[";
+        }
+
+        if (elementType == ElementType.OBJECTREF) {
+            String className = ((ClassType)type).getName();
+            for (String imported: imports) {
+                if (imported.endsWith("." + className))
+                    return jasminCode + "L" + imported.replace('.', '/') + ";";
+            }
+            return jasminCode + "L" + className + ";";
         }
 
         switch (elementType) {

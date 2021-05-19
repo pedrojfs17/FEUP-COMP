@@ -33,7 +33,7 @@ public class OptimizationStage implements JmmOptimization {
         // More reports from this stage
         List<Report> reports = new ArrayList<>();
 
-        OllirVisitor2 visitor = new OllirVisitor2((SymbolTable) semanticsResult.getSymbolTable());
+        OllirVisitor visitor = new OllirVisitor((SymbolTable) semanticsResult.getSymbolTable());
 
         ollirCode = visitor.visit(node);
         System.out.println(ollirCode);

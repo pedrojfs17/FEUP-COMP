@@ -7,11 +7,15 @@
     <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OptimizationStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OptimizationStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/fixtures/public/HelloWorld.jmm" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/HelloWorld.jmm" afterDir="false" />
     </list>
     <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="">
       <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +98,7 @@
     <setting file="file://$PROJECT_DIR$/test/BackendTest.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/BackendStage.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/OptimizeTest.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/OllirVisitor2.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/OllirVisitor.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/ollir/findmaximum.txt" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -117,6 +121,17 @@
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
   <component name="RunManager" selected="Gradle.BackendTest">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BackendTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -275,7 +290,10 @@
       <workItem from="1620306229442" duration="1617000" />
       <workItem from="1620729434447" duration="1907000" />
       <workItem from="1621088807518" duration="3349000" />
-      <workItem from="1621097043114" duration="1045000" />
+      <workItem from="1621097043114" duration="1259000" />
+      <workItem from="1621334383998" duration="2616000" />
+      <workItem from="1621347105978" duration="59000" />
+      <workItem from="1621410031172" duration="3364000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
@@ -305,7 +323,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620293328300</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fixed stack size calculations">
+      <created>1621098704565</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1621098704566</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -350,7 +375,8 @@
     <MESSAGE value="Fixing errors" />
     <MESSAGE value="If condition fix on backend" />
     <MESSAGE value="All backend tests passing" />
-    <option name="LAST_COMMIT_MESSAGE" value="All backend tests passing" />
+    <MESSAGE value="Fixed stack size calculations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed stack size calculations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
