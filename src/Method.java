@@ -42,6 +42,15 @@ public class Method {
         return null;
     }
 
+    public int getParamIndex(String varName) {
+        int i = 0;
+        for (Symbol symbol: parameters) {
+            if(symbol.getName().equals(varName)) return i;
+            i++;
+        }
+        return -1;
+    }
+
     public boolean containsParameter(String varName) {
         for (Symbol symbol: parameters) {
             if(symbol.getName().equals(varName)) return true;
