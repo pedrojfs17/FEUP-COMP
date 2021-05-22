@@ -6,17 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BackendStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackendStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor2.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OptimizationStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OptimizationStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/fixtures/public/HelloWorld.jmm" beforeDir="false" afterPath="$PROJECT_DIR$/test/fixtures/public/HelloWorld.jmm" afterDir="false" />
-    </list>
-    <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="">
+      <change beforePath="$PROJECT_DIR$/beLazy.dot" beforeDir="false" afterPath="$PROJECT_DIR$/beLazy.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build_test_arr.dot" beforeDir="false" afterPath="$PROJECT_DIR$/build_test_arr.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/changeturn.dot" beforeDir="false" afterPath="$PROJECT_DIR$/changeturn.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/field.dot" beforeDir="false" afterPath="$PROJECT_DIR$/field.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/getNeighborCoords.dot" beforeDir="false" afterPath="$PROJECT_DIR$/getNeighborCoords.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/init.dot" beforeDir="false" afterPath="$PROJECT_DIR$/init.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/printField.dot" beforeDir="false" afterPath="$PROJECT_DIR$/printField.dot" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/update.dot" beforeDir="false" afterPath="$PROJECT_DIR$/update.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/winner.dot" beforeDir="false" afterPath="$PROJECT_DIR$/winner.dot" afterDir="false" />
     </list>
+    <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -88,19 +90,19 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/ollir/Lazysort.txt" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/ollir/Life.txt" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/test/fixtures/public/FindMaximum.jmm" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/test/fixtures/public/TicTacToe.jmm" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/fixtures/public/ollir/test.ollir" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/test/fixtures/public/QuickSort.jmm" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/test/fixtures/public/Lazysort.jmm" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/BackendTest.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/BackendStage.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/QuickSort.jmm" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/OptimizeTest.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/ollir/Life.txt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/ollir/Lazysort.txt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/BackendStage.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/OllirVisitor.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src-lib/pt/up/fe/comp/jmm/ollir/OllirUtils.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/TicTacToe.jmm" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/Lazysort.jmm" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/ollir/findmaximum.txt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test/fixtures/public/FindMaximum.jmm" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1qqKFM9e7BOUAKV2z1iHY0G0LmE" />
   <component name="ProjectViewState">
@@ -120,18 +122,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
-  <component name="RunManager" selected="Gradle.BackendTest">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Gradle.comp2021-4b [test]">
     <configuration name="BackendTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -246,9 +237,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.BackendTest" />
         <item itemvalue="Gradle.OptimizeTest" />
-        <item itemvalue="Gradle.comp2021-4b [test]" />
         <item itemvalue="Gradle.BackendTest.testTicTacToe" />
         <item itemvalue="Gradle.BackendTest.testLife" />
       </list>
@@ -294,6 +285,7 @@
       <workItem from="1621334383998" duration="2616000" />
       <workItem from="1621347105978" duration="59000" />
       <workItem from="1621410031172" duration="3364000" />
+      <workItem from="1621694603047" duration="7377000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
