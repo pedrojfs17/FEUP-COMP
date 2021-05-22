@@ -287,7 +287,6 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
             }
             if(!arrayAccessed) {
-                System.out.println("ASSIGNMENT: "+assignString);
                 if(assignString.contains("\n")) {
                     methodStr.append(assignString.substring(0, assignString.lastIndexOf("\n") + 1));
                     assignString = assignString.substring(assignString.lastIndexOf("\n") + 1);
@@ -337,7 +336,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 }
 
             } else if (grandchild.getKind().equals("OBJECT_METHOD")) {
-                String substring = visitString.substring(visitString.lastIndexOf("."), visitString.length() - 1);
+                String substring = visitString.substring(visitString.contains(".array") ? visitString.indexOf(".array"): visitString.lastIndexOf("."), visitString.length() - 1);
                 visitString = "\t\tt" + tempVar + substring + " :=" + substring + " " + visitString + "\n";
                 param = "t" + tempVar + substring;
                 tempVar++;

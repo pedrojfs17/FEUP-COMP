@@ -4,19 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="">
+    <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="Fixed stack size calculations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beLazy.dot" beforeDir="false" afterPath="$PROJECT_DIR$/beLazy.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build_test_arr.dot" beforeDir="false" afterPath="$PROJECT_DIR$/build_test_arr.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/changeturn.dot" beforeDir="false" afterPath="$PROJECT_DIR$/changeturn.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/field.dot" beforeDir="false" afterPath="$PROJECT_DIR$/field.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/getNeighborCoords.dot" beforeDir="false" afterPath="$PROJECT_DIR$/getNeighborCoords.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/init.dot" beforeDir="false" afterPath="$PROJECT_DIR$/init.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/printField.dot" beforeDir="false" afterPath="$PROJECT_DIR$/printField.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/update.dot" beforeDir="false" afterPath="$PROJECT_DIR$/update.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/winner.dot" beforeDir="false" afterPath="$PROJECT_DIR$/winner.dot" afterDir="false" />
     </list>
     <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -285,7 +275,8 @@
       <workItem from="1621334383998" duration="2616000" />
       <workItem from="1621347105978" duration="59000" />
       <workItem from="1621410031172" duration="3364000" />
-      <workItem from="1621694603047" duration="7377000" />
+      <workItem from="1621694603047" duration="7971000" />
+      <workItem from="1621704777998" duration="1016000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
