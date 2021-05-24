@@ -31,6 +31,7 @@ public class BackendStage implements JasminBackend {
     int stack;
     String className;
     String superClass;
+    ArrayList<String> imports;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -63,6 +64,7 @@ public class BackendStage implements JasminBackend {
 
     private String generateClass(ClassUnit classUnit) {
         className = classUnit.getClassName();
+        imports = classUnit.getImports();
         if (classUnit.getSuperClass() == null)
             superClass = "java/lang/Object";
         else
@@ -140,8 +142,8 @@ public class BackendStage implements JasminBackend {
             }
         }
 
-        //jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
-        jasminCode.append("\t.limit stack 99\n");
+        jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
+        //jasminCode.append("\t.limit stack 99\n");
 
         int locals = varTable.size();
         if (!method.isConstructMethod())
@@ -213,7 +215,7 @@ public class BackendStage implements JasminBackend {
         Operand o = (Operand) instruction.getDest();
         int reg = varTable.get(o.getName()).getVirtualReg();
 
-        if(varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
+        if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
             && o.getType().getTypeOfElement() != ElementType.ARRAYREF) {
             ArrayOperand arrayOp = (ArrayOperand) o;
             Element index = arrayOp.getIndexOperands().get(0);
@@ -408,9 +410,18 @@ public class BackendStage implements JasminBackend {
             limitStack(1);
             stack = 0;
 
-            return loadElement(instruction.getLeftOperand(), varTable) +
-                    loadElement(instruction.getRightOperand(), varTable) +
-                    "\t" + getComparison(instruction.getUnaryOperation()) + " True" + conditionals + "\n" +
+            String jasminCode = loadElement(instruction.getLeftOperand(), varTable);
+
+            if(((Operand)instruction.getRightOperand()).getName().equals(
+                    ((Operand)instruction.getLeftOperand()).getName())) {
+                jasminCode += "\tifeq";
+
+            } else {
+                jasminCode += loadElement(instruction.getRightOperand(), varTable) +
+                        "\t" + getComparison(instruction.getUnaryOperation());
+            }
+
+            return jasminCode + " True" + conditionals + "\n" +
                     "\ticonst_0\n" +
                     "\tgoto Store" + conditionals + "\n" +
                     "True" + conditionals + ":\n" +
@@ -442,7 +453,7 @@ public class BackendStage implements JasminBackend {
                 "\t" + getOperation(instruction.getUnaryOperation()) + "\n";
 
         limitStack(stack);
-        stack -= stackSize(instruction.getRightOperand());
+        stack -= 1;
         return jasminCode;
     }
 
@@ -511,7 +522,7 @@ public class BackendStage implements JasminBackend {
     }
 
     private String loadLiteral(LiteralElement element) {
-        stack += stackSize(element);
+        stack += 1;
         String jasminCode = "\t";
         if (element.getType().getTypeOfElement() == ElementType.INT32 || element.getType().getTypeOfElement() == ElementType.BOOLEAN) {
             if (Integer.parseInt(element.getLiteral()) <= 5)
@@ -534,6 +545,15 @@ public class BackendStage implements JasminBackend {
         if (elementType == ElementType.ARRAYREF) {
             elementType = ((ArrayType) type).getTypeOfElements();
             jasminCode += "[";
+        }
+
+        if (elementType == ElementType.OBJECTREF) {
+            String className = ((ClassType)type).getName();
+            for (String imported: imports) {
+                if (imported.endsWith("." + className))
+                    return jasminCode + "L" + imported.replace('.', '/') + ";";
+            }
+            return jasminCode + "L" + className + ";";
         }
 
         switch (elementType) {
@@ -585,18 +605,6 @@ public class BackendStage implements JasminBackend {
     private void limitStack(int s) {
         if (s > stacklimit)
             stacklimit = s;
-    }
-
-    private int stackSize(Element e) {
-        if (e.isLiteral()) {
-            int val = Integer.parseInt(((LiteralElement) e).getLiteral());
-            if (val > 65535)
-                return 4;
-            else if(val > 255)
-                return 2;
-            else return 1;
-        }
-        return 1;
     }
 
     private String getObjectName(String name) {

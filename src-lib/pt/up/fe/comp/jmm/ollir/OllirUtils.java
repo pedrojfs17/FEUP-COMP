@@ -47,7 +47,7 @@ public class OllirUtils {
     }
 
     public static CallType getCallInvocationType(CallInstruction callInstruction) {
-        return OllirAccesser.getCallInvocation(callInstruction);
+        return callInstruction.getInvocationType();
     }
 
 }

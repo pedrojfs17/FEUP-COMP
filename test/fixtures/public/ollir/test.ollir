@@ -1,3 +1,120 @@
+.class TicTacToe
+.super java/lang/Object
+
+.field private row0 [I
+
+.field private row1 [I
+
+.field private row2 [I
+
+.field private whoseturn I
+
+.field private movesmade I
+
+.field private pieces [I
+
+.method <init>()V
+	.limit stack 99
+	.limit locals 1
+
+	aload_0
+	invokespecial java/lang/Object.<init>()V
+	return
+.end method
+
+.method public init()Z
+	.limit stack 99
+	.limit locals 19
+
+	iconst_3
+	newarray int
+	astore_1
+	aload_0
+	aload_1
+	putfield TicTacToe/row0 [I
+	iconst_3
+	newarray int
+	astore 4
+	aload_0
+	aload 4
+	putfield TicTacToe/row1 [I
+	iconst_3
+	newarray int
+	astore 6
+	aload_0
+	aload 6
+	putfield TicTacToe/row2 [I
+	iconst_2
+	newarray int
+	astore 8
+	aload_0
+	aload 8
+	putfield TicTacToe/pieces [I
+	aload_0
+	getfield TicTacToe/pieces [I
+	astore 10
+	iconst_0
+	istore 11
+	aload 10
+	iload 11
+	iconst_1
+	iastore
+	aload_0
+	getfield TicTacToe/pieces [I
+	astore 12
+	iconst_1
+	istore 13
+	aload 12
+	iload 13
+	iconst_2
+	iastore
+	iconst_0
+	istore 14
+	aload_0
+	iload 14
+	putfield TicTacToe/whoseturn I
+	iconst_0
+	istore 16
+	aload_0
+	iload 16
+	putfield TicTacToe/movesmade I
+	iconst_1
+	ireturn
+.end method
+
+.method public getRow0()[I
+	.limit stack 99
+	.limit locals 4
+
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore_1
+	aload_1
+	areturn
+.end method
+
+.method public getRow1()[I
+	.limit stack 99
+	.limit locals 4
+
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore_1
+	aload_1
+	areturn
+.end method
+
+.method public getRow2()[I
+	.limit stack 99
+	.limit locals 4
+
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore_1
+	aload_1
+	areturn
+.end method
+
 .method public MoveRow([II)Z
 	.limit stack 99
 	.limit locals 15
@@ -60,6 +177,9 @@ else2:
 	istore 9
 	aload_1
 	iload_2
+	aload 7
+	iload 9
+	iaload
 	iastore
 	aload_0
 	getfield TicTacToe/movesmade I
@@ -78,4 +198,1019 @@ endif0:
 endif1:
 	iload 4
 	ireturn
+.end method
+
+.method public Move(II)Z
+	.limit stack 99
+	.limit locals 26
+
+	iload_1
+	iconst_0
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore_3
+	iload_3
+	if_eq True2
+	iconst_0
+	goto Store2
+True2:
+	iconst_1
+Store2:
+	istore 4
+	iconst_0
+	iload_1
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 5
+	iload 5
+	if_eq True4
+	iconst_0
+	goto Store4
+True4:
+	iconst_1
+Store4:
+	istore 6
+	iload 4
+	ifeq False5
+	iload 6
+	ifeq False5
+	iconst_1
+	goto Store5
+False5:
+	iconst_0
+Store5:
+	istore 7
+	iload 7
+	iconst_1
+	if_icmpne else3
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 8
+	aload_0
+	aload 8
+	iload_2
+	invokevirtual TicTacToe.MoveRow([II)Z
+	istore 10
+	goto endif3
+else3:
+	iload_1
+	iconst_1
+	if_icmplt True6
+	iconst_0
+	goto Store6
+True6:
+	iconst_1
+Store6:
+	istore 11
+	iload 11
+	if_eq True7
+	iconst_0
+	goto Store7
+True7:
+	iconst_1
+Store7:
+	istore 12
+	iconst_1
+	iload_1
+	if_icmplt True8
+	iconst_0
+	goto Store8
+True8:
+	iconst_1
+Store8:
+	istore 13
+	iload 13
+	if_eq True9
+	iconst_0
+	goto Store9
+True9:
+	iconst_1
+Store9:
+	istore 14
+	iload 12
+	ifeq False10
+	iload 14
+	ifeq False10
+	iconst_1
+	goto Store10
+False10:
+	iconst_0
+Store10:
+	istore 15
+	iload 15
+	iconst_1
+	if_icmpne else4
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 16
+	aload_0
+	aload 16
+	iload_2
+	invokevirtual TicTacToe.MoveRow([II)Z
+	istore 10
+	goto endif4
+else4:
+	iload_1
+	iconst_2
+	if_icmplt True11
+	iconst_0
+	goto Store11
+True11:
+	iconst_1
+Store11:
+	istore 18
+	iload 18
+	if_eq True12
+	iconst_0
+	goto Store12
+True12:
+	iconst_1
+Store12:
+	istore 19
+	iconst_2
+	iload_1
+	if_icmplt True13
+	iconst_0
+	goto Store13
+True13:
+	iconst_1
+Store13:
+	istore 20
+	iload 20
+	if_eq True14
+	iconst_0
+	goto Store14
+True14:
+	iconst_1
+Store14:
+	istore 21
+	iload 19
+	ifeq False15
+	iload 21
+	ifeq False15
+	iconst_1
+	goto Store15
+False15:
+	iconst_0
+Store15:
+	istore 22
+	iload 22
+	iconst_1
+	if_icmpne else5
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 23
+	aload_0
+	aload 23
+	iload_2
+	invokevirtual TicTacToe.MoveRow([II)Z
+	istore 10
+	goto endif5
+else5:
+	iconst_0
+	istore 10
+endif4:
+endif5:
+endif3:
+	iload 10
+	ireturn
+.end method
+
+.method public inbounds(II)Z
+	.limit stack 99
+	.limit locals 8
+
+	iload_1
+	iconst_0
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore_3
+	iload_3
+	iconst_1
+	if_icmpne else6
+	iconst_0
+	istore 4
+	goto endif6
+else6:
+	iload_2
+	iconst_0
+	if_icmplt True2
+	iconst_0
+	goto Store2
+True2:
+	iconst_1
+Store2:
+	istore 5
+	iload 5
+	iconst_1
+	if_icmpne else7
+	iconst_0
+	istore 4
+	goto endif7
+else7:
+	iconst_2
+	iload_1
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 6
+	iload 6
+	iconst_1
+	if_icmpne else8
+	iconst_0
+	istore 4
+	goto endif8
+else8:
+	iconst_2
+	iload_2
+	if_icmplt True4
+	iconst_0
+	goto Store4
+True4:
+	iconst_1
+Store4:
+	istore 7
+	iload 7
+	iconst_1
+	if_icmpne else9
+	iconst_0
+	istore 4
+	goto endif9
+else9:
+	iconst_1
+	istore 4
+endif8:
+endif9:
+endif6:
+endif7:
+	iload 4
+	ireturn
+.end method
+
+.method public changeturn()Z
+	.limit stack 99
+	.limit locals 5
+
+	aload_0
+	getfield TicTacToe/whoseturn I
+	istore_1
+	iconst_1
+	iload_1
+	isub
+	istore_3
+	aload_0
+	iload_3
+	putfield TicTacToe/whoseturn I
+	iconst_1
+	ireturn
+.end method
+
+.method public getCurrentPlayer()I
+	.limit stack 99
+	.limit locals 5
+
+	aload_0
+	getfield TicTacToe/whoseturn I
+	istore_1
+	iload_1
+	iconst_1
+	iadd
+	istore_3
+	iload_3
+	ireturn
+.end method
+
+.method public winner()I
+	.limit stack 99
+	.limit locals 84
+
+	iconst_0
+	iconst_1
+	isub
+	istore_1
+	iconst_3
+	newarray int
+	astore_2
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 4
+	aload 4
+	invokestatic BoardBase.sameArray([I)Z
+	istore 6
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 8
+	aload 8
+	invokestatic BoardBase.sameArray([I)Z
+	istore 10
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 11
+	aload 11
+	invokestatic BoardBase.sameArray([I)Z
+	istore 13
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 14
+	iconst_0
+	istore 15
+	iconst_0
+	aload 14
+	iload 15
+	iaload
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore 16
+	iload 6
+	ifeq False2
+	iload 16
+	ifeq False2
+	iconst_1
+	goto Store2
+False2:
+	iconst_0
+Store2:
+	istore 17
+	iload 17
+	iconst_1
+	if_icmpne else10
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 18
+	iconst_0
+	istore 19
+	aload 18
+	iload 19
+	iaload
+	istore_1
+	goto endif10
+else10:
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 20
+	iconst_0
+	istore 21
+	iconst_0
+	aload 20
+	iload 21
+	iaload
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 22
+	iload 10
+	ifeq False4
+	iload 22
+	ifeq False4
+	iconst_1
+	goto Store4
+False4:
+	iconst_0
+Store4:
+	istore 23
+	iload 23
+	iconst_1
+	if_icmpne else11
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 24
+	iconst_0
+	istore 25
+	aload 24
+	iload 25
+	iaload
+	istore_1
+	goto endif11
+else11:
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 26
+	iconst_0
+	istore 27
+	iconst_0
+	aload 26
+	iload 27
+	iaload
+	if_icmplt True5
+	iconst_0
+	goto Store5
+True5:
+	iconst_1
+Store5:
+	istore 28
+	iload 13
+	ifeq False6
+	iload 28
+	ifeq False6
+	iconst_1
+	goto Store6
+False6:
+	iconst_0
+Store6:
+	istore 29
+	iload 29
+	iconst_1
+	if_icmpne else12
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 30
+	iconst_0
+	istore 31
+	aload 30
+	iload 31
+	iaload
+	istore_1
+	goto endif12
+else12:
+	iconst_0
+	istore 32
+Loop13:
+	iload_1
+	iconst_1
+	if_icmplt True7
+	iconst_0
+	goto Store7
+True7:
+	iconst_1
+Store7:
+	istore 33
+	iload 32
+	iconst_3
+	if_icmplt True8
+	iconst_0
+	goto Store8
+True8:
+	iconst_1
+Store8:
+	istore 34
+	iload 33
+	ifeq False9
+	iload 34
+	ifeq False9
+	iconst_1
+	goto Store9
+False9:
+	iconst_0
+Store9:
+	istore 35
+	iload 35
+	iconst_1
+	if_icmpeq Body13
+	goto EndLoop13
+Body13:
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 36
+	iconst_0
+	istore 37
+	aload_2
+	iload 37
+	aload 36
+	iload 32
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 38
+	iconst_1
+	istore 39
+	aload_2
+	iload 39
+	aload 38
+	iload 32
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 40
+	iconst_2
+	istore 41
+	aload_2
+	iload 41
+	aload 40
+	iload 32
+	iaload
+	iastore
+	aload_2
+	invokestatic BoardBase.sameArray([I)Z
+	istore 6
+	iconst_0
+	istore 42
+	iconst_0
+	aload_2
+	iload 42
+	iaload
+	if_icmplt True10
+	iconst_0
+	goto Store10
+True10:
+	iconst_1
+Store10:
+	istore 43
+	iload 6
+	ifeq False11
+	iload 43
+	ifeq False11
+	iconst_1
+	goto Store11
+False11:
+	iconst_0
+Store11:
+	istore 44
+	iload 44
+	iconst_1
+	if_icmpne else14
+	iconst_0
+	istore 45
+	aload_2
+	iload 45
+	iaload
+	istore_1
+	goto endif14
+endif14:
+else14:
+	iload 32
+	iconst_1
+	iadd
+	istore 32
+	goto Loop13
+EndLoop13:
+	iload_1
+	iconst_1
+	if_icmplt True12
+	iconst_0
+	goto Store12
+True12:
+	iconst_1
+Store12:
+	istore 46
+	iload 46
+	iconst_1
+	if_icmpne else15
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 47
+	iconst_0
+	istore 48
+	iconst_0
+	istore 49
+	aload_2
+	iload 49
+	aload 47
+	iload 48
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 50
+	iconst_1
+	istore 51
+	iconst_1
+	istore 52
+	aload_2
+	iload 52
+	aload 50
+	iload 51
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 53
+	iconst_2
+	istore 54
+	iconst_2
+	istore 55
+	aload_2
+	iload 55
+	aload 53
+	iload 54
+	iaload
+	iastore
+	aload_2
+	invokestatic BoardBase.sameArray([I)Z
+	istore 6
+	iconst_0
+	istore 56
+	iconst_0
+	aload_2
+	iload 56
+	iaload
+	if_icmplt True13
+	iconst_0
+	goto Store13
+True13:
+	iconst_1
+Store13:
+	istore 57
+	iload 6
+	ifeq False14
+	iload 57
+	ifeq False14
+	iconst_1
+	goto Store14
+False14:
+	iconst_0
+Store14:
+	istore 58
+	iload 58
+	iconst_1
+	if_icmpne else16
+	iconst_0
+	istore 59
+	aload_2
+	iload 59
+	iaload
+	istore_1
+	goto endif16
+else16:
+	aload_0
+	getfield TicTacToe/row0 [I
+	astore 60
+	iconst_2
+	istore 61
+	iconst_0
+	istore 62
+	aload_2
+	iload 62
+	aload 60
+	iload 61
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row1 [I
+	astore 63
+	iconst_1
+	istore 64
+	iconst_1
+	istore 65
+	aload_2
+	iload 65
+	aload 63
+	iload 64
+	iaload
+	iastore
+	aload_0
+	getfield TicTacToe/row2 [I
+	astore 66
+	iconst_0
+	istore 67
+	iconst_2
+	istore 68
+	aload_2
+	iload 68
+	aload 66
+	iload 67
+	iaload
+	iastore
+	aload_2
+	invokestatic BoardBase.sameArray([I)Z
+	istore 6
+	iconst_0
+	istore 69
+	iconst_0
+	aload_2
+	iload 69
+	iaload
+	if_icmplt True15
+	iconst_0
+	goto Store15
+True15:
+	iconst_1
+Store15:
+	istore 70
+	iload 6
+	ifeq False16
+	iload 70
+	ifeq False16
+	iconst_1
+	goto Store16
+False16:
+	iconst_0
+Store16:
+	istore 71
+	iload 71
+	iconst_1
+	if_icmpne else17
+	iconst_0
+	istore 72
+	aload_2
+	iload 72
+	iaload
+	istore_1
+	goto endif17
+endif16:
+endif17:
+else17:
+	goto endif15
+endif15:
+endif11:
+endif12:
+endif10:
+else15:
+	iload_1
+	iconst_1
+	if_icmplt True17
+	iconst_0
+	goto Store17
+True17:
+	iconst_1
+Store17:
+	istore 73
+	aload_0
+	getfield TicTacToe/movesmade I
+	istore 74
+	iload 74
+	bipush 9
+	if_icmplt True18
+	iconst_0
+	goto Store18
+True18:
+	iconst_1
+Store18:
+	istore 76
+	iload 76
+	if_eq True19
+	iconst_0
+	goto Store19
+True19:
+	iconst_1
+Store19:
+	istore 77
+	iload 73
+	ifeq False20
+	iload 77
+	ifeq False20
+	iconst_1
+	goto Store20
+False20:
+	iconst_0
+Store20:
+	istore 78
+	aload_0
+	getfield TicTacToe/movesmade I
+	istore 79
+	bipush 9
+	iload 79
+	if_icmplt True21
+	iconst_0
+	goto Store21
+True21:
+	iconst_1
+Store21:
+	istore 80
+	iload 80
+	if_eq True22
+	iconst_0
+	goto Store22
+True22:
+	iconst_1
+Store22:
+	istore 81
+	iload 78
+	ifeq False23
+	iload 81
+	ifeq False23
+	iconst_1
+	goto Store23
+False23:
+	iconst_0
+Store23:
+	istore 82
+	iload 82
+	iconst_1
+	if_icmpne else18
+	iconst_0
+	istore_1
+	goto endif18
+else18:
+endif18:
+	iload_1
+	ireturn
+.end method
+
+.method public static main([Ljava/lang/String;)V
+	.limit stack 99
+	.limit locals 37
+
+	new TicTacToe
+	dup
+	astore_1
+	aload_1
+	invokespecial TicTacToe.<init>()V
+	aload_1
+	invokevirtual TicTacToe.init()Z
+	pop
+Loop19:
+	aload_1
+	invokevirtual TicTacToe.winner()I
+	istore_3
+	iconst_0
+	iconst_1
+	isub
+	istore 4
+	iload_3
+	iload 4
+	if_icmplt True1
+	iconst_0
+	goto Store1
+True1:
+	iconst_1
+Store1:
+	istore 5
+	iload 5
+	if_eq True2
+	iconst_0
+	goto Store2
+True2:
+	iconst_1
+Store2:
+	istore 6
+	iconst_0
+	iconst_1
+	isub
+	istore 7
+	aload_1
+	invokevirtual TicTacToe.winner()I
+	istore 8
+	iload 7
+	iload 8
+	if_icmplt True3
+	iconst_0
+	goto Store3
+True3:
+	iconst_1
+Store3:
+	istore 9
+	iload 9
+	if_eq True4
+	iconst_0
+	goto Store4
+True4:
+	iconst_1
+Store4:
+	istore 10
+	iload 6
+	ifeq False5
+	iload 10
+	ifeq False5
+	iconst_1
+	goto Store5
+False5:
+	iconst_0
+Store5:
+	istore 11
+	iload 11
+	iconst_1
+	if_icmpeq Body19
+	goto EndLoop19
+Body19:
+	iconst_0
+	istore 12
+Loop20:
+	iload 12
+	if_eq True6
+	iconst_0
+	goto Store6
+True6:
+	iconst_1
+Store6:
+	istore 13
+	iload 13
+	iconst_1
+	if_icmpeq Body20
+	goto EndLoop20
+Body20:
+	aload_1
+	invokevirtual TicTacToe.getRow0()[I
+	astore 14
+	aload_1
+	invokevirtual TicTacToe.getRow1()[I
+	astore 15
+	aload_1
+	invokevirtual TicTacToe.getRow2()[I
+	astore 16
+	aload 14
+	aload 15
+	aload 16
+	invokestatic BoardBase.printBoard([I[I[I)V
+	aload_1
+	invokevirtual TicTacToe.getCurrentPlayer()I
+	istore 18
+	iload 18
+	invokestatic BoardBase.playerTurn(I)I
+	astore 19
+	iconst_0
+	istore 20
+	aload 19
+	iload 20
+	iaload
+	istore 21
+	iconst_1
+	istore 22
+	aload 19
+	iload 22
+	iaload
+	istore 23
+	aload_1
+	iload 21
+	iload 23
+	invokevirtual TicTacToe.inbounds(II)Z
+	istore 24
+	iload 24
+	if_eq True7
+	iconst_0
+	goto Store7
+True7:
+	iconst_1
+Store7:
+	istore 25
+	iload 25
+	iconst_1
+	if_icmpne else21
+	invokestatic BoardBase.wrongMove()V
+	goto endif21
+else21:
+	iconst_0
+	istore 26
+	aload 19
+	iload 26
+	iaload
+	istore 27
+	iconst_1
+	istore 28
+	aload 19
+	iload 28
+	iaload
+	istore 29
+	aload_1
+	iload 27
+	iload 29
+	invokevirtual TicTacToe.Move(II)Z
+	istore 30
+	iload 30
+	if_eq True8
+	iconst_0
+	goto Store8
+True8:
+	iconst_1
+Store8:
+	istore 31
+	iload 31
+	iconst_1
+	if_icmpne else22
+	invokestatic BoardBase.placeTaken()V
+	goto endif22
+else22:
+	iconst_1
+	istore 12
+endif22:
+endif21:
+	goto Loop20
+EndLoop20:
+	aload_1
+	invokevirtual TicTacToe.changeturn()Z
+	pop
+	goto Loop19
+EndLoop19:
+	aload_1
+	invokevirtual TicTacToe.getRow0()[I
+	astore 32
+	aload_1
+	invokevirtual TicTacToe.getRow1()[I
+	astore 33
+	aload_1
+	invokevirtual TicTacToe.getRow2()[I
+	astore 34
+	aload 32
+	aload 33
+	aload 34
+	invokestatic BoardBase.printBoard([I[I[I)V
+	aload_1
+	invokevirtual TicTacToe.winner()I
+	istore 35
+	iload 35
+	invokestatic BoardBase.printWinner(I)V
+	return
 .end method
