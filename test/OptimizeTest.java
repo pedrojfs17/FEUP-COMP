@@ -72,4 +72,10 @@ public class OptimizeTest {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/WhileAndIF.jmm"));
         TestUtils.noErrors(result.getReports());
     }
+
+    @Test
+    public void testCustom() {
+        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/CustomTest.jmm"));
+        TestUtils.noErrors(result.getReports());
+    }
 }

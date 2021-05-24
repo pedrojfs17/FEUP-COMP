@@ -113,7 +113,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
 
     private String parseVarName(String var) {
         var = var.substring(0,var.lastIndexOf("."));
-        if(var.contains("array")) {
+        if(var.contains(".array")) {
             var = var.substring(0,var.lastIndexOf("."));
         }
         return var;

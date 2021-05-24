@@ -1,0 +1,70 @@
+import io;
+import MathUtils;
+
+class Math extends MathUtils {
+  public boolean isValidTriangle(int a, int b, int c) {
+    return (c < (a + b)) && (b < (a + c)) && (a < (c + b));
+  }
+
+  public int triangleArea(int base, int height) {
+     return (base * height) / 2;
+  }
+
+  public int rectangleArea(int width, int height) {
+     return width * height; 
+  }
+
+  public int squareArea(int side) {
+     return this.rectangleArea(side, side);
+  }
+
+  public int between(int number, int min, int max) {
+     boolean isBetween;
+     isBetween = true;
+     if (number < min) {
+        isBetween = false;
+     }
+     else {
+        if ( max < number ) {
+            isBetween = false;
+        }
+        else {
+
+        }
+     }
+     return isBetween;
+  }
+
+  public int sumArray(int[] A) {
+      int i;
+      int sum;
+
+      i = 0;
+      sum = 0;
+      while (i < A.length) {
+          sum = sum + A[i];
+      }
+      return sum;
+  }
+
+  public static void main(String[] args){
+    int[] L;
+    int i;
+    boolean d;
+    Math q;
+
+    L = new int[10];
+
+    i = 0;
+    while (i < L.length) {
+        L[i] = L.length - i;
+        i = i + 1;
+    }
+
+    q = new Math();
+
+    q.sumArray(L);
+    d = q.printL(L);
+    io.print(q.isValidTriangle(1,2,3));
+  }
+}

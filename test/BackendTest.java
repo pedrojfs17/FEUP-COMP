@@ -122,6 +122,15 @@ public class BackendTest {
                 "9\n" +
                 "10", output.trim());*/
     }
+    @Test
+    public void testCustom() {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/CustomTest.jmm"));
+
+        TestUtils.noErrors(result.getReports());
+
+        //var output = result.run();
+        //assertEquals("30", output.trim());
+    }
 /*
     @Test
     public void testMyClass1() {
