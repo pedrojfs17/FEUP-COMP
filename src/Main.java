@@ -3,10 +3,17 @@ import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.specs.util.SpecsIo;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.StringReader;
@@ -40,8 +47,54 @@ public class Main implements JmmParser {
 		Main compiler = new Main();
 		AnalysisStage analysisStage = new AnalysisStage();
 		JmmParserResult parserResult = compiler.parse(fileContents);
-
 		JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(parserResult);
+		OptimizationStage optimizationStage = new OptimizationStage();
+		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult);
+		BackendStage backendStage = new BackendStage();
+		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
+
+		Path path = Paths.get(ollirResult.getSymbolTable().getClassName() + "/");
+		try {
+			if (!Files.exists(path)) {
+				Files.createDirectory(path);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			FileWriter myWriter = new FileWriter(path + "/ast.json");
+			myWriter.write(parserResult.toJson());
+			myWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			FileWriter myWriter = new FileWriter(path + "/symbolTable.txt");
+			myWriter.write(semanticsResult.getSymbolTable().toString());
+			myWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			FileWriter myWriter = new FileWriter(path + "/ollir.ollir");
+			myWriter.write(ollirResult.getOllirCode());
+			myWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			FileWriter myWriter = new FileWriter(path + "/jasmin.j");
+			myWriter.write(jasminResult.getJasminCode());
+			myWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		jasminResult.compile(path.toFile());
     }
 
 

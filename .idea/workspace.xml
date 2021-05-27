@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="5fc25134-38f1-43d5-9c5e-2821889dc6ed" name="Default Changelist" comment="Fixed stack size calculations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OllirVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OllirVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/BackendTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/BackendTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/OptimizeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/OptimizeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.dot" beforeDir="false" afterPath="$PROJECT_DIR$/main.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Method.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SymbolTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SymbolTable.java" afterDir="false" />
     </list>
     <list id="181f5087-0c76-4346-8ba1-45d0f6f24998" name="Changes by up201806451" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -114,7 +115,15 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
   </component>
-  <component name="RunManager" selected="Gradle.comp2021-4b [test]">
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="comp2021-4b.main" />
+      <option name="PROGRAM_PARAMETERS" value="./test/fixtures/public/Simple.jmm" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -232,6 +241,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Application.Main" />
       <item itemvalue="Gradle.BackendTest" />
       <item itemvalue="Gradle.BackendTest.testLife" />
       <item itemvalue="Gradle.BackendTest.testTicTacToe" />
@@ -290,7 +300,9 @@
       <workItem from="1621410031172" duration="3364000" />
       <workItem from="1621694603047" duration="7971000" />
       <workItem from="1621704777998" duration="1016000" />
-      <workItem from="1621889794107" duration="2551000" />
+      <workItem from="1621889794107" duration="3351000" />
+      <workItem from="1622119669015" duration="217000" />
+      <workItem from="1622119913537" duration="5287000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring to not use ollir accesser">
       <created>1619775982438</created>
@@ -332,6 +344,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.j" />
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ID_ORDER">

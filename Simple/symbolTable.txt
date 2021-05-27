@@ -1,0 +1,22 @@
+SymbolTable{
+imports=[io]
+className='Simple'
+superClass='null'
+fields=[]
+methods=
+add - {
+parameters=[Symbol [type=Type [name=int, isArray=false], name=a], Symbol [type=Type [name=int, isArray=false], name=b]]
+localVariables=[Symbol [type=Type [name=int, isArray=false], name=c]]
+returnType=Type [name=int, isArray=false]
+}
+constInstr - {
+parameters=[]
+localVariables=[Symbol [type=Type [name=int, isArray=false], name=c]]
+returnType=Type [name=int, isArray=false]
+}
+main - {
+parameters=[]
+localVariables=[Symbol [type=Type [name=int, isArray=false], name=a], Symbol [type=Type [name=int, isArray=false], name=b], Symbol [type=Type [name=int, isArray=false], name=c], Symbol [type=Type [name=Simple, isArray=false], name=s]]
+returnType=Type [name=void, isArray=false]
+}
+}

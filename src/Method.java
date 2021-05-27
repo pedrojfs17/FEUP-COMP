@@ -72,10 +72,10 @@ public class Method {
 
     @Override
     public String toString() {
-        return "Method{" +
-                "parameters=" + parameters +
-                ", localVariables=" + localVariables +
-                ", returnType=" + type +
-                '}';
+        return "{" +
+                "\nparameters=" + parameters +
+                "\nlocalVariables=" + localVariables +
+                "\nreturnType=" + type +
+                "\n}";
     }
 }

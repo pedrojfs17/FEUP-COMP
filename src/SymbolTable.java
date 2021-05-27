@@ -4,10 +4,7 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable {
     private List<String> imports = new ArrayList<>();
@@ -176,5 +173,21 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
     @Override
     public List<Symbol> getLocalVariables(String methodName) {
         return methods.get(methodName).getLocalVariables();
+    }
+
+    @Override
+    public String toString() {
+        String ret = "SymbolTable{" +
+                "\nimports=" + imports +
+                "\nclassName='" + className + '\'' +
+                "\nsuperClass='" + superClass + '\'' +
+                "\nfields=" + fields +
+                "\nmethods=";
+
+        for(Map.Entry<String, Method> method : methods.entrySet()) {
+            ret+="\n"+method.getKey()+" - "+method.getValue();
+        }
+
+        return  ret+"\n}";
     }
 }
