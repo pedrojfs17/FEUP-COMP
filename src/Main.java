@@ -45,11 +45,17 @@ public class Main implements JmmParser {
 		System.out.println("Executing file: "+args[0]);
 
 		Main compiler = new Main();
-		AnalysisStage analysisStage = new AnalysisStage();
+
+		// Syntactic analysis
 		JmmParserResult parserResult = compiler.parse(fileContents);
+		// Semantic analysis
+		AnalysisStage analysisStage = new AnalysisStage();
 		JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(parserResult);
+		// Ollir
 		OptimizationStage optimizationStage = new OptimizationStage();
+		semanticsResult = optimizationStage.optimize(semanticsResult);
 		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult);
+		// Jasmin
 		BackendStage backendStage = new BackendStage();
 		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
 

@@ -43,7 +43,17 @@ public class OptimizationStage implements JmmOptimization {
 
     @Override
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
-        // THIS IS JUST FOR CHECKPOINT 3
+        JmmNode node = semanticsResult.getRootNode();
+
+        ConstantOptimizationVisitor constantVisitor = new ConstantOptimizationVisitor();
+
+        boolean hasChanges = true;
+        while (hasChanges) {
+            hasChanges = constantVisitor.visit(node, 0);
+            System.out.println("------------------------");
+            System.out.println(node.toTree());
+        }
+
         return semanticsResult;
     }
 
