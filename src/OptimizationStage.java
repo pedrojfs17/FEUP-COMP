@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import org.specs.comp.ollir.ClassUnit;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
@@ -59,7 +60,11 @@ public class OptimizationStage implements JmmOptimization {
 
     @Override
     public OllirResult optimize(OllirResult ollirResult) {
-        // THIS IS JUST FOR CHECKPOINT 3
+        ClassUnit classUnit = ollirResult.getOllirClass();
+
+        RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
+        optimizer.allocateRegisters(10);
+
         return ollirResult;
     }
 
