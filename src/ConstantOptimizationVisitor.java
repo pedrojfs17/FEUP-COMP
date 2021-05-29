@@ -41,7 +41,7 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
             constants.put(identifier.get("name"), new AbstractMap.SimpleEntry<>("INT", value.get("value")));
         else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
             constants.put(identifier.get("name"), new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
-        else if (constants.get(identifier.get("name")) != null)
+        else if (value.getKind().equals("IDENTIFIER") && constants.get(identifier.get("name")) != null)
             constants.remove(identifier.get("name"));
 
         return changes || checkIdentifier(jmmNode, value, 1);

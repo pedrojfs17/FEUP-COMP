@@ -1,0 +1,22 @@
+SymbolTable{
+imports=[MathUtils, Quicksort]
+className='Lazysort'
+superClass='Quicksort'
+fields=[]
+methods=
+beLazy - {
+parameters=[Symbol [type=Type [name=int, isArray=true], name=L]]
+localVariables=[Symbol [type=Type [name=int, isArray=false], name=_allowedNameL], Symbol [type=Type [name=int, isArray=false], name=_allowedNameI], Symbol [type=Type [name=int, isArray=false], name=rand]]
+returnType=Type [name=boolean, isArray=false]
+}
+main - {
+parameters=[]
+localVariables=[Symbol [type=Type [name=int, isArray=true], name=L], Symbol [type=Type [name=int, isArray=false], name=i], Symbol [type=Type [name=boolean, isArray=false], name=d], Symbol [type=Type [name=Lazysort, isArray=false], name=q]]
+returnType=Type [name=void, isArray=false]
+}
+quicksort - {
+parameters=[Symbol [type=Type [name=int, isArray=true], name=L]]
+localVariables=[Symbol [type=Type [name=boolean, isArray=false], name=lazy], Symbol [type=Type [name=int, isArray=false], name=rand]]
+returnType=Type [name=boolean, isArray=false]
+}
+}

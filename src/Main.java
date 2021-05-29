@@ -57,7 +57,9 @@ public class Main implements JmmParser {
 		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult);
 		// Jasmin
 		BackendStage backendStage = new BackendStage();
+		ollirResult = optimizationStage.optimize(ollirResult);
 		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
+
 
 		Path path = Paths.get(ollirResult.getSymbolTable().getClassName() + "/");
 		try {

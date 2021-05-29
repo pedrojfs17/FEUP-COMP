@@ -1,0 +1,83 @@
+Lazysort {
+	.construct Lazysort().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public static main(args.array.String).V {
+		L.array.i32 :=.array.i32 new(array, 10.i32).array.i32;
+		i.i32 :=.i32 0.i32;
+		Loop0:
+
+t2.i32 :=.i32  arraylength(L.array.i32).i32;t3.bool :=.bool i.i32  <.bool t2.i32;
+			if (t3.bool ==.bool t3.bool) goto Body0;
+			goto EndLoop0;
+		Body0:
+			t5.i32 :=.i32  arraylength(L.array.i32).i32;
+		
+		 L[i.i32].i32 :=.i32 t5.i32 -.i32 i.i32;
+			
+		
+		i.i32 :=.i32 i.i32 +.i32 1.i32;
+			goto Loop0;
+		EndLoop0:
+		q.Lazysort :=.Lazysort new(Lazysort).Lazysort;
+		invokespecial(q.Lazysort, "<init>").V;
+invokevirtual(q.Lazysort, "quicksort", L.array.i32).bool;		d.bool :=.bool invokevirtual(q.Lazysort, "printL", L.array.i32).bool;
+		ret.V;
+	}
+	.method public quicksort(L.array.i32).bool{
+		rand.i32 :=.i32 		invokestatic(MathUtils, "random", 0.i32, 5.i32).i32;
+
+t7.bool :=.bool rand.i32  <.bool 4.i32;
+		if (t7.bool !.bool t7.bool) goto else1;
+	invokevirtual(this, "beLazy", $1.L.array.i32).bool;			lazy.bool :=.bool 1.bool;
+			goto endif1;
+		else1:
+			lazy.bool :=.bool 0.bool;
+		endif1:
+		if (lazy.bool !.bool lazy.bool) goto else2;
+			
+		lazy.bool :=.bool lazy.bool  !.bool lazy.bool;
+			goto endif2;
+		else2:
+			t9.i32 :=.i32  arraylength(L.array.i32).i32;
+
+		t10.i32 :=.i32 t9.i32 -.i32 1.i32;		lazy.bool :=.bool invokevirtual(this, "quicksort", $1.L.array.i32, 0.i32, t10.i32).bool;
+		endif2:
+		ret.bool lazy.bool;
+	}
+	.method public beLazy(L.array.i32).bool{
+t11.i32 :=.i32 arraylength(L.array.i32).i32;		u_allowedNameL.i32 :=.i32 t11.i32;
+		u_allowedNameI.i32 :=.i32 0.i32;
+		Loop3:
+
+t12.i32 :=.i32 
+
+u_allowedNameL.i32 /.i32 2.i32;t13.bool :=.bool u_allowedNameI.i32  <.bool t12.i32;
+			if (t13.bool ==.bool t13.bool) goto Body3;
+			goto EndLoop3;
+		Body3:
+			 $1.L[u_allowedNameI.i32].i32 :=.i32 		invokestatic(MathUtils, "random", 0.i32, 10.i32).i32;
+			
+		
+		u_allowedNameI.i32 :=.i32 u_allowedNameI.i32 +.i32 1.i32;
+			goto Loop3;
+		EndLoop3:
+		Loop4:
+
+t16.bool :=.bool u_allowedNameI.i32  <.bool u_allowedNameL.i32;
+			if (t16.bool ==.bool t16.bool) goto Body4;
+			goto EndLoop4;
+		Body4:
+			rand.i32 :=.i32 		invokestatic(MathUtils, "random", 0.i32, 10.i32).i32;
+			
+		
+		 $1.L[u_allowedNameI.i32].i32 :=.i32 rand.i32 +.i32 1.i32;
+			
+		
+		u_allowedNameI.i32 :=.i32 u_allowedNameI.i32 +.i32 1.i32;
+			goto Loop4;
+		EndLoop4:
+		ret.bool 1.bool;
+	}
+}

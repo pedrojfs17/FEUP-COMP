@@ -1,0 +1,21 @@
+import ioPlus;
+class Test {
+    public static void main(String[] args) {
+        ioPlus.printHelloWorld();
+    }
+
+    public int test(int N, int[] A) {
+        int sum;
+        int i;
+        int t1;
+
+        sum = 0;
+        i = 0;
+        while (i < N) {
+            t1 = A[i];
+            sum = sum + t1;
+            i = i + 1;
+        }
+        return sum;
+    }
+}

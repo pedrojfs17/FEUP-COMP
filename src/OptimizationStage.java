@@ -46,6 +46,7 @@ public class OptimizationStage implements JmmOptimization {
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
         JmmNode node = semanticsResult.getRootNode();
 
+        /*
         ConstantOptimizationVisitor constantVisitor = new ConstantOptimizationVisitor();
 
         boolean hasChanges = true;
@@ -53,7 +54,7 @@ public class OptimizationStage implements JmmOptimization {
             hasChanges = constantVisitor.visit(node, 0);
             System.out.println("------------------------");
             System.out.println(node.toTree());
-        }
+        }*/
 
         return semanticsResult;
     }
@@ -61,9 +62,12 @@ public class OptimizationStage implements JmmOptimization {
     @Override
     public OllirResult optimize(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
-
+        WhileOptimization optimization = new WhileOptimization(classUnit);
+        classUnit = optimization.getOptimizedClassUnit();
         RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
         optimizer.allocateRegisters(10);
+
+
 
         return ollirResult;
     }
