@@ -53,15 +53,28 @@ public class Main implements JmmParser {
 		JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(parserResult);
 		// Ollir
 		OptimizationStage optimizationStage = new OptimizationStage();
-		semanticsResult = optimizationStage.optimize(semanticsResult);
-		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult);
+		boolean optimize=false;
+		if(args.length>1 && Arrays.asList(args).contains("-o")){
+			semanticsResult = optimizationStage.optimize(semanticsResult);
+			optimize = true;
+		}
+		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult,optimize);
 		// Jasmin
 		BackendStage backendStage = new BackendStage();
-		ollirResult = optimizationStage.optimize(ollirResult);
+		if(args.length>1 && Arrays.asList(args).contains("-r"))
+			ollirResult = optimizationStage.optimize(ollirResult);
 		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
 
+		Path mainDir = Paths.get("ToolResults/");
+		try {
+			if (!Files.exists(mainDir)) {
+				Files.createDirectory(mainDir);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		Path path = Paths.get(ollirResult.getSymbolTable().getClassName() + "/");
+		Path path = Paths.get("ToolResults/"+ollirResult.getSymbolTable().getClassName() + "/");
 		try {
 			if (!Files.exists(path)) {
 				Files.createDirectory(path);

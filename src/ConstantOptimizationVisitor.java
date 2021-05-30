@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
     private HashMap<String, Map.Entry<String, String>> constants;
@@ -32,17 +33,28 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
     }
 
     private Boolean dealWithAssignment(JmmNode jmmNode, Integer index) {
+
+
         JmmNode identifier = jmmNode.getChildren().get(0);
         JmmNode value = jmmNode.getChildren().get(1);
 
         boolean changes = visit(value, 1);
 
-        if (value.getKind().equals("INT"))
-            constants.put(identifier.get("name"), new AbstractMap.SimpleEntry<>("INT", value.get("value")));
+        String var;
+        if(identifier.getKind().equals("ARRAY_ACCESS")){
+            var=identifier.getChildren().get(0).get("name")+"["+
+                    (identifier.getChildren().get(1).getKind().equals("IDENTIFIER") ? identifier.getChildren().get(1).get("name"): identifier.getChildren().get(1).get("value"))
+                    +"]";
+        } else
+            var = identifier.get("name");
+
+        if (value.getKind().equals("INT")){
+            constants.put(var, new AbstractMap.SimpleEntry<>("INT", value.get("value")));
+        }
         else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
-            constants.put(identifier.get("name"), new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
-        else if (value.getKind().equals("IDENTIFIER") && constants.get(identifier.get("name")) != null)
-            constants.remove(identifier.get("name"));
+            constants.put(var, new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
+        else if (value.getKind().equals("IDENTIFIER") && constants.get(var) != null)
+            constants.remove(var);
 
         return changes || checkIdentifier(jmmNode, value, 1);
     }
@@ -85,6 +97,12 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
     private boolean checkIdentifier(JmmNode parentNode, JmmNode child, int index) {
         if (child.getKind().equals("IDENTIFIER") && constants.get(child.get("name")) != null) {
+            if(getAncestor(child,"PROGRAM","WHILE").get().getKind().equals("WHILE") ||
+                    getAncestor(child,"PROGRAM","IF").get().getKind().equals("IF") ||
+                    getAncestor(child,"PROGRAM","ELSE").get().getKind().equals("ELSE")) {
+                constants.remove(child.get("name"));
+                return false;
+            }
             parentNode.removeChild(child);
             Map.Entry<String, String> constant = constants.get(child.get("name"));
             JmmNode newNode = new JmmNodeImpl(constant.getKey());
@@ -111,5 +129,9 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
             return rhs;
         }
         return lhs;
+    }
+
+    private Optional<JmmNode> getAncestor(JmmNode jmmNode, String globalScope, String specificScope) {
+        return jmmNode.getAncestor(specificScope).isPresent() ? jmmNode.getAncestor(specificScope) : jmmNode.getAncestor(globalScope);
     }
 }

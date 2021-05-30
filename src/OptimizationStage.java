@@ -25,7 +25,7 @@ import pt.up.fe.specs.util.SpecsIo;
 public class OptimizationStage implements JmmOptimization {
 
     @Override
-    public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
+    public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize) {
         JmmNode node = semanticsResult.getRootNode();
 
         // Convert the AST to a String containing the equivalent OLLIR code
@@ -34,7 +34,7 @@ public class OptimizationStage implements JmmOptimization {
         // More reports from this stage
         List<Report> reports = new ArrayList<>();
 
-        OllirVisitor visitor = new OllirVisitor((SymbolTable) semanticsResult.getSymbolTable());
+        OllirVisitor visitor = new OllirVisitor((SymbolTable) semanticsResult.getSymbolTable(), optimize);
 
         ollirCode = visitor.visit(node);
         System.out.println(ollirCode);
@@ -60,14 +60,15 @@ public class OptimizationStage implements JmmOptimization {
     }
 
     @Override
+    public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
+        return this.toOllir(semanticsResult,false);
+    }
+
+    @Override
     public OllirResult optimize(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
-        WhileOptimization optimization = new WhileOptimization(classUnit);
-        classUnit = optimization.getOptimizedClassUnit();
         RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
-        //optimizer.allocateRegisters(10);
-
-
+        optimizer.allocateRegisters(10);
 
         return ollirResult;
     }

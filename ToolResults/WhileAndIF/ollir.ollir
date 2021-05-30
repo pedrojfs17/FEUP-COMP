@@ -1,0 +1,52 @@
+WhileAndIF {
+	.construct WhileAndIF().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public static main(args.array.String).V {
+		a.i32 :=.i32 20.i32;
+		b.i32 :=.i32 10.i32;
+		d.array.i32 :=.array.i32 new(array, 10.i32).array.i32;
+
+t1.bool :=.bool a.i32  <.bool b.i32;
+		if (t1.bool !.bool t1.bool) goto else0;
+			
+		
+		c.i32 :=.i32 a.i32 -.i32 1.i32;
+			goto endif0;
+		else0:
+			
+		
+		c.i32 :=.i32 b.i32 -.i32 1.i32;
+		endif0:
+		goto Condition1;
+		Loop1:
+			
+		
+		 d[c.i32].i32 :=.i32 a.i32 -.i32 b.i32;
+			
+		
+		c.i32 :=.i32 c.i32 -.i32 1.i32;
+			
+		
+		a.i32 :=.i32 a.i32 -.i32 1.i32;
+			
+		
+		b.i32 :=.i32 b.i32 -.i32 1.i32;
+		Condition1:
+
+t2.bool :=.bool -1.i32  <.bool c.i32;
+			if (t2.bool ==.bool t2.bool) goto Loop1;
+		c.i32 :=.i32 0.i32;
+		goto Condition2;
+		Loop2:
+			t7.i32 :=.i32 d[c.i32].i32;		invokestatic(io, "println", 		t7.i32).V;			
+		
+		c.i32 :=.i32 c.i32 +.i32 1.i32;
+		Condition2:
+
+t5.i32 :=.i32  arraylength(d.array.i32).i32;t6.bool :=.bool c.i32  <.bool t5.i32;
+			if (t6.bool ==.bool t6.bool) goto Loop2;
+		ret.V;
+	}
+}

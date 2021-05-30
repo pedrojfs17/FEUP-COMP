@@ -10,8 +10,7 @@ class Test {
         sum = 0;
         i = 0;
         while (i < N) {
-            t1 = A[i];
-            sum = sum + t1;
+            sum = sum + A[i];
             i = i + 1;
         }
         return sum;

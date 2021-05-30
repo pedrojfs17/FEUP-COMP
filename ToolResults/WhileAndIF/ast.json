@@ -1,0 +1,762 @@
+{
+  "rootNode": {
+    "kind": "PROGRAM",
+    "attributes": {
+      "col": "1",
+      "line": "1"
+    },
+    "children": [
+      {
+        "kind": "IMPORT",
+        "attributes": {
+          "col": "1",
+          "line": "1",
+          "name": "io"
+        },
+        "children": []
+      },
+      {
+        "kind": "CLASS_DECLARATION",
+        "attributes": {
+          "col": "1",
+          "line": "2",
+          "name": "WhileAndIF"
+        },
+        "children": [
+          {
+            "kind": "MAIN",
+            "attributes": {
+              "col": "12",
+              "param": "args",
+              "line": "4",
+              "name": "main"
+            },
+            "children": [
+              {
+                "kind": "METHOD_BODY",
+                "attributes": {
+                  "col": "9",
+                  "line": "5"
+                },
+                "children": [
+                  {
+                    "kind": "VAR_DECLARATION",
+                    "attributes": {
+                      "col": "9",
+                      "line": "5",
+                      "name": "a",
+                      "type": "int"
+                    },
+                    "children": []
+                  },
+                  {
+                    "kind": "VAR_DECLARATION",
+                    "attributes": {
+                      "col": "9",
+                      "line": "6",
+                      "name": "b",
+                      "type": "int"
+                    },
+                    "children": []
+                  },
+                  {
+                    "kind": "VAR_DECLARATION",
+                    "attributes": {
+                      "col": "9",
+                      "line": "7",
+                      "name": "c",
+                      "type": "int"
+                    },
+                    "children": []
+                  },
+                  {
+                    "kind": "VAR_DECLARATION",
+                    "attributes": {
+                      "col": "9",
+                      "line": "8",
+                      "name": "d",
+                      "type": "int array"
+                    },
+                    "children": []
+                  },
+                  {
+                    "kind": "ASSIGNMENT",
+                    "attributes": {
+                      "col": "13",
+                      "line": "9"
+                    },
+                    "children": [
+                      {
+                        "kind": "IDENTIFIER",
+                        "attributes": {
+                          "col": "11",
+                          "line": "9",
+                          "name": "a"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "INT",
+                        "attributes": {
+                          "col": "15",
+                          "line": "9",
+                          "value": "20"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "ASSIGNMENT",
+                    "attributes": {
+                      "col": "13",
+                      "line": "10"
+                    },
+                    "children": [
+                      {
+                        "kind": "IDENTIFIER",
+                        "attributes": {
+                          "col": "11",
+                          "line": "10",
+                          "name": "b"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "INT",
+                        "attributes": {
+                          "col": "15",
+                          "line": "10",
+                          "value": "10"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "ASSIGNMENT",
+                    "attributes": {
+                      "col": "13",
+                      "line": "11"
+                    },
+                    "children": [
+                      {
+                        "kind": "IDENTIFIER",
+                        "attributes": {
+                          "col": "11",
+                          "line": "11",
+                          "name": "d"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "NEW",
+                        "attributes": {
+                          "col": "17",
+                          "line": "11"
+                        },
+                        "children": [
+                          {
+                            "kind": "ARRAY",
+                            "attributes": {
+                              "col": "20",
+                              "line": "11"
+                            },
+                            "children": [
+                              {
+                                "kind": "INT",
+                                "attributes": {
+                                  "col": "23",
+                                  "line": "11",
+                                  "value": "10"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "IF",
+                    "attributes": {
+                      "col": "9",
+                      "line": "12"
+                    },
+                    "children": [
+                      {
+                        "kind": "LESS",
+                        "attributes": {
+                          "col": "17",
+                          "line": "12"
+                        },
+                        "children": [
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "15",
+                              "line": "12",
+                              "name": "a"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "18",
+                              "line": "12",
+                              "name": "b"
+                            },
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "ASSIGNMENT",
+                        "attributes": {
+                          "col": "18",
+                          "line": "13"
+                        },
+                        "children": [
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "16",
+                              "line": "13",
+                              "name": "c"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "OPERATION",
+                            "attributes": {
+                              "col": "21",
+                              "op": "-",
+                              "line": "13"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "19",
+                                  "line": "13",
+                                  "name": "a"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "INT",
+                                "attributes": {
+                                  "col": "21",
+                                  "line": "13",
+                                  "value": "1"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "ELSE",
+                    "attributes": {
+                      "col": "14",
+                      "line": "14"
+                    },
+                    "children": [
+                      {
+                        "kind": "ASSIGNMENT",
+                        "attributes": {
+                          "col": "17",
+                          "line": "15"
+                        },
+                        "children": [
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "15",
+                              "line": "15",
+                              "name": "c"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "OPERATION",
+                            "attributes": {
+                              "col": "20",
+                              "op": "-",
+                              "line": "15"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "18",
+                                  "line": "15",
+                                  "name": "b"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "INT",
+                                "attributes": {
+                                  "col": "20",
+                                  "line": "15",
+                                  "value": "1"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "WHILE",
+                    "attributes": {
+                      "col": "9",
+                      "line": "19"
+                    },
+                    "children": [
+                      {
+                        "kind": "LESS",
+                        "attributes": {
+                          "col": "23",
+                          "line": "19"
+                        },
+                        "children": [
+                          {
+                            "kind": "INT",
+                            "attributes": {
+                              "value": "-1"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "24",
+                              "line": "19",
+                              "name": "c"
+                            },
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "WHILE_BODY",
+                        "attributes": {
+                          "col": "25",
+                          "line": "19"
+                        },
+                        "children": [
+                          {
+                            "kind": "ASSIGNMENT",
+                            "attributes": {
+                              "col": "20",
+                              "line": "20"
+                            },
+                            "children": [
+                              {
+                                "kind": "ARRAY_ACCESS",
+                                "attributes": {
+                                  "col": "14",
+                                  "line": "20"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "14",
+                                      "line": "20",
+                                      "name": "d"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "16",
+                                      "line": "20",
+                                      "name": "c"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "OPERATION",
+                                "attributes": {
+                                  "col": "23",
+                                  "op": "-",
+                                  "line": "20"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "21",
+                                      "line": "20",
+                                      "name": "a"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "23",
+                                      "line": "20",
+                                      "name": "b"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "ASSIGNMENT",
+                            "attributes": {
+                              "col": "16",
+                              "line": "21"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "14",
+                                  "line": "21",
+                                  "name": "c"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "OPERATION",
+                                "attributes": {
+                                  "col": "19",
+                                  "op": "-",
+                                  "line": "21"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "17",
+                                      "line": "21",
+                                      "name": "c"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "INT",
+                                    "attributes": {
+                                      "col": "19",
+                                      "line": "21",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "ASSIGNMENT",
+                            "attributes": {
+                              "col": "16",
+                              "line": "22"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "14",
+                                  "line": "22",
+                                  "name": "a"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "OPERATION",
+                                "attributes": {
+                                  "col": "19",
+                                  "op": "-",
+                                  "line": "22"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "17",
+                                      "line": "22",
+                                      "name": "a"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "INT",
+                                    "attributes": {
+                                      "col": "19",
+                                      "line": "22",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "ASSIGNMENT",
+                            "attributes": {
+                              "col": "16",
+                              "line": "23"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "14",
+                                  "line": "23",
+                                  "name": "b"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "OPERATION",
+                                "attributes": {
+                                  "col": "19",
+                                  "op": "-",
+                                  "line": "23"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "17",
+                                      "line": "23",
+                                      "name": "b"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "INT",
+                                    "attributes": {
+                                      "col": "19",
+                                      "line": "23",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "ASSIGNMENT",
+                    "attributes": {
+                      "col": "11",
+                      "line": "25"
+                    },
+                    "children": [
+                      {
+                        "kind": "IDENTIFIER",
+                        "attributes": {
+                          "col": "10",
+                          "line": "25",
+                          "name": "c"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "INT",
+                        "attributes": {
+                          "col": "12",
+                          "line": "25",
+                          "value": "0"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "WHILE",
+                    "attributes": {
+                      "col": "9",
+                      "line": "26"
+                    },
+                    "children": [
+                      {
+                        "kind": "LESS",
+                        "attributes": {
+                          "col": "19",
+                          "line": "26"
+                        },
+                        "children": [
+                          {
+                            "kind": "IDENTIFIER",
+                            "attributes": {
+                              "col": "17",
+                              "line": "26",
+                              "name": "c"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "OBJECT_METHOD",
+                            "attributes": {
+                              "col": "21",
+                              "line": "26"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "20",
+                                  "line": "26",
+                                  "name": "d"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "LENGTH",
+                                "attributes": {
+                                  "col": "21",
+                                  "line": "26"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "WHILE_BODY",
+                        "attributes": {
+                          "col": "28",
+                          "line": "26"
+                        },
+                        "children": [
+                          {
+                            "kind": "OBJECT_METHOD",
+                            "attributes": {
+                              "col": "16",
+                              "line": "27"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "15",
+                                  "line": "27",
+                                  "name": "io"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "METHOD_CALL",
+                                "attributes": {
+                                  "col": "16",
+                                  "line": "27",
+                                  "name": "println"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "ARRAY_ACCESS",
+                                    "attributes": {
+                                      "col": "25",
+                                      "line": "27"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "IDENTIFIER",
+                                        "attributes": {
+                                          "col": "25",
+                                          "line": "27",
+                                          "name": "d"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "IDENTIFIER",
+                                        "attributes": {
+                                          "col": "27",
+                                          "line": "27",
+                                          "name": "c"
+                                        },
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "ASSIGNMENT",
+                            "attributes": {
+                              "col": "16",
+                              "line": "28"
+                            },
+                            "children": [
+                              {
+                                "kind": "IDENTIFIER",
+                                "attributes": {
+                                  "col": "14",
+                                  "line": "28",
+                                  "name": "c"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "OPERATION",
+                                "attributes": {
+                                  "col": "19",
+                                  "op": "+",
+                                  "line": "28"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "IDENTIFIER",
+                                    "attributes": {
+                                      "col": "17",
+                                      "line": "28",
+                                      "name": "c"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "INT",
+                                    "attributes": {
+                                      "col": "19",
+                                      "line": "28",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "reports": []
+}

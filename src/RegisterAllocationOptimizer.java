@@ -59,7 +59,7 @@ public class RegisterAllocationOptimizer {
                 BitSet new_out = new BitSet(n_vars);
                 if (instruction.getSucc1() != null) {
                     if(instruction.getSucc1().getNodeType() != NodeType.END) {
-                        new_out = in.get(instruction.getSucc1());
+                        new_out = (BitSet)in.get(instruction.getSucc1()).clone();
                         if (instruction.getSucc2() != null) {
                             new_out.or(in.get(instruction.getSucc2()));
                         }
@@ -67,7 +67,7 @@ public class RegisterAllocationOptimizer {
                 }
                 out.replace(instruction, new_out);
 
-                BitSet new_in = out.get(instruction);
+                BitSet new_in = (BitSet)out.get(instruction).clone();
                 new_in.xor(def.get(instruction));
                 new_in.or(use.get(instruction));
                 in.replace(instruction, new_in);
@@ -82,9 +82,6 @@ public class RegisterAllocationOptimizer {
                 if(!out.get(instruction).equals(out_temp.get(instruction)))
                     done = false;
             }
-
-            if (i > 5)
-                done = true;
         }
     }
 
@@ -186,11 +183,30 @@ public class RegisterAllocationOptimizer {
     }
 
     private void setElementBit(BitSet vars, Element e, HashMap<String, Descriptor> varTable) {
-        if (e.isLiteral() || ((Operand) e).isParameter())
-            return;
+        try {
+            if (e.getType().getTypeOfElement() == ElementType.THIS) {
+                vars.set(0);
+                return;
+            }
 
-        int reg =  varTable.get(((Operand) e).getName()).getVirtualReg();
-        vars.set(reg);
+            if (e.isLiteral())
+                return;
+
+            Descriptor d = varTable.get(((Operand) e).getName());
+            if (d.getVarType().getTypeOfElement() == ElementType.ARRAYREF
+                    && e.getType().getTypeOfElement() == ElementType.INT32) {
+                for (Element index : ((ArrayOperand) e).getIndexOperands())
+                    setElementBit(vars, index, varTable);
+            }
+
+            if (d.getScope() == VarScope.PARAMETER || d.getScope() == VarScope.FIELD)
+                return;
+
+            int reg = d.getVirtualReg();
+            vars.set(reg);
+        } catch (Exception exception) {
+            System.out.println("exception: " + e);
+        }
     }
 
     private String showBitset(BitSet bitset) {
@@ -201,7 +217,7 @@ public class RegisterAllocationOptimizer {
     }
 
     private void printTable(HashMap<Node, BitSet> use, HashMap<Node, BitSet> def, HashMap<Node, BitSet> in, HashMap<Node, BitSet> out, ArrayList<Instruction> nodes) {
-        System.out.format("%10s%10s%10s%10s%10s%10s\n","node", "use", "def", "succ", "out", "in");
+        System.out.format("%15s%15s%15s%15s%15s%15s\n","node", "use", "def", "succ", "out", "in");
         for (Node node: nodes) {
             StringBuilder succ = new StringBuilder(node.getSucc1().getId());
             if (node.getSucc1() != null) {
@@ -212,7 +228,7 @@ public class RegisterAllocationOptimizer {
             if (node.getSucc2() != null)
                 succ.append(node.getSucc2().getId());
 
-            System.out.format("%10d%10s%10s%10s%10s%10s\n",
+            System.out.format("%15d%15s%15s%15s%15s%15s\n",
                     node.getId(), showBitset(use.get(node)), showBitset(def.get(node)),
                     succ, showBitset(out.get(node)), showBitset(in.get(node)));
         }

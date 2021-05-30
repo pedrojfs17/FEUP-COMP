@@ -411,7 +411,8 @@ public class BackendStage implements JasminBackend {
             stack = 0;
 
             String jasminCode = loadElement(instruction.getLeftOperand(), varTable);
-
+            System.out.println(jasminCode);
+            instruction.getRightOperand().show();
             if(((Operand)instruction.getRightOperand()).getName().equals(
                     ((Operand)instruction.getLeftOperand()).getName())) {
                 jasminCode += "\tifeq";
@@ -524,18 +525,23 @@ public class BackendStage implements JasminBackend {
     private String loadLiteral(LiteralElement element) {
         stack += 1;
         String jasminCode = "\t";
+        int n = Integer.parseInt(element.getLiteral());
         if (element.getType().getTypeOfElement() == ElementType.INT32 || element.getType().getTypeOfElement() == ElementType.BOOLEAN) {
-            if (Integer.parseInt(element.getLiteral()) <= 5)
+            if (n <= 5 && n >= -1)
                 jasminCode += "iconst_";
-            else if (Integer.parseInt(element.getLiteral()) > 255)
+            else if (n > 255 || n < -1)
                 jasminCode += "ldc ";
-            else if (Integer.parseInt(element.getLiteral()) > 127)
+            else if (n > 127)
                 jasminCode += "sipush ";
             else
                 jasminCode += "bipush ";
         } else
             jasminCode += "ldc ";
-        return jasminCode + element.getLiteral() + "\n";
+
+        if (n == -1)
+            return jasminCode + "m1\n";
+
+        return jasminCode + n + "\n";
     }
 
     private String getDescriptor(Type type) {
