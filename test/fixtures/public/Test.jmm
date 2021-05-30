@@ -1,7 +1,5 @@
-import ioPlus;
 class Test {
     public static void main(String[] args) {
-        ioPlus.printHelloWorld();
     }
 
     public int test(int N, int[] A) {

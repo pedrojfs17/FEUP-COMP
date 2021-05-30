@@ -45,15 +45,17 @@ public class RegisterAllocationOptimizer {
         }
 
         boolean done = false;
+        int i = 0;
+        ArrayList<Instruction> nodes = new ArrayList<>(method.getInstructions());
+        Collections.reverse(nodes);
+
         while (!done) {
-            HashMap<Node, BitSet> in_temp = new HashMap<>();
-            HashMap<Node, BitSet> out_temp = new HashMap<>();
+            System.out.println("iteration " + i);
+            i++;
+            HashMap<Node, BitSet> in_temp = new HashMap<>(in);
+            HashMap<Node, BitSet> out_temp = new HashMap<>(out);
 
-            done = true;
-            for (Instruction instruction: method.getInstructions()) {
-                in_temp.replace(instruction, in.get(instruction));
-                out_temp.replace(instruction, out.get(instruction));
-
+            for (Instruction instruction: nodes) {
                 BitSet new_out = new BitSet(n_vars);
                 if (instruction.getSucc1() != null) {
                     if(instruction.getSucc1().getNodeType() != NodeType.END) {
@@ -66,17 +68,23 @@ public class RegisterAllocationOptimizer {
                 out.replace(instruction, new_out);
 
                 BitSet new_in = out.get(instruction);
-                for (Node node: out.keySet()) {
-                    System.out.println(node + " " + out.get(node));
-                }
-                System.out.println(out);
                 new_in.xor(def.get(instruction));
                 new_in.or(use.get(instruction));
                 in.replace(instruction, new_in);
+            }
 
-                if (!in_temp.get(instruction).equals(in.get(instruction)) || !out_temp.get(instruction).equals(out.get(instruction)))
+            printTable(use, def, in, out, nodes);
+
+            done = true;
+            for (Instruction instruction: nodes) {
+                if(!in.get(instruction).equals(in_temp.get(instruction)))
+                    done = false;
+                if(!out.get(instruction).equals(out_temp.get(instruction)))
                     done = false;
             }
+
+            if (i > 5)
+                done = true;
         }
     }
 
@@ -147,7 +155,8 @@ public class RegisterAllocationOptimizer {
 
     private BitSet getUsedVarsReturn(ReturnInstruction instruction, HashMap<String, Descriptor> varTable) {
         BitSet vars = new BitSet();
-        setElementBit(vars, instruction.getOperand(), varTable);
+        if (instruction.hasReturnValue())
+            setElementBit(vars, instruction.getOperand(), varTable);
         return vars;
     }
 
@@ -189,5 +198,23 @@ public class RegisterAllocationOptimizer {
         for (int i = 0; i < bitset.length(); i++)
             s.append(bitset.get(i) ? '1': '0');
         return s.toString();
+    }
+
+    private void printTable(HashMap<Node, BitSet> use, HashMap<Node, BitSet> def, HashMap<Node, BitSet> in, HashMap<Node, BitSet> out, ArrayList<Instruction> nodes) {
+        System.out.format("%10s%10s%10s%10s%10s%10s\n","node", "use", "def", "succ", "out", "in");
+        for (Node node: nodes) {
+            StringBuilder succ = new StringBuilder(node.getSucc1().getId());
+            if (node.getSucc1() != null) {
+                succ.append(node.getSucc1().getId());
+                if (node.getSucc2() != null)
+                    succ.append(",");
+            }
+            if (node.getSucc2() != null)
+                succ.append(node.getSucc2().getId());
+
+            System.out.format("%10d%10s%10s%10s%10s%10s\n",
+                    node.getId(), showBitset(use.get(node)), showBitset(def.get(node)),
+                    succ, showBitset(out.get(node)), showBitset(in.get(node)));
+        }
     }
 }
