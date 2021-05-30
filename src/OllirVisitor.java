@@ -154,6 +154,7 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 }
             }
         }
+
         if(!identifierString.contains("\n")) {
             ret += before + "\t\tt" + tempVar + ".i32 :=.i32 " + identifierString + "[" + accessString + "].i32;";
             tempVar++;
@@ -230,10 +231,9 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
         if (identifier.getKind().equals("ARRAY_ACCESS")) {
             arrayAccess = true;
             var = symbolTable.getVariable(identifier.getChildren().get(0).get("name"), ancestor.get().get("name"));
-            var.setType(new Type("int", false));
+            //var.setType(new Type("int", false));
         } else
             var = symbolTable.getVariable(identifier.get("name"), ancestor.get().get("name"));
-
         if (isOp(assignment)) {
             String operation = visit(assignment);
             String[] lines = operation.split("\n");
@@ -258,18 +258,16 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                         .append(", \"<init>\").V;\n");
         } else {
             String assignString = visit(assignment);
-            boolean arrayAccessed= false;
             if (assignment.getKind().equals("ARRAY_ACCESS")) {
-                arrayAccessed=true;
-                String before = "";
-
+                String before;
                 if (assignString.contains("\n")) {
                     before=assignString.substring(0,assignString.lastIndexOf("\n"));
-                    if(assignString.lastIndexOf("\n")<assignString.lastIndexOf(":=."))
+                    if(assignString.lastIndexOf("\n")<assignString.lastIndexOf(":=.")) {
+                        before+=assignString.substring(assignString.lastIndexOf("\n"));
                         assignString = assignString.substring(assignString.lastIndexOf("\n") + 1, assignString.lastIndexOf(" :=."));
+                    }
                     else
                         assignString = assignString.substring(assignString.lastIndexOf("\n") + 1, assignString.lastIndexOf(";"));
-                    arrayAccessed = false;
                 }
                 else {
                     before=assignString;
@@ -286,22 +284,22 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 }
 
             }
-            if(!arrayAccessed) {
-                if(assignString.contains("\n")) {
-                    methodStr.append(assignString.substring(0, assignString.lastIndexOf("\n") + 1));
-                    assignString = assignString.substring(assignString.lastIndexOf("\n") + 1);
-                }
-                methodStr.append(varAssign(identifier, var, arrayAccess));
-                methodStr.append(assignString);
+            System.out.println("ASSIGNING: "+varAssign(identifier, var, arrayAccess)+ " = "+assignString);
+            if(assignString.contains("\n")) {
+                methodStr.append(assignString.substring(0, assignString.lastIndexOf("\n") + 1));
+                assignString = assignString.substring(assignString.lastIndexOf("\n") + 1);
             }
 
-            if (!assignment.getKind().equals("OBJECT_METHOD") && !arrayAccessed)
+            methodStr.append(varAssign(identifier, var, arrayAccess));
+            methodStr.append(assignString);
+
+            if (!assignment.getKind().equals("OBJECT_METHOD"))
                 methodStr.append(";");
             methodStr.append("\n");
         }
+        /*
         if(identifier.getKind().equals("ARRAY_ACCESS"))
-            var.setType(new Type("int", true));
-
+            var.setType(new Type("int", true));*/
 
 
         return methodStr.toString();
@@ -344,7 +342,6 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
                 if (!visitString.contains("\n"))
                     param = visitString.substring(0, visitString.indexOf(" "));
                 else {
-                    System.out.println("PARAM: "+visitString);
                     String sub = visitString.substring(visitString.lastIndexOf("\n") + 1);
                     visitString= visitString.substring(0,visitString.lastIndexOf("\n") + 1);
                     param = sub.contains(":=.") ? sub.substring(0, sub.indexOf(" ")) : sub.substring(0,sub.length()-1);

@@ -40,7 +40,6 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         setDefaultVisit(this::defaultVisit);
     }
 
-
     private String defaultVisit(JmmNode jmmNode, List<Report> reports) {
         for (JmmNode child : jmmNode.getChildren())
             visit(child, reports);
@@ -54,9 +53,6 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     private String dealWithInt(JmmNode jmmNode, List<Report> reports) {
         return "int";
     }
-
-
-
 
     private String dealWithExclamation(JmmNode jmmNode, List<Report> reports) {
         String expressionType = visit(jmmNode.getChildren().get(0), reports);

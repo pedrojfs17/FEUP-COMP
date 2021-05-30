@@ -65,7 +65,7 @@ public class OptimizationStage implements JmmOptimization {
         WhileOptimization optimization = new WhileOptimization(classUnit);
         classUnit = optimization.getOptimizedClassUnit();
         RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
-        optimizer.allocateRegisters(10);
+        //optimizer.allocateRegisters(10);
 
 
 

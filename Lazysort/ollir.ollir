@@ -65,8 +65,8 @@ u_allowedNameL.i32 /.i32 2.i32;t13.bool :=.bool u_allowedNameI.i32  <.bool t12.i
 		EndLoop3:
 		Loop4:
 
-t16.bool :=.bool u_allowedNameI.i32  <.bool u_allowedNameL.i32;
-			if (t16.bool ==.bool t16.bool) goto Body4;
+t17.bool :=.bool u_allowedNameI.i32  <.bool u_allowedNameL.i32;
+			if (t17.bool ==.bool t17.bool) goto Body4;
 			goto EndLoop4;
 		Body4:
 			rand.i32 :=.i32 		invokestatic(MathUtils, "random", 0.i32, 10.i32).i32;
