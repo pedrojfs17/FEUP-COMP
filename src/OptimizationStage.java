@@ -46,7 +46,7 @@ public class OptimizationStage implements JmmOptimization {
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
         JmmNode node = semanticsResult.getRootNode();
 
-        /*
+
         ConstantOptimizationVisitor constantVisitor = new ConstantOptimizationVisitor();
 
         boolean hasChanges = true;
@@ -54,7 +54,7 @@ public class OptimizationStage implements JmmOptimization {
             hasChanges = constantVisitor.visit(node, 0);
             System.out.println("------------------------");
             System.out.println(node.toTree());
-        }*/
+        }
 
         return semanticsResult;
     }
