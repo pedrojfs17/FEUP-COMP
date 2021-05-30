@@ -34,8 +34,7 @@ Store1:
 	istore 5
 	iload 5
 	iload 5
-	if_icmpeq Body0
-	goto EndLoop0
+	if_icmpne EndLoop0
 Body0:
 	aload_1
 	arraylength
@@ -157,8 +156,7 @@ Store1:
 	istore 6
 	iload 6
 	iload 6
-	if_icmpeq Body3
-	goto EndLoop3
+	if_icmpne EndLoop3
 Body3:
 	aload_1
 	iload 4
@@ -184,8 +182,7 @@ Store2:
 	istore 8
 	iload 8
 	iload 8
-	if_icmpeq Body4
-	goto EndLoop4
+	if_icmpne EndLoop4
 Body4:
 	iconst_0
 	bipush 10

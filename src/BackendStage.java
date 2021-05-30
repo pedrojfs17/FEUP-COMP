@@ -595,6 +595,7 @@ public class BackendStage implements JasminBackend {
             case EQ:
                 return "if_icmpeq";
             case NOTB:
+            case NEQ:
                 return "if_icmpne";
             default:
                 System.out.println(operation.getOpType());
