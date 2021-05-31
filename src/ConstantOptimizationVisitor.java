@@ -48,13 +48,19 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
         } else
             var = identifier.get("name");
 
-        if (value.getKind().equals("INT")){
-            constants.put(var, new AbstractMap.SimpleEntry<>("INT", value.get("value")));
-        }
-        else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
-            constants.put(var, new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
-        else if (value.getKind().equals("IDENTIFIER") && constants.get(var) != null)
+        if(getAncestor(jmmNode,"PROGRAM","WHILE").get().getKind().equals("WHILE") ||
+                getAncestor(jmmNode,"PROGRAM","IF").get().getKind().equals("IF") ||
+                getAncestor(jmmNode,"PROGRAM","ELSE").get().getKind().equals("ELSE")) {
             constants.remove(var);
+        } else {
+            if (value.getKind().equals("INT")){
+                constants.put(var, new AbstractMap.SimpleEntry<>("INT", value.get("value")));
+            }
+            else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
+                constants.put(var, new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
+            else if (value.getKind().equals("IDENTIFIER") && constants.get(var) != null)
+                constants.remove(var);
+        }
 
         return changes || checkIdentifier(jmmNode, value, 1);
     }
@@ -97,12 +103,6 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
     private boolean checkIdentifier(JmmNode parentNode, JmmNode child, int index) {
         if (child.getKind().equals("IDENTIFIER") && constants.get(child.get("name")) != null) {
-            if(getAncestor(child,"PROGRAM","WHILE").get().getKind().equals("WHILE") ||
-                    getAncestor(child,"PROGRAM","IF").get().getKind().equals("IF") ||
-                    getAncestor(child,"PROGRAM","ELSE").get().getKind().equals("ELSE")) {
-                constants.remove(child.get("name"));
-                return false;
-            }
             parentNode.removeChild(child);
             Map.Entry<String, String> constant = constants.get(child.get("name"));
             JmmNode newNode = new JmmNodeImpl(constant.getKey());
