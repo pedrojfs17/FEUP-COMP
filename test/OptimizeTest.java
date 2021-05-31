@@ -20,13 +20,6 @@ import pt.up.fe.specs.util.SpecsIo;
 
 public class OptimizeTest {
     @Test
-    public void testLivenessAnalysis() {
-        OllirResult result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Test.jmm"));
-        OptimizationStage optimization = new OptimizationStage();
-        OllirResult new_result = optimization.optimize(result);
-    }
-
-    @Test
     public void testHelloWorld() {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
         TestUtils.noErrors(result.getReports());

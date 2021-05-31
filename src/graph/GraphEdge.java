@@ -1,4 +1,4 @@
-import pt.up.fe.specs.util.graphs.Graph;
+package graph;
 
 import java.util.Objects;
 
@@ -30,9 +30,9 @@ public class GraphEdge {
 
     @Override
     public String toString() {
-        return "GraphEdge{" +
-                "" + first +
-                "," + second +
+        return "graph.GraphEdge{" +
+                "" + first.getName() +
+                "," + second.getName() +
                 '}';
     }
 }

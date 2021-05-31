@@ -68,7 +68,7 @@ public class OptimizationStage implements JmmOptimization {
     public OllirResult optimize(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
         RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
-        optimizer.allocateRegisters(10);
+        optimizer.allocateRegisters(4);
 
         return ollirResult;
     }

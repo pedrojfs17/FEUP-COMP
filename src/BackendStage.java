@@ -145,10 +145,15 @@ public class BackendStage implements JasminBackend {
         jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
         //jasminCode.append("\t.limit stack 99\n");
 
-        int locals = varTable.size();
-        if (!method.isConstructMethod())
-            locals++;
-        jasminCode.append("\t.limit locals ").append(locals).append("\n\n");
+        ArrayList<Integer> locals = new ArrayList<>();
+        for (Descriptor d: varTable.values()) {
+            if (!locals.contains(d.getVirtualReg()))
+                locals.add(d.getVirtualReg());
+        }
+        if (!locals.contains(0) && !method.isConstructMethod())
+            locals.add(0);
+
+        jasminCode.append("\t.limit locals ").append(locals.size()).append("\n\n");
 
         jasminCode.append(instructions);
 

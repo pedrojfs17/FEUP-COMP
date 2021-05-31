@@ -15,4 +15,32 @@ class Test {
         }
         return sum;
     }
+
+    public int test2() {
+        int t0;
+        int t1;
+        int t2;
+        int t3;
+        int t4;
+        int t5;
+        int t6;
+        int t7;
+        int t8;
+        int t9;
+        int t10;
+
+        t0 = 4;
+        t1 = 8;
+        t2 = t1 + t0;
+        t3 = 8;
+        t4 = 8;
+        t5 = t3 + t4;
+        t6 = 0;
+        t7= t5 * t6;
+        t8 = t7 + t2;
+        t9 = 12;
+        t10 = t8 + t9;
+        t10 = 16;
+        return 1;
+    }
 }
