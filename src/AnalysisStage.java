@@ -18,19 +18,6 @@ public class AnalysisStage implements JmmAnalysis {
 
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
-
-        if (TestUtils.getNumReports(parserResult.getReports(), ReportType.ERROR) > 0) {
-            var errorReport = new Report(ReportType.ERROR, Stage.SEMANTIC, -1,
-                    "Started semantic analysis but there are errors from previous stage");
-            return new JmmSemanticsResult(parserResult, null, Arrays.asList(errorReport));
-        }
-
-        if (parserResult.getRootNode() == null) {
-            var errorReport = new Report(ReportType.ERROR, Stage.SEMANTIC, -1,
-                    "Started semantic analysis but AST root node is null");
-            return new JmmSemanticsResult(parserResult, null, Arrays.asList(errorReport));
-        }
-
         JmmNode node = parserResult.getRootNode().sanitize();
 
         ExampleVisitor visitor = new ExampleVisitor("Identifier", "id");

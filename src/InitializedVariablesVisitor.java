@@ -25,6 +25,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         addVisit("INT", this::dealWithInt);
         addVisit("OPERATION", this::dealWithOperation);
         addVisit("VAR_DECLARATION", this::dealWithVarDeclaration);
+        addVisit("METHOD_DECLARATION", this::dealWithMethodDeclaration);
         addVisit("NEW", this::dealWithNew);
         addVisit("OBJECT", this::dealWithObject);
         addVisit("ARRAY", this::dealWithArray);
@@ -373,5 +374,10 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         }
 
         return jmmNode.get("type");
+    }
+
+    private String dealWithMethodDeclaration(JmmNode jmmNode, List<Report> reports) {
+        initializedVariables.clear();
+        return defaultVisit(jmmNode, reports);
     }
 }

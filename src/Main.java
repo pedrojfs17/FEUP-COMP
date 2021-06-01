@@ -84,6 +84,10 @@ public class Main implements JmmParser {
 			ollirResult = optimizationStage.optimize(ollirResult);
 		}
 		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
+		if (TestUtils.getNumReports(jasminResult.getReports(), ReportType.ERROR) > 0) {
+			System.out.println(jasminResult.getReports());
+			return;
+		}
 
 		Path mainDir = Paths.get("ToolResults/");
 		try {
