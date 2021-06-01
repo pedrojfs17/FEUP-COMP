@@ -1,3 +1,5 @@
+package visitors.optimizations;
+
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
@@ -6,10 +8,12 @@ import java.util.*;
 
 public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
     private final HashMap<String, Map.Entry<String, String>> constants;
+    private boolean check;
 
     public ConstantOptimizationVisitor() {
         super();
         this.constants = new HashMap<>();
+        this.check = true;
 
         addVisit("ASSIGNMENT", this::dealWithAssignment);
         addVisit("OPERATION", this::dealWithOperation);
@@ -27,7 +31,7 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
         for (int i = 0; i < node.getNumChildren(); i++) {
             JmmNode child = node.getChildren().get(i);
             changes = changes || visit(child, i);
-            if (!insideIfOrWhile(child))
+            if (this.check && !insideIfOrWhile(child))
                 changes = changes || checkIdentifier(node, child, i);
         }
 
@@ -57,8 +61,7 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
                 parent.add(child, index + i - 1);
             }
             return true;
-        }
-        else if (condition.getKind().equals("FALSE")) {
+        } else if (condition.getKind().equals("FALSE")) {
             JmmNode parent = jmmNode.getParent();
             JmmNode elseNode = parent.getChildren().get(index + 1);
             parent.removeChild(jmmNode);
@@ -70,7 +73,14 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
             return true;
         }
 
-        return visit(condition, 0);
+        boolean changes = visit(condition, 0);
+        this.check = false;
+        for (int i = 1; i < jmmNode.getNumChildren(); i++) {
+            JmmNode child = jmmNode.getChildren().get(i);
+            changes = changes || visit(child, i);
+        }
+        this.check = true;
+        return changes;
     }
 
     private Boolean dealWithAssignment(JmmNode jmmNode, Integer index) {
@@ -80,27 +90,28 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
         boolean changes = visit(value, 1);
 
         String var;
-        if(identifier.getKind().equals("ARRAY_ACCESS")){
-            var=identifier.getChildren().get(0).get("name")+"["+
-                    (identifier.getChildren().get(1).getKind().equals("IDENTIFIER") ? identifier.getChildren().get(1).get("name"): identifier.getChildren().get(1).get("value"))
-                    +"]";
+        if (identifier.getKind().equals("ARRAY_ACCESS")) {
+            var = identifier.getChildren().get(0).get("name") + "[" +
+                    (identifier.getChildren().get(1).getKind().equals("IDENTIFIER") ? identifier.getChildren().get(1).get("name") : identifier.getChildren().get(1).get("value"))
+                    + "]";
         } else
             var = identifier.get("name");
 
-        if(insideIfOrWhile(jmmNode)) {
+        if (insideIfOrWhile(jmmNode)) {
             constants.remove(var);
-        }
-        else {
-            if (value.getKind().equals("INT")){
+        } else {
+            if (value.getKind().equals("INT")) {
                 constants.put(var, new AbstractMap.SimpleEntry<>("INT", value.get("value")));
-            }
-            else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
+            } else if (value.getKind().equals("TRUE") || value.getKind().equals("FALSE"))
                 constants.put(var, new AbstractMap.SimpleEntry<>(value.getKind(), value.getKind()));
             else if (value.getKind().equals("IDENTIFIER") && constants.get(var) != null)
                 constants.remove(var);
         }
 
-        return changes || checkIdentifier(jmmNode, value, 1);
+        if (this.check)
+            changes = changes || checkIdentifier(jmmNode, value, 1);
+
+        return changes;
     }
 
     private Boolean dealWithOperation(JmmNode jmmNode, Integer index) {
@@ -109,19 +120,18 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
         boolean changes;
 
-        if (lhs.getKind().equals("INT") && rhs.getKind().equals("INT")) {
+        if (this.check && lhs.getKind().equals("INT") && rhs.getKind().equals("INT")) {
             JmmNode parent = jmmNode.getParent();
             parent.removeChild(jmmNode);
             JmmNode newNode = new JmmNodeImpl("INT");
             newNode.put("value", String.valueOf(evaluateOperation(jmmNode.get("op"), lhs.get("value"), rhs.get("value"))));
             parent.add(newNode, index);
             changes = true;
-        }
-        else {
+        } else {
             changes = visit(lhs, 0) || visit(rhs, 1);
         }
 
-        if (!insideIfOrWhile(jmmNode)) {
+        if (this.check && !insideIfOrWhile(jmmNode)) {
             changes = changes || checkIdentifier(jmmNode, lhs, 0) || checkIdentifier(jmmNode, rhs, 1);
         }
 
@@ -134,19 +144,18 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
         boolean changes;
 
-        if ((lhs.getKind().equals("TRUE") || lhs.getKind().equals("FALSE"))
+        if (this.check && (lhs.getKind().equals("TRUE") || lhs.getKind().equals("FALSE"))
                 && (rhs.getKind().equals("TRUE") || rhs.getKind().equals("FALSE"))) {
             JmmNode parent = jmmNode.getParent();
             parent.removeChild(jmmNode);
             JmmNode newNode = new JmmNodeImpl(evaluateAnd(lhs.getKind(), rhs.getKind()));
             parent.add(newNode, index);
             changes = true;
-        }
-        else {
+        } else {
             changes = visit(lhs, 0) || visit(rhs, 1);
         }
 
-        if (!insideIfOrWhile(jmmNode)) {
+        if (this.check && !insideIfOrWhile(jmmNode)) {
             changes = changes || checkIdentifier(jmmNode, lhs, 0) || checkIdentifier(jmmNode, rhs, 1);
         }
 
@@ -159,18 +168,17 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
         boolean changes;
 
-        if (lhs.getKind().equals("INT") && rhs.getKind().equals("INT")) {
+        if (this.check && lhs.getKind().equals("INT") && rhs.getKind().equals("INT")) {
             JmmNode parent = jmmNode.getParent();
             parent.removeChild(jmmNode);
             JmmNode newNode = new JmmNodeImpl(evaluateLess(lhs.get("value"), rhs.get("value")));
             parent.add(newNode, index);
             changes = true;
-        }
-        else {
+        } else {
             changes = visit(lhs, 0) || visit(rhs, 1);
         }
 
-        if (!insideIfOrWhile(jmmNode)) {
+        if (this.check && !insideIfOrWhile(jmmNode)) {
             changes = changes || checkIdentifier(jmmNode, lhs, 0) || checkIdentifier(jmmNode, rhs, 1);
         }
 
@@ -191,11 +199,15 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
     }
 
     private int evaluateOperation(String operation, String lhs, String rhs) {
-        switch(operation) {
-            case "+" : return Integer.parseInt(lhs) + Integer.parseInt(rhs);
-            case "-" : return Integer.parseInt(lhs) - Integer.parseInt(rhs);
-            case "*" : return Integer.parseInt(lhs) / Integer.parseInt(rhs);
-            case "/" : return Integer.parseInt(lhs) * Integer.parseInt(rhs);
+        switch (operation) {
+            case "+":
+                return Integer.parseInt(lhs) + Integer.parseInt(rhs);
+            case "-":
+                return Integer.parseInt(lhs) - Integer.parseInt(rhs);
+            case "*":
+                return Integer.parseInt(lhs) * Integer.parseInt(rhs);
+            case "/":
+                return Integer.parseInt(lhs) / Integer.parseInt(rhs);
         }
         return 0;
     }
@@ -214,8 +226,8 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
     private boolean insideIfOrWhile(JmmNode jmmNode) {
         try {
-            return (getAncestor(jmmNode,"WHILE").get().getKind().equals("WHILE")
-                    || getAncestor(jmmNode,"ELSE").get().getKind().equals("ELSE")
+            return (getAncestor(jmmNode, "WHILE").get().getKind().equals("WHILE")
+                    || getAncestor(jmmNode, "ELSE").get().getKind().equals("ELSE")
             );
         } catch (Exception e) {
             return false;

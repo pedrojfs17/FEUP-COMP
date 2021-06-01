@@ -1,10 +1,9 @@
+package visitors.optimizations;
+
 import graph.Graph;
 import org.specs.comp.ollir.*;
 import org.specs.comp.ollir.Method;
 import org.specs.comp.ollir.Node;
-import pt.up.fe.comp.jmm.jasmin.JasminResult;
-import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
 
@@ -28,7 +27,7 @@ public class RegisterAllocationOptimizer {
             return;
         }
         for (Method method : classUnit.getMethods()) {
-            System.out.println("Method: " + method.getMethodName());
+            System.out.println("semantic.Method: " + method.getMethodName());
 
             ArrayList<HashMap<Node, BitSet>> liveRanges = livenessAnalyzer.livenessAnalysis(method);
             Graph varGraph = new Graph(liveRanges, method);

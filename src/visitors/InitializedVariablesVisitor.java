@@ -1,9 +1,12 @@
+package visitors;
+
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
+import semantic.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,24 +100,22 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
     private String dealWithMethodCall(JmmNode jmmNode, List<Report> reports) {
         for (JmmNode child : jmmNode.getChildren())
             visit(child, reports);
-        
+
         if (symbolTable.getMethod(jmmNode.get("name")) != null)
             return symbolTable.getReturnType(jmmNode.get("name")).getName();
-        else if(!jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).getKind().equals("THIS")) {
-            if(symbolTable.getImports().contains(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name")))
+        else if (!jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).getKind().equals("THIS")) {
+            if (symbolTable.getImports().contains(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name")))
                 return "import";
-            else if(symbolTable.getSuper()!=null) {
+            else if (symbolTable.getSuper() != null) {
                 Optional<JmmNode> ancestor = jmmNode.getAncestor("MAIN").isPresent() ? jmmNode.getAncestor("MAIN") : jmmNode.getAncestor("METHOD_DECLARATION");
-                Symbol symbol = symbolTable.getVariable(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name"),ancestor.get().get("name"));
-                if(symbol.getType().getName().equals(symbolTable.getClassName()))
+                Symbol symbol = symbolTable.getVariable(jmmNode.getAncestor("OBJECT_METHOD").get().getChildren().get(0).get("name"), ancestor.get().get("name"));
+                if (symbol.getType().getName().equals(symbolTable.getClassName()))
                     return "extends";
                 else
                     return "";
-            }
-            else
+            } else
                 return "";
-        }
-        else
+        } else
             return "";
     }
 
@@ -185,7 +186,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        if((!lhsType.equals("int") && !lhsType.equals("import") && !lhsType.equals("extends"))
+        if ((!lhsType.equals("int") && !lhsType.equals("import") && !lhsType.equals("extends"))
                 || (!rhsType.equals("int") && !rhsType.equals("import") && !rhsType.equals("extends"))) {
             reports.add(new Report(
                     ReportType.ERROR,
@@ -256,7 +257,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        if (!lhsType.equals("boolean")&& !lhsType.equals("import") && !lhsType.equals("extends")) {
+        if (!lhsType.equals("boolean") && !lhsType.equals("import") && !lhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -266,7 +267,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        if (!rhsType.equals("boolean")&& !lhsType.equals("import") && !lhsType.equals("extends")) {
+        if (!rhsType.equals("boolean") && !lhsType.equals("import") && !lhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -294,8 +295,10 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
             return "<Unknown>";
         }
-
-        if (jmmNode.getParent().getKind().equals("OPERATION") && !initializedVariables.contains(jmmNode.get("name")) && !symbolTable.getMethod(ancestor.get().get("name")).containsParameter(jmmNode.get("name"))) {
+        if (jmmNode.getParent().getKind().equals("OPERATION")
+                && !initializedVariables.contains(jmmNode.get("name"))
+                && !symbolTable.getMethod(ancestor.get().get("name")).containsParameter(jmmNode.get("name"))
+                && symbolTable.getField(jmmNode.get("name"))==null) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -304,8 +307,11 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
                     "Variable \"" + jmmNode.get("name") + "\" has not been initialized."
             ));
         }
+        String ret = "<Unknown>";
+        if (var != null)
+            ret = var.getType().isArray() ? var.getType().getName() + " array" : var.getType().getName();
 
-        return var != null ? var.getType().getName() : "<Unknown>";
+        return ret;
     }
 
     private String dealWithAssignment(JmmNode jmmNode, List<Report> reports) {
@@ -325,7 +331,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         String lhsType = visit(lhs, reports);
         String rhsType = visit(rhs, reports);
 
-        if (!lhsType.equals(rhsType) && !rhsType.equals("import") && !rhsType.equals("extends")) {
+        if (!(lhsType.equals("int array") && rhsType.equals("int")) && !lhsType.equals(rhsType) && !rhsType.equals("import") && !rhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -345,7 +351,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
 
     private String dealWithCondition(JmmNode jmmNode, List<Report> reports) {
         String condition = visit(jmmNode.getChildren().get(0), reports);
-        if (!condition.equals("boolean")&& !condition.equals("import") && !condition.equals("extends")) {
+        if (!condition.equals("boolean") && !condition.equals("import") && !condition.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,

@@ -28,6 +28,7 @@ public class BackendTest {
     public void testRegisterAllocation() {
         OllirResult result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Test.jmm"));
         OptimizationStage optimization = new OptimizationStage();
+        optimization.setNumRegisters(5);
         OllirResult new_result = optimization.optimize(result);
 
         JasminResult jasminResult = TestUtils.backend(new_result);

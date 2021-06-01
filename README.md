@@ -35,6 +35,8 @@ Where <jar filename> is the name of the JAR file that has been copied to the roo
 
 ### Usage
 
+All results are stored in the **ToolResults** directory.
+
 ## DEALING WITH SYNTACTIC ERRORS:
 
 As described in the project assignment, we recover from errors in the conditional statement of a while cycle.
@@ -115,7 +117,7 @@ The jasmin code is iteratively written to a String as we extract the needed info
 
 - Parser: António Bezerra, Gonçalo Alves, Inês Silva, Pedro Seixas;
 - Semantic Analysis: Gonçalo Alves, Pedro Seixas;
-- OLLIR Generation: Gonçalo Alves, Inês Silva;
+- OLLIR Generation: Gonçalo Alves, Inês Silva, Pedro Seixas;
 - Jasmin Generation: Inês Silva;
 - Optimizations: Gonçalo Alves, Inês Silva, Pedro Seixas;
 

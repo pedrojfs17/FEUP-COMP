@@ -1,4 +1,5 @@
-import graph.Graph;
+package visitors.optimizations;
+
 import org.specs.comp.ollir.*;
 import org.specs.comp.ollir.Method;
 import org.specs.comp.ollir.Node;
@@ -9,7 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class LivenessAnalysis {
-    public ArrayList<HashMap<Node, BitSet>> livenessAnalysis (Method method) {
+    public ArrayList<HashMap<Node, BitSet>> livenessAnalysis(Method method) {
         HashMap<Node, BitSet> def = new HashMap<>();
         HashMap<Node, BitSet> use = new HashMap<>();
 
@@ -17,7 +18,7 @@ public class LivenessAnalysis {
         HashMap<Node, BitSet> out = new HashMap<>();
 
         int n_vars = method.getVarTable().size();
-        for (Instruction instruction: method.getInstructions()) {
+        for (Instruction instruction : method.getInstructions()) {
             def.put(instruction, getDefinedVars(instruction, method.getVarTable()));
             use.put(instruction, getUsedVars(instruction, method.getVarTable()));
             in.put(instruction, new BitSet(n_vars));
@@ -35,11 +36,11 @@ public class LivenessAnalysis {
             HashMap<Node, BitSet> in_temp = new HashMap<>(in);
             HashMap<Node, BitSet> out_temp = new HashMap<>(out);
 
-            for (Instruction instruction: nodes) {
+            for (Instruction instruction : nodes) {
                 BitSet new_out = new BitSet(n_vars);
                 if (instruction.getSucc1() != null) {
-                    if(instruction.getSucc1().getNodeType() != NodeType.END) {
-                        new_out = (BitSet)in.get(instruction.getSucc1()).clone();
+                    if (instruction.getSucc1().getNodeType() != NodeType.END) {
+                        new_out = (BitSet) in.get(instruction.getSucc1()).clone();
                         if (instruction.getSucc2() != null) {
                             new_out.or(in.get(instruction.getSucc2()));
                         }
@@ -47,8 +48,14 @@ public class LivenessAnalysis {
                 }
                 out.replace(instruction, new_out);
 
-                BitSet new_in = (BitSet)out.get(instruction).clone();
-                new_in.xor(def.get(instruction));
+                BitSet new_in = (BitSet) out.get(instruction).clone();
+                BitSet temp_def = def.get(instruction);
+                for (int index = 0; index < n_vars; index++) {
+                    if (new_in.get(index) && !temp_def.get(index))
+                        new_in.set(index);
+                    else
+                        new_in.clear(index);
+                }
                 new_in.or(use.get(instruction));
                 in.replace(instruction, new_in);
             }
@@ -56,10 +63,10 @@ public class LivenessAnalysis {
             printTable(use, def, in, out, nodes, n_vars + 1);
 
             done = true;
-            for (Instruction instruction: nodes) {
-                if(!in.get(instruction).equals(in_temp.get(instruction)))
+            for (Instruction instruction : nodes) {
+                if (!in.get(instruction).equals(in_temp.get(instruction)))
                     done = false;
-                if(!out.get(instruction).equals(out_temp.get(instruction)))
+                if (!out.get(instruction).equals(out_temp.get(instruction)))
                     done = false;
             }
         }
@@ -74,7 +81,7 @@ public class LivenessAnalysis {
     private BitSet getDefinedVars(Instruction instruction, HashMap<String, Descriptor> varTable) {
         BitSet vars = new BitSet();
 
-        if(instruction.getInstType() == InstructionType.ASSIGN)
+        if (instruction.getInstType() == InstructionType.ASSIGN)
             setElementBit(vars, ((AssignInstruction) instruction).getDest(), varTable);
 
         return vars;
@@ -113,7 +120,7 @@ public class LivenessAnalysis {
             if (instruction.getInvocationType() != CallType.NEW)
                 setElementBit(vars, instruction.getSecondArg(), varTable);
 
-            for (Element arg: instruction.getListOfOperands())
+            for (Element arg : instruction.getListOfOperands())
                 setElementBit(vars, arg, varTable);
         }
         return vars;
@@ -195,15 +202,16 @@ public class LivenessAnalysis {
     private String showBitset(BitSet bitset, int n) {
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < bitset.length(); i++)
-            s.append(bitset.get(i) ? '1': '0');
+            s.append(bitset.get(i) ? '1' : '0');
         while (s.length() < n)
             s.append('0');
         return s.toString();
     }
 
     private void printTable(HashMap<Node, BitSet> use, HashMap<Node, BitSet> def, HashMap<Node, BitSet> in, HashMap<Node, BitSet> out, ArrayList<Instruction> nodes, int n) {
-        System.out.format("%15s%15s%15s%15s%15s%15s\n","node", "use", "def", "succ", "out", "in");
-        for (Node node: nodes) {
+        int table_size = Math.max(n, 15) + 1;
+        System.out.format("%10s%" + table_size + "s%" + table_size + "s%10s%" + table_size + "s%" + table_size + "s\n", "node", "use", "def", "succ", "out", "in");
+        for (Node node : nodes) {
             StringBuilder succ = new StringBuilder();
             if (node.getSucc1() != null) {
                 succ.append(node.getSucc1().getId());
@@ -213,7 +221,7 @@ public class LivenessAnalysis {
             if (node.getSucc2() != null)
                 succ.append(node.getSucc2().getId());
 
-            System.out.format("%15d%15s%15s%15s%15s%15s\n",
+            System.out.format("%10d%" + table_size + "s%" + table_size + "s%10s%" + table_size + "s%" + table_size + "s\n",
                     node.getId(), showBitset(use.get(node), n), showBitset(def.get(node), n),
                     succ, showBitset(out.get(node), n), showBitset(in.get(node), n));
         }
