@@ -2,10 +2,7 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
     private HashMap<String, Map.Entry<String, String>> constants;

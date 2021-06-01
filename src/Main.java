@@ -1,4 +1,5 @@
 
+import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
@@ -6,6 +7,8 @@ import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.specs.util.SpecsIo;
 
 import java.io.File;
@@ -17,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.StringReader;
+import java.util.List;
 
 public class Main implements JmmParser {
 
@@ -40,7 +44,7 @@ public class Main implements JmmParser {
         if (args[0].contains("fail")) {
             throw new RuntimeException("It's supposed to fail");
         }
-        File outputDir = new File("out");
+
         var fileContents = SpecsIo.read(args[0]);
 		System.out.println("Executing file: "+args[0]);
 
@@ -48,21 +52,37 @@ public class Main implements JmmParser {
 
 		// Syntactic analysis
 		JmmParserResult parserResult = compiler.parse(fileContents);
+		if (TestUtils.getNumReports(parserResult.getReports(), ReportType.ERROR) > 0 || parserResult.getRootNode() == null) {
+			System.out.println(parserResult.getReports());
+			return;
+		}
+
 		// Semantic analysis
 		AnalysisStage analysisStage = new AnalysisStage();
 		JmmSemanticsResult semanticsResult = analysisStage.semanticAnalysis(parserResult);
+		if (TestUtils.getNumReports(semanticsResult.getReports(), ReportType.ERROR) > 0 || semanticsResult.getRootNode() == null) {
+			System.out.println(semanticsResult.getReports());
+			return;
+		}
+
 		// Ollir
 		OptimizationStage optimizationStage = new OptimizationStage();
-		boolean optimize=false;
-		if(args.length>1 && Arrays.asList(args).contains("-o")){
+		boolean optimize = args.length > 1 && Arrays.asList(args).contains("-o");
+		if (optimize)
 			semanticsResult = optimizationStage.optimize(semanticsResult);
-			optimize = true;
-		}
 		OllirResult ollirResult = optimizationStage.toOllir(semanticsResult,optimize);
+		if (TestUtils.getNumReports(ollirResult.getReports(), ReportType.ERROR) > 0) {
+			System.out.println(ollirResult.getReports());
+			return;
+		}
+
 		// Jasmin
 		BackendStage backendStage = new BackendStage();
-		if(args.length>1 && Arrays.asList(args).contains("-r"))
+		if(args.length>1 && Arrays.asList(args).contains("-r")) {
+			List<String> argList = Arrays.asList(args);
+			optimizationStage.setNumRegisters(Integer.parseInt(argList.get(argList.indexOf("-r") + 1)));
 			ollirResult = optimizationStage.optimize(ollirResult);
+		}
 		JasminResult jasminResult = backendStage.toJasmin(ollirResult);
 
 		Path mainDir = Paths.get("ToolResults/");
@@ -117,6 +137,4 @@ public class Main implements JmmParser {
 
 		jasminResult.compile(path.toFile());
     }
-
-
 }

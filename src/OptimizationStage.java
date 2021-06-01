@@ -1,12 +1,17 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.specs.comp.ollir.ClassUnit;
+import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.specs.util.SpecsIo;
 
 /**
@@ -23,6 +28,7 @@ import pt.up.fe.specs.util.SpecsIo;
  */
 
 public class OptimizationStage implements JmmOptimization {
+    private int n_registers;
 
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult, boolean optimize) {
@@ -46,14 +52,12 @@ public class OptimizationStage implements JmmOptimization {
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
         JmmNode node = semanticsResult.getRootNode();
 
-
-        ConstantOptimizationVisitor constantVisitor = new ConstantOptimizationVisitor();
-
         boolean hasChanges = true;
         while (hasChanges) {
+            System.out.println(node.toTree());
+            ConstantOptimizationVisitor constantVisitor = new ConstantOptimizationVisitor();
             hasChanges = constantVisitor.visit(node, 0);
             System.out.println("------------------------");
-            System.out.println(node.toTree());
         }
 
         return semanticsResult;
@@ -68,9 +72,13 @@ public class OptimizationStage implements JmmOptimization {
     public OllirResult optimize(OllirResult ollirResult) {
         ClassUnit classUnit = ollirResult.getOllirClass();
         RegisterAllocationOptimizer optimizer = new RegisterAllocationOptimizer(classUnit);
-        optimizer.allocateRegisters(4);
+        optimizer.allocateRegisters(n_registers);
 
         return ollirResult;
+    }
+
+    public void setNumRegisters(int n) {
+        n_registers = n;
     }
 
 }

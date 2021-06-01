@@ -17,7 +17,6 @@ public class LivenessAnalysis {
         HashMap<Node, BitSet> out = new HashMap<>();
 
         int n_vars = method.getVarTable().size();
-        System.out.println(method.getVarTable());
         for (Instruction instruction: method.getInstructions()) {
             def.put(instruction, getDefinedVars(instruction, method.getVarTable()));
             use.put(instruction, getUsedVars(instruction, method.getVarTable()));
@@ -179,10 +178,7 @@ public class LivenessAnalysis {
             return;
 
         Descriptor d = varTable.get(((Operand) e).getName());
-        if(d == null) {
-            System.out.println("upsi " + e);
-            System.out.println(varTable);
-        }
+
         if (d.getVarType().getTypeOfElement() == ElementType.ARRAYREF
                 && e.getType().getTypeOfElement() == ElementType.INT32) {
             for (Element index : ((ArrayOperand) e).getIndexOperands())

@@ -49,17 +49,13 @@ public class Graph {
         }
     }
 
-    public void addNode(GraphNode node) {
-        //nodes.put(node);
-    }
-
     public HashMap<String, Descriptor> graphColoring(int k) {
         if (k < minRegisters) {
             //If the value of n is not enough to have the required local variables of the JVM sufficient
             //to store the variables of the Java-- method, the compiler shall abort execution and shall
             //report an error and indicate the minimum number of JVM local variables required.
             System.out.println("Insufficient registers to store this method's variables");
-            return varTable;
+            return graphColoring(k+1);
         }
 
         Stack<GraphNode> stack = new Stack<>();
@@ -86,9 +82,6 @@ public class Graph {
             node.setActive(true);
             nodes.put(node.getOriginalReg(), node);
 
-            System.out.println("!!! " + node);
-
-            System.out.println(colors);
             boolean colored = false;
             for (Integer reg : colors.keySet()) {
                 boolean canColor = true;
@@ -107,8 +100,13 @@ public class Graph {
             }
 
             if (!colored) {
-                System.out.println("Insufficient registers to store this method's variables");
-                return varTable;
+                System.out.println(k + " -- Insufficient registers to store this method's variables");
+                while (!stack.isEmpty()) {
+                    GraphNode n = stack.pop();
+                    n.setActive(true);
+                    nodes.put(n.getOriginalReg(), n);
+                }
+                return graphColoring(k+1);
             }
         }
 
@@ -120,6 +118,16 @@ public class Graph {
                 reg++;
             }
         }
+
+        ArrayList<Integer> used_reg = new ArrayList<>();
+        for (Descriptor d: newVarTable.values()) {
+            if(!used_reg.contains(d.getVirtualReg()))
+                used_reg.add(d.getVirtualReg());
+        }
+        if (!used_reg.contains(0))
+            used_reg.add(0);
+
+        System.out.println("Allocated " + used_reg.size() + " registers");
         return newVarTable;
     }
 }

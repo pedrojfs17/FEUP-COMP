@@ -22,9 +22,7 @@ public class RegisterAllocationOptimizer {
             // Example of what you can do with the OLLIR class
             classUnit.checkMethodLabels(); // check the use of labels in the OLLIR loaded
             classUnit.buildCFGs(); // build the CFG of each method
-            classUnit.outputCFGs(); // output to .dot files the CFGs, one per method
             classUnit.buildVarTables(); // build the table of variables for each method
-            classUnit.show(); // print to console main information about the input OLLIR
         } catch (OllirErrorException e) {
             e.printStackTrace();
             return;
