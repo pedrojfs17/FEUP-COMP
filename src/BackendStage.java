@@ -45,7 +45,7 @@ public class BackendStage implements JasminBackend {
             // Example of what you can do with the OLLIR class
             ollirClass.checkMethodLabels(); // check the use of labels in the OLLIR loaded
             ollirClass.buildCFGs(); // build the CFG of each method
-            ollirClass.outputCFGs(); // output to .dot files the CFGs, one per method
+            //ollirClass.outputCFGs(); // output to .dot files the CFGs, one per method
             ollirClass.buildVarTables(); // build the table of variables for each method
             ollirClass.show(); // print to console main information about the input OLLIR
 
@@ -146,7 +146,6 @@ public class BackendStage implements JasminBackend {
         }
 
         jasminCode.append("\t.limit stack ").append(stacklimit).append("\n");
-        //jasminCode.append("\t.limit stack 99\n");
 
         ArrayList<Integer> locals = new ArrayList<>();
         for (Descriptor d: varTable.values()) {
@@ -222,6 +221,24 @@ public class BackendStage implements JasminBackend {
 
         Operand o = (Operand) instruction.getDest();
         int reg = varTable.get(o.getName()).getVirtualReg();
+
+        // case i = i + 1 => iinc i
+        if (instruction.getRhs().getInstType() == InstructionType.BINARYOPER) {
+            BinaryOpInstruction op = (BinaryOpInstruction) instruction.getRhs();
+            if (op.getUnaryOperation().getOpType() == OperationType.ADD) {
+                if (!op.getLeftOperand().isLiteral() && op.getRightOperand().isLiteral()) {
+                    if (((Operand) op.getLeftOperand()).getName().equals(o.getName())
+                        && Integer.parseInt(((LiteralElement) op.getRightOperand()).getLiteral()) == 1) {
+                        return "\tiinc " + reg + " 1\n";
+                    }
+                } else if (op.getLeftOperand().isLiteral() && !op.getRightOperand().isLiteral()) {
+                    if (((Operand) op.getRightOperand()).getName().equals(o.getName())
+                            && Integer.parseInt(((LiteralElement) op.getLeftOperand()).getLiteral()) == 1) {
+                        return "\tiinc " + reg + " 1\n";
+                    }
+                }
+            }
+        }
 
         if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF
             && o.getType().getTypeOfElement() != ElementType.ARRAYREF) {
@@ -419,8 +436,6 @@ public class BackendStage implements JasminBackend {
             stack = 0;
 
             String jasminCode = loadElement(instruction.getLeftOperand(), varTable);
-            System.out.println(jasminCode);
-            instruction.getRightOperand().show();
             if(((Operand)instruction.getRightOperand()).getName().equals(
                     ((Operand)instruction.getLeftOperand()).getName())) {
                 jasminCode += "\tifeq";
@@ -526,7 +541,7 @@ public class BackendStage implements JasminBackend {
                     ((reg <= 3) ? "_" : " ") + reg + "\n";
         } catch (NullPointerException except) {
             System.out.println(descriptor.getVirtualReg());
-            return "merde";
+            return "ERROR";
         }
     }
 

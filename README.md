@@ -37,12 +37,30 @@ Where <jar filename> is the name of the JAR file that has been copied to the roo
 
 ## DEALING WITH SYNTACTIC ERRORS:
 
-Our tool captures all syntactic errors within a file and warns the user about them.
+As described in the project assignment, we recover from errors in the conditional statement of a while cycle.
+If an error is found in the conditional statement of a while cycle, the compiler ignores every token until the next 
+right parentheses token, ')', showing an error message indicating which tokens were expected and the line and column
+where the error occurred.
 
 ## SEMANTIC ANALYSIS:
 
 Semantic rules that our tool abides to:
-(Refer the semantic rules implemented by your tool.)
+
+- Type Verification
+    - Operations must be between elements of the same type;
+    - Operations are not allowed between arrays;
+    - Only int values to index an array access;
+    - Only int values to initialize an array;
+    - Assignments must be between the same type;
+    - Arithmetic operations must be between two integers or functions that return an integer;
+    - Conditional operations must be between two booleans or function calls that return boolean;
+    - Variables must be initialized;
+    - Variables must be defined, before its usages;
+- Method Verification
+    - Only allows calls to methods that exists with the correct signature;
+    - Checks if method call is for the current class, if it is a method of the super class or if it was imported;
+    - Verifies if the parameter types match the method signature;
+    - Method can be declared after or before any other function calls it;
 
 ## CODE GENERATION:
 
@@ -95,29 +113,11 @@ The jasmin code is iteratively written to a String as we extract the needed info
 
 ## TASK DISTRIBUTION:
 
-1. Develop a parser for Java--using JavaCC and taking as starting point the Java--grammar furnished (note that the original grammar may originate conflicts when implemented
-with parsers of LL(1) type and in that case you need to modify the grammar in order to solve those conflicts);
-2. Include error treatment and recovery mechanisms for while conditions; 
-   
-3. Proceed with the specification of the file jjt to generate, using JJTree, a new version of the parser including in this case the generation of the syntax tree(the generated tree should be anAST), annotating the nodes and leafs of the tree with the information (in-cluding tokens) necessary to perform the subsequent compiler steps; 
-
-4.Implement the interfaces that will allow the generation of the JSON files representing the source code and the necessary symbol tables;
-
-5.Implement the Semantic Analysis and generate the LLIR code, OLLIR(see document [7]), from the AST;
-
-6.Generate from the OLLIR the JVM code accepted by jasmin corresponding to the invoca-tion of functions inJava--;
-
-7.Generate from the OLLIR JVM code accepted by jasmin for arithmetic expressions;[checkpoint2]
-
-8.Generate from the OLLIR JVM code accepted by jasmin for conditional instructions(ifandif-else);
-
-9.Generate from the OLLIR JVM code accepted by jasmin for loops;
-
-10.Generate from the OLLIR JVM code accepted by jasmin to deal with arrays.
-
-11.Complete the compiler and test it using a set of Java--classes;[checkpoint3]
-
-12.Proceed with the optimizations related to the code generation,related to the register al-location (“-r”option) and the optimizations related tothe “-o”option.
+- Parser: António Bezerra, Gonçalo Alves, Inês Silva, Pedro Seixas;
+- Semantic Analysis: Gonçalo Alves, Pedro Seixas;
+- OLLIR Generation: Gonçalo Alves, Inês Silva;
+- Jasmin Generation: Inês Silva;
+- Optimizations: Gonçalo Alves, Inês Silva, Pedro Seixas;
 
 ## PROS:
 
@@ -160,4 +160,7 @@ the interference between two variables with intersecting lifetimes
  - If the specified number of registers isn't enough to store all the variables, increments this value and 
 performs graph coloring again to find the minimum number of registers needed
 
-## CONS: (Identify the most negative aspects of your tool)
+## CONS:
+
+We didn't get to implement the instruction selection optimization that in the case of 'i < 0'
+uses 'load i => if_lt' instead of 'load i => iconst_0 => if_icmpeq'

@@ -22,7 +22,6 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         String[] arr = result.split("\n");
         for (int i =0; i<arr.length; i++) {
             String node = arr[i];
-            System.out.println(node);
             if(node.contains("IMPORT"))this.addImport(node);
             else if(node.contains("CLASS_DECLARATION"))this.addClassName(node);
             else if(node.contains("METHOD_DECLARATION") || node.contains("MAIN")) i = this.addMethod(arr,i);
@@ -51,7 +50,6 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         node = arr[i];
 
         while (!(node.contains("METHOD_DECLARATION") || node.contains("MAIN")) && i < arr.length-1) {
-            System.out.println(node);
             if(node.contains("PARAMETER"))this.addParamOrVar(method,node, true);
             else if(node.contains("VAR_DECLARATION"))this.addParamOrVar(method,node,false);
             i++;

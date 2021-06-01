@@ -184,6 +184,17 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
+        if((!lhsType.equals("int") && !lhsType.equals("import") && !lhsType.equals("extends"))
+                || (!rhsType.equals("int") && !rhsType.equals("import") && !rhsType.equals("extends"))) {
+            reports.add(new Report(
+                    ReportType.ERROR,
+                    Stage.SEMANTIC,
+                    Integer.parseInt(rhs.get("line")),
+                    Integer.parseInt(rhs.get("col")),
+                    "Operations must be between integers. Used <" + lhsType + "> and <" + rhsType + ">"
+            ));
+        }
+
         return lhsType;
     }
 
@@ -234,11 +245,6 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
         String lhsType = visit(lhs, reports);
         String rhsType = visit(rhs, reports);
 
-        System.out.println(lhs);
-        System.out.println(lhsType);
-        System.out.println(rhs);
-        System.out.println(rhsType);
-
         if (!lhsType.equals(rhsType)) {
             reports.add(new Report(
                     ReportType.ERROR,
@@ -249,7 +255,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        if (!lhsType.equals("boolean")) {
+        if (!lhsType.equals("boolean")&& !lhsType.equals("import") && !lhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -259,7 +265,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
             ));
         }
 
-        if (!rhsType.equals("boolean")) {
+        if (!rhsType.equals("boolean")&& !lhsType.equals("import") && !lhsType.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
@@ -338,8 +344,7 @@ public class InitializedVariablesVisitor extends AJmmVisitor<List<Report>, Strin
 
     private String dealWithCondition(JmmNode jmmNode, List<Report> reports) {
         String condition = visit(jmmNode.getChildren().get(0), reports);
-        System.out.println(jmmNode);
-        if (!condition.equals("boolean")) {
+        if (!condition.equals("boolean")&& !condition.equals("import") && !condition.equals("extends")) {
             reports.add(new Report(
                     ReportType.ERROR,
                     Stage.SEMANTIC,
