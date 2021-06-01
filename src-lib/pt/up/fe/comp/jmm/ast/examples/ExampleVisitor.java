@@ -11,8 +11,8 @@ public class ExampleVisitor extends AJmmVisitor<String, String> {
     public ExampleVisitor(String identifierType, String identifierAttribute) {
         this.identifierAttribute = identifierAttribute;
 
-        addVisit(identifierType, this::dealWithIdentifier); // Method reference
-        setDefaultVisit(this::defaultVisit); // Method reference
+        addVisit(identifierType, this::dealWithIdentifier); // semantic.Method reference
+        setDefaultVisit(this::defaultVisit); // semantic.Method reference
     }
 
     public String dealWithIdentifier(JmmNode node, String space) {

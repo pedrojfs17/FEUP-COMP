@@ -18,7 +18,7 @@ public class ExamplePrintVariables extends PreorderJmmVisitor<Boolean, Boolean> 
         this.varNameAttribute = varNameAttribute;
         this.varLineAttribute = varLineAttribute;
 
-        addVisit(varNodeKind, this::printId); // Method reference
+        addVisit(varNodeKind, this::printId); // semantic.Method reference
     }
 
     private Boolean printId(JmmNode node, Boolean dummy) {

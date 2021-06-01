@@ -1,0 +1,14 @@
+class Optimize {
+	public static void main(String[] args) {
+		int i;
+		int b;
+		boolean a;
+		boolean c;
+		i = 10;
+		i = i + 1;
+		b = i;
+		a = true;
+		c = a && false;
+		c = a;
+	}
+}

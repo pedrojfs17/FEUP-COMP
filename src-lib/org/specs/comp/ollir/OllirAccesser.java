@@ -62,4 +62,8 @@ public class OllirAccesser {
         return method.methodLabels;
     }
 
+
+    public static void setVarTable(Method method, HashMap<String, Descriptor> varTable) {
+        method.varTable = new HashMap<>(varTable);
+    }
 }

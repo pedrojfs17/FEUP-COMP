@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.specs.util.SpecsIo;
@@ -23,6 +24,19 @@ import pt.up.fe.specs.util.SpecsIo;
 import java.util.ArrayList;
 
 public class BackendTest {
+    @Test
+    public void testRegisterAllocation() {
+        OllirResult result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Test.jmm"));
+        OptimizationStage optimization = new OptimizationStage();
+        optimization.setNumRegisters(5);
+        OllirResult new_result = optimization.optimize(result);
+
+        JasminResult jasminResult = TestUtils.backend(new_result);
+
+        TestUtils.noErrors(jasminResult.getReports());
+
+        var output = jasminResult.run();
+    }
 
     @Test
     public void testHelloWorld() {
