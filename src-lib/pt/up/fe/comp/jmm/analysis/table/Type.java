@@ -10,7 +10,7 @@ public class Type {
     }
 
     public String getName() {
-        return isArray ? name + " array" : name;
+        return name;
     }
 
     public boolean isArray() {
@@ -54,6 +54,17 @@ public class Type {
         } else if (!name.equals(other.name))
             return false;
         return true;
+    }
+
+    public String print() {
+        var builder = new StringBuilder();
+
+        builder.append(getName());
+        if (isArray) {
+            builder.append("[]");
+        }
+
+        return builder.toString();
     }
 
 }

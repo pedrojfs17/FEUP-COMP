@@ -1,7 +1,7 @@
 package pt.up.fe.comp.jmm.analysis.table;
 
 public class Symbol {
-    private Type type;
+    private final Type type;
     private final String name;
 
     public Symbol(Type type, String name) {
@@ -11,10 +11,6 @@ public class Symbol {
 
     public Type getType() {
         return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     public String getName() {
@@ -63,4 +59,11 @@ public class Symbol {
         return true;
     }
 
+    public String print() {
+        var builder = new StringBuilder();
+
+        builder.append(getType().print() + " " + getName());
+
+        return builder.toString();
+    }
 }
