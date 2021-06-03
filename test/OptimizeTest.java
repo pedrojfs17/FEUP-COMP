@@ -78,4 +78,10 @@ public class OptimizeTest {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/CustomTest.jmm"));
         TestUtils.noErrors(result.getReports());
     }
+
+    @Test
+    public void testTuring() {
+        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/private/Turing.jmm"));
+        TestUtils.noErrors(result.getReports());
+    }
 }

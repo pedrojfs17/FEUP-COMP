@@ -1,5 +1,4 @@
-import static io.println(int) void;
-import static io.println() void;
+import io;
 class Turing {
 
     int NUM_SYMBOLS;
@@ -67,7 +66,7 @@ class Turing {
         Turing t;
         
         
-        t = this;
+        //t = this;
         
         halt = false;
         while (!halt) {
@@ -76,7 +75,7 @@ class Turing {
             
             dummy = io.read();
 
-            halt = !t.trans();
+            halt = !this.trans();
         }
         
         

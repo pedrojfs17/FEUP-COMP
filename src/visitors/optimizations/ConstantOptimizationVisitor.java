@@ -91,6 +91,7 @@ public class ConstantOptimizationVisitor extends AJmmVisitor<Integer, Boolean> {
 
         String var;
         if (identifier.getKind().equals("ARRAY_ACCESS")) {
+            if(!identifier.getChildren().get(1).getKind().equals("IDENTIFIER") && !identifier.getChildren().get(1).getKind().equals("INT")) return false;
             var = identifier.getChildren().get(0).get("name") + "[" +
                     (identifier.getChildren().get(1).getKind().equals("IDENTIFIER") ? identifier.getChildren().get(1).get("name") : identifier.getChildren().get(1).get("value"))
                     + "]";

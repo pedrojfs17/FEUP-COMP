@@ -251,6 +251,7 @@ public class BackendStage implements JasminBackend {
 
         jasminCode.append(generateInstruction(instruction.getRhs(), varTable));
 
+
         if (o.getType().getTypeOfElement() == ElementType.INT32 || o.getType().getTypeOfElement() == ElementType.BOOLEAN)
             if (varTable.get(o.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
                 jasminCode.append("\tiastore\n");
@@ -264,10 +265,11 @@ public class BackendStage implements JasminBackend {
             jasminCode.append("\tastore");
         }
 
+        jasminCode.append((reg <= 3) ? "_" : " ").append(reg).append("\n");
+
+
         limitStack(stack);
         stack = 0;
-
-        jasminCode.append((reg <= 3) ? "_" : " ").append(reg).append("\n");
 
         return jasminCode.toString();
     }

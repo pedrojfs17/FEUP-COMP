@@ -191,7 +191,14 @@ public class OllirVisitor extends AJmmVisitor<List<Report>, String> {
             } else if (accessString.contains(":=.")) {
                 before = accessString + "\n";
                 accessString = accessString.substring(0, accessString.indexOf(" "));
-            } else {
+            } else if (accessString.contains(";")){
+                before += "\t\tt" + tempVar + substring + " :=" + substring + " " + accessString + "\n";
+                accessString = "t" + tempVar + substring;
+                tempVar++;
+                while (skipTemps.contains(tempVar))
+                    tempVar++;
+            }
+            else {
                 if (!identifier.getKind().equals("IDENTIFIER")) {
                     before += "\t\tt" + tempVar + substring + " :=" + substring + " " + accessString + "\n";
                     accessString = "t" + tempVar + substring;
