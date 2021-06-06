@@ -107,11 +107,6 @@ TOKEN :
 SimpleNode Program() #PROGRAM : {}
 {
     try {
-        {
-            var = new HashMap<String, Integer>();
-            par_count=0;
-            reports = new ArrayList<Report>();
-        }
         (ImportDeclaration())* ClassDeclaration() <EOF> { return jjtThis; }
     } catch(Exception e) {
         reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, getToken(0).beginLine, getToken(0).beginColumn, e.getMessage()));
