@@ -1,4 +1,3 @@
-
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
@@ -28,6 +27,11 @@ public class Main implements JmmParser {
 	public JmmParserResult parse(String jmmCode) {
 		
 		try {
+            
+            Jmm.var = new HashMap<String, Integer>();
+            Jmm.par_count=0;
+            Jmm.reports = new ArrayList<Report>();
+        
 		    Jmm myParser = new Jmm(new StringReader(jmmCode));
 			SimpleNode root = myParser.Program(); // returns reference to root node
             	
