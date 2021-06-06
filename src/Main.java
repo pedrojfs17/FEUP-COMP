@@ -28,9 +28,9 @@ public class Main implements JmmParser {
 		
 		try {
             
-            Jmm.var = new HashMap<String, Integer>();
+            Jmm.var = new HashMap<>();
             Jmm.par_count=0;
-            Jmm.reports = new ArrayList<Report>();
+            Jmm.reports = new ArrayList<>();
         
 		    Jmm myParser = new Jmm(new StringReader(jmmCode));
 			SimpleNode root = myParser.Program(); // returns reference to root node
